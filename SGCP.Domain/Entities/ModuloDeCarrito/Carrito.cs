@@ -3,10 +3,13 @@
 namespace SGCP.Domain.Entities.ModuloDeCarrito
 {
     public sealed class Carrito : Base.BaseEntity   
+
     {
-        public int IdCarrito { get; private set; }
-        public List<Producto> Productos { get; private set; } = new List<Producto>();
-        public Dictionary<Producto, int> Cantidades { get; private set; } = new Dictionary<Producto, int>();
+        public int ClienteId { get; set; } 
+
+        public int IdCarrito { get; set; }
+        public List<Producto> Productos { get; set; } = new List<Producto>();
+        public Dictionary<Producto, int> Cantidades { get;  set; } = new Dictionary<Producto, int>();
 
         public Carrito() { }
 

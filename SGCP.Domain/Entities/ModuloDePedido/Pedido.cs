@@ -5,11 +5,11 @@ namespace SGCP.Domain.Entities.ModuloDePedido
 {
     public sealed class Pedido : Base.BaseEntity
     {
-        public int IdPedido { get; private set; }
-        public Cliente Cliente { get; private set; }
-        public Carrito Carrito { get; private set; }
-        public decimal Total { get; private set; }
-        public string Estado { get; private set; }
+        public int IdPedido { get;  set; }
+        public Cliente Cliente { get; set; }
+        public Carrito Carrito { get; set; }
+        public decimal Total { get;  set; }
+        public string Estado { get; set; }
 
         public Pedido(Carrito carrito, Cliente cliente)
         {

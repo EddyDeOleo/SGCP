@@ -1,0 +1,6 @@
+@SGCP.ModuloCarrito.Api_HostAddress = http://localhost:5136
+
+GET {{SGCP.ModuloCarrito.Api_HostAddress}}/weatherforecast/
+Accept: application/json
+
+###

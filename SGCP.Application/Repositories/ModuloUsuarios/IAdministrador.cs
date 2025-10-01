@@ -1,11 +1,10 @@
-﻿
-using SGCP.Domain.Entities.ModuloDeReporte;
+﻿using SGCP.Domain.Entities.ModuloDeReporte;
 using SGCP.Domain.Entities.ModuloDeUsuarios;
 using SGCP.Domain.Repository;
 
-namespace SGCP.Application.Repositories
+namespace SGCP.Application.Repositories.ModuloUsuarios
 {
-    internal interface IAdministrador : IBaseRepository<Administrador>  
+    public interface IAdministrador : IBaseRepository<Administrador>  
     {
         Task<Administrador> GetByUsername(string username);
 

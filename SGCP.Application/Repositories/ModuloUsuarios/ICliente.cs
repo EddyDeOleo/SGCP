@@ -1,11 +1,10 @@
-﻿
-using SGCP.Domain.Entities.ModuloDePedido;
+﻿using SGCP.Domain.Entities.ModuloDePedido;
 using SGCP.Domain.Entities.ModuloDeUsuarios;
 using SGCP.Domain.Repository;
 
-namespace SGCP.Application.Repositories
+namespace SGCP.Application.Repositories.ModuloUsuarios
 {
-    internal interface ICliente : IBaseRepository<Cliente>
+    public interface ICliente : IBaseRepository<Cliente>
     {
         Task<Cliente> GetByUsername(string username);
 

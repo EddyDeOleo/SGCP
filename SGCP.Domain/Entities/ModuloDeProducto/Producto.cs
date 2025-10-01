@@ -3,13 +3,16 @@ namespace SGCP.Domain.Entities.ModuloDeProducto
 {
     public sealed class Producto : Base.BaseEntity
     {
-        public int IdProducto { get; private set; }
-        public string Nombre { get; private set; }
-        public string Descripcion { get; private set; }
-        public decimal Precio { get; private set; }
-        public int Stock { get; private set; }
-        public string Categoria { get; private set; }
+        public int IdProducto { get; set; }
+        public string Nombre { get; set; }
+        public string Descripcion { get; set; }
+        public decimal Precio { get; set; }
+        public int Stock { get; set; }
+        public string Categoria { get; set; }
 
+      public Producto(){}
+        
+           
         public Producto(int idProducto, string nombre, string descripcion, decimal precio, int stock, string categoria)
         {
             IdProducto = idProducto;
