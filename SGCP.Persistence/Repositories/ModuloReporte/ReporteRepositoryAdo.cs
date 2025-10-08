@@ -1,10 +1,10 @@
-﻿using Microsoft.Data.SqlClient;
-using Microsoft.Extensions.Logging;
+﻿using Microsoft.Extensions.Logging;
 using SGCP.Application.Repositories.ModuloReporte;
 using SGCP.Domain.Base;
 using SGCP.Domain.Entities.ModuloDeReporte;
 using SGCP.Persistence.Base;
-using SGCP.Persistence.Models.ModuloReporte.Reporte;
+using SGCP.Persistence.Base.EntityHelper.ModuloReporte;
+using SGCP.Persistence.Base.EntityValidator.ModuloReporte;
 using System.Linq.Expressions;
 
 namespace SGCP.Persistence.Repositories.ModuloReporte
@@ -14,331 +14,170 @@ namespace SGCP.Persistence.Repositories.ModuloReporte
 
         private readonly IStoredProcedureExecutor _spExecutor;
         private readonly ILogger<ReporteRepositoryAdo> _logger;
+        private readonly ReporteValidator _reporteValidator;
 
-        public ReporteRepositoryAdo(IStoredProcedureExecutor spExecutor, ILogger<ReporteRepositoryAdo> logger)
+        public ReporteRepositoryAdo(IStoredProcedureExecutor spExecutor, ILogger<ReporteRepositoryAdo> logger, ReporteValidator reporteValidator)
         {
             _spExecutor = spExecutor;
             _logger = logger;
+            _reporteValidator = reporteValidator;
         }
-
-
         public async Task<bool> Exists(Expression<Func<Reporte, bool>> filter)
         {
-            _logger.LogInformation("Verificando existencia de reportes con filtro {Filter}", filter);
-            try
-            {
-                var reportesGet = await _spExecutor.QueryAsync(
-                    "sp_GetAllReportes",
-                    reader => new ReporteGetModel
-                    {
-                        IdReporte = reader.GetInt32(reader.GetOrdinal("reporte_id")),
-                        TotalVentas = reader.GetDecimal(reader.GetOrdinal("total_ventas")),
-                        TotalPedidos = reader.GetInt32(reader.GetOrdinal("total_pedidos"))
-                    }
-                );
-
-                var reportes = reportesGet.Select(rgm => new Reporte
+            var result = await RepositoryLoggerHelper.ExecuteLoggedAsync<Reporte>(
+                _logger,
+                nameof(Exists),
+                async () =>
                 {
-                    IdReporte = rgm.IdReporte,
-                    TotalVentas = rgm.TotalVentas,
-                    TotalPedidos = rgm.TotalPedidos
-                }).AsQueryable();
+                    var all = await GetAll();
+                    if (!all.Success || all.Data == null)
+                        return OperationResult.FailureResult("No se pudo obtener reportes para verificar existencia");
 
-                bool exists = reportes.Any(filter.Compile());
-                _logger.LogInformation("Existencia verificada: {Exists}", exists);
-                return exists;
-            }
-            catch (Exception ex)
-            {
-                _logger.LogError(ex, "Error al verificar existencia de reportes");
-                return false;
-            }
+                    bool exists = ((List<Reporte>)all.Data).AsQueryable().Any(filter.Compile());
+                    return OperationResult.SuccessResult("Existencia verificada", exists);
+                },
+                filter
+            );
+
+            return result.Success && result.Data is bool b && b;
         }
 
-        public async Task<OperationResult> GetAll()
-        {
-            _logger.LogInformation("Obteniendo todos los reportes");
-            try
-            {
-                var reportesGet = await _spExecutor.QueryAsync(
-                    "sp_GetAllReportes",
-                    reader => new ReporteGetModel
-                    {
-                        IdReporte = reader.GetInt32(reader.GetOrdinal("reporte_id")),
-                        TotalVentas = reader.GetDecimal(reader.GetOrdinal("total_ventas")),
-                        TotalPedidos = reader.GetInt32(reader.GetOrdinal("total_pedidos"))
-                    }
-                );
-
-                var reportes = reportesGet.Select(rgm => new Reporte
+        public Task<OperationResult> GetAll() =>
+            RepositoryLoggerHelper.ExecuteLoggedAsync<Reporte>(
+                _logger,
+                nameof(GetAll),
+                async () =>
                 {
-                    IdReporte = rgm.IdReporte,
-                    TotalVentas = rgm.TotalVentas,
-                    TotalPedidos = rgm.TotalPedidos
-                }).ToList();
-
-                _logger.LogInformation("{Count} reportes obtenidos", reportes.Count);
-                return OperationResult.SuccessResult("Reportes obtenidos correctamente", reportes);
-            }
-            catch (Exception ex)
-            {
-                _logger.LogError(ex, "Error al obtener reportes");
-                return OperationResult.FailureResult($"Error al obtener reportes: {ex.Message}");
-            }
-        }
-
-        public async Task<OperationResult> GetAll(Expression<Func<Reporte, bool>> filter)
-        {
-            _logger.LogInformation("Obteniendo reportes filtrados");
-            try
-            {
-                var reportesGet = await _spExecutor.QueryAsync(
-                    "sp_GetAllReportes",
-                    reader => new ReporteGetModel
-                    {
-                        IdReporte = reader.GetInt32(reader.GetOrdinal("reporte_id")),
-                        TotalVentas = reader.GetDecimal(reader.GetOrdinal("total_ventas")),
-                        TotalPedidos = reader.GetInt32(reader.GetOrdinal("total_pedidos"))
-                    }
-                );
-
-                var reportes = reportesGet.Select(rgm => new Reporte
-                {
-                    IdReporte = rgm.IdReporte,
-                    TotalVentas = rgm.TotalVentas,
-                    TotalPedidos = rgm.TotalPedidos
-                }).AsQueryable();
-
-                var filtered = reportes.Where(filter.Compile()).ToList();
-                _logger.LogInformation("{Count} reportes filtrados obtenidos", filtered.Count);
-                return OperationResult.SuccessResult("Reportes filtrados correctamente", filtered);
-            }
-            catch (Exception ex)
-            {
-                _logger.LogError(ex, "Error al filtrar reportes");
-                return OperationResult.FailureResult($"Error al filtrar reportes: {ex.Message}");
-            }
-        }
-
-        public async Task<List<Reporte>> GetByAdministradorId(int adminId)
-        {
-            _logger.LogInformation("Obteniendo reportes del administrador Id {AdminId}", adminId);
-            try
-            {
-                var parameters = new Dictionary<string, object> { { "@AdministradorId", adminId } };
-
-                var reportesGet = await _spExecutor.QueryAsync(
-                    "sp_GetReportesByAdministrador",
-                    reader => new ReporteGetModel
-                    {
-                        IdReporte = reader.GetInt32(reader.GetOrdinal("reporte_id")),
-                        TotalVentas = reader.GetDecimal(reader.GetOrdinal("total_ventas")),
-                        TotalPedidos = reader.GetInt32(reader.GetOrdinal("total_pedidos"))
-                    },
-                    parameters
-                );
-
-                var reportes = reportesGet.Select(rgm => new Reporte
-                {
-                    IdReporte = rgm.IdReporte,
-                    TotalVentas = rgm.TotalVentas,
-                    TotalPedidos = rgm.TotalPedidos
-                }).ToList();
-
-                _logger.LogInformation("{Count} reportes obtenidos para el administrador Id {AdminId}", reportes.Count, adminId);
-                return reportes;
-            }
-            catch (Exception ex)
-            {
-                _logger.LogError(ex, "Error al obtener reportes para el administrador Id {AdminId}", adminId);
-                throw;
-            }
-        }
-
-        public async Task<List<Reporte>> GetByFecha(DateTime fechaInicio, DateTime fechaFin)
-        {
-            _logger.LogInformation("Obteniendo reportes entre {FechaInicio} y {FechaFin}", fechaInicio, fechaFin);
-            try
-            {
-                var parameters = new Dictionary<string, object>
-                {
-                    { "@FechaInicio", fechaInicio },
-                    { "@FechaFin", fechaFin }
-                };
-
-                var reportesGet = await _spExecutor.QueryAsync(
-                    "sp_GetReportesByFecha",
-                    reader => new ReporteGetModel
-                    {
-                        IdReporte = reader.GetInt32(reader.GetOrdinal("reporte_id")),
-                        TotalVentas = reader.GetDecimal(reader.GetOrdinal("total_ventas")),
-                        TotalPedidos = reader.GetInt32(reader.GetOrdinal("total_pedidos"))
-                    },
-                    parameters
-                );
-
-                var reportes = reportesGet.Select(rgm => new Reporte
-                {
-                    IdReporte = rgm.IdReporte,
-                    TotalVentas = rgm.TotalVentas,
-                    TotalPedidos = rgm.TotalPedidos
-                }).ToList();
-
-                _logger.LogInformation("{Count} reportes obtenidos entre las fechas indicadas", reportes.Count);
-                return reportes;
-            }
-            catch (Exception ex)
-            {
-                _logger.LogError(ex, "Error al obtener reportes entre fechas {FechaInicio} - {FechaFin}", fechaInicio, fechaFin);
-                throw;
-            }
-        }
-
-        public async Task<OperationResult> GetEntityBy(int id)
-        {
-            _logger.LogInformation("Obteniendo reporte con Id {Id}", id);
-            try
-            {
-                var reportesGet = await _spExecutor.QueryAsync(
-                    "sp_GetReporteById",
-                    reader => new ReporteGetModel
-                    {
-                        IdReporte = reader.GetInt32(reader.GetOrdinal("reporte_id")),
-                        TotalVentas = reader.GetDecimal(reader.GetOrdinal("total_ventas")),
-                        TotalPedidos = reader.GetInt32(reader.GetOrdinal("total_pedidos"))
-                    },
-                    new Dictionary<string, object> { { "@IdReporte", id } }
-                );
-
-                if (!reportesGet.Any())
-                {
-                    _logger.LogWarning("Reporte con Id {Id} no encontrado", id);
-                    return OperationResult.FailureResult("Reporte no encontrado");
+                    var reportesGet = await _spExecutor.QueryAsync("sp_GetAllReportes", ReporteRepositoryHelper.MapToReporteGetModel);
+                    var reportes = reportesGet.Select(ReporteRepositoryHelper.MapToReporte).ToList();
+                    return OperationResult.SuccessResult("Reportes obtenidos correctamente", reportes);
                 }
+            );
 
-                var rgm = reportesGet.First();
-                var reporte = new Reporte
+        public Task<OperationResult> GetEntityBy(int id) =>
+            RepositoryLoggerHelper.ExecuteLoggedAsync<Reporte>(
+                _logger,
+                nameof(GetEntityBy),
+                async () =>
                 {
-                    IdReporte = rgm.IdReporte,
-                    TotalVentas = rgm.TotalVentas,
-                    TotalPedidos = rgm.TotalPedidos
-                };
+                    var reportesGet = await _spExecutor.QueryAsync(
+                        "sp_GetReporteById",
+                        ReporteRepositoryHelper.MapToReporteGetModel,
+                        new Dictionary<string, object> { { "@IdReporte", id } }
+                    );
 
-                _logger.LogInformation("Reporte con Id {Id} obtenido correctamente", id);
-                return OperationResult.SuccessResult("Reporte obtenido correctamente", reporte);
-            }
-            catch (Exception ex)
-            {
-                _logger.LogError(ex, "Error al obtener reporte con Id {Id}", id);
-                return OperationResult.FailureResult($"Error al obtener reporte: {ex.Message}");
-            }
-        }
+                    if (!reportesGet.Any())
+                        return OperationResult.FailureResult("Reporte no encontrado");
 
-        public async Task<OperationResult> Remove(Reporte entity)
-        {
-            _logger.LogInformation("Eliminando reporte Id {IdReporte}", entity?.IdReporte);
-            if (entity == null)
-            {
-                _logger.LogWarning("Reporte nulo no puede ser eliminado");
-                return OperationResult.FailureResult("El reporte no puede ser nulo.");
-            }
+                    var reporte = ReporteRepositoryHelper.MapToReporte(reportesGet.First());
+                    return OperationResult.SuccessResult("Reporte obtenido correctamente", reporte);
+                },
+                id
+            );
 
-            try
-            {
-                var parameters = new Dictionary<string, object>
+        public Task<OperationResult> Save(Reporte entity) =>
+            RepositoryLoggerHelper.ExecuteLoggedAsync<Reporte>(
+                _logger,
+                nameof(Save),
+                async () =>
                 {
-                    { "@IdReporte", entity.IdReporte }
-                };
+                    var validation = _reporteValidator.ValidateForSave(entity);
+                    if (!validation.Success) return validation;
 
-                await _spExecutor.ExecuteAsync("sp_DeleteReporte", parameters);
-                _logger.LogInformation("Reporte eliminado correctamente Id {IdReporte}", entity.IdReporte);
-                return OperationResult.SuccessResult("Reporte eliminado correctamente");
-            }
-            catch (Exception ex)
-            {
-                _logger.LogError(ex, "Error al eliminar reporte Id {IdReporte}", entity.IdReporte);
-                return OperationResult.FailureResult($"Error al eliminar reporte: {ex.Message}");
-            }
-        }
+                    var (parameters, outputParam) = ReporteRepositoryHelper.GetInsertParameters(entity);
+                    await _spExecutor.ExecuteAsync("sp_InsertReporte", parameters, outputParam);
+                    entity.IdReporte = (int)outputParam.Value;
 
-        public async Task<OperationResult> Save(Reporte entity)
-        {
-            _logger.LogInformation("Creando reporte");
-            if (entity == null)
-            {
-                _logger.LogWarning("Reporte nulo no puede ser creado");
-                return OperationResult.FailureResult("El reporte no puede ser nulo.");
-            }
+                    return OperationResult.SuccessResult("Reporte creado correctamente", entity);
+                },
+                entity.AdminId
+            );
 
-            if (entity.TotalVentas < 0 || entity.TotalPedidos < 0)
-            {
-                _logger.LogWarning("Valores inválidos de ventas o pedidos para el reporte");
-                return OperationResult.FailureResult("El total de ventas o pedidos no puede ser negativo.");
-            }
-
-            try
-            {
-                var parameters = new Dictionary<string, object>
+        public Task<OperationResult> Update(Reporte entity) =>
+            RepositoryLoggerHelper.ExecuteLoggedAsync<Reporte>(
+                _logger,
+                nameof(Update),
+                async () =>
                 {
-                    { "@AdminId", entity.AdminId },
-                    { "@Fecha", entity.FechaCreacion },
-                    { "@TotalVentas", entity.TotalVentas },
-                    { "@TotalPedidos", entity.TotalPedidos }
-                };
+                    var validation = _reporteValidator.ValidateForUpdate(entity);
+                    if (!validation.Success) return validation;
 
-                var outputParam = new SqlParameter("@IdReporte", System.Data.SqlDbType.Int)
+                    var parameters = ReporteRepositoryHelper.GetUpdateParameters(entity);
+                    await _spExecutor.ExecuteAsync("sp_UpdateReporte", parameters);
+
+                    return OperationResult.SuccessResult("Reporte actualizado correctamente", entity);
+                },
+                entity.IdReporte
+            );
+
+        public Task<OperationResult> Remove(Reporte entity) =>
+            RepositoryLoggerHelper.ExecuteLoggedAsync<Reporte>(
+                _logger,
+                nameof(Remove),
+                async () =>
                 {
-                    Direction = System.Data.ParameterDirection.Output
-                };
+                    var validation = _reporteValidator.ValidateForRemove(entity);
+                    if (!validation.Success) return validation;
 
-                await _spExecutor.ExecuteAsync("sp_InsertReporte", parameters, outputParam);
-                entity.IdReporte = (int)outputParam.Value;
+                    var parameters = ReporteRepositoryHelper.GetDeleteParameters(entity);
+                    await _spExecutor.ExecuteAsync("sp_DeleteReporte", parameters);
 
-                _logger.LogInformation("Reporte creado correctamente Id {IdReporte}", entity.IdReporte);
-                return OperationResult.SuccessResult("Reporte creado correctamente", entity);
-            }
-            catch (Exception ex)
-            {
-                _logger.LogError(ex, "Error al crear reporte");
-                return OperationResult.FailureResult($"Error al crear reporte: {ex.Message}");
-            }
-        }
+                    return OperationResult.SuccessResult("Reporte eliminado correctamente");
+                },
+                entity.IdReporte
+            );
 
-        public async Task<OperationResult> Update(Reporte entity)
-        {
-            _logger.LogInformation("Actualizando reporte Id {IdReporte}", entity?.IdReporte);
-            if (entity == null)
-            {
-                _logger.LogWarning("Reporte nulo no puede ser actualizado");
-                return OperationResult.FailureResult("El reporte no puede ser nulo.");
-            }
-
-            if (entity.TotalVentas < 0 || entity.TotalPedidos < 0)
-            {
-                _logger.LogWarning("Valores inválidos de ventas o pedidos para actualizar reporte Id {IdReporte}", entity.IdReporte);
-                return OperationResult.FailureResult("El total de ventas o pedidos no puede ser negativo.");
-            }
-
-            try
-            {
-                var parameters = new Dictionary<string, object>
+        public Task<OperationResult> GetAll(Expression<Func<Reporte, bool>> filter) =>
+            RepositoryLoggerHelper.ExecuteLoggedAsync<Reporte>(
+                _logger,
+                nameof(GetAll),
+                async () =>
                 {
-                    { "@IdReporte", entity.IdReporte },
-                    { "@AdminId", entity.AdminId },
-                    { "@Fecha", entity.FechaCreacion },
-                    { "@TotalVentas", entity.TotalVentas },
-                    { "@TotalPedidos", entity.TotalPedidos }
-                };
+                    var all = await GetAll();
+                    if (!all.Success || all.Data == null)
+                        return OperationResult.FailureResult("No se pudieron obtener reportes");
 
-                await _spExecutor.ExecuteAsync("sp_UpdateReporte", parameters);
-                _logger.LogInformation("Reporte actualizado correctamente Id {IdReporte}", entity.IdReporte);
-                return OperationResult.SuccessResult("Reporte actualizado correctamente", entity);
-            }
-            catch (Exception ex)
-            {
-                _logger.LogError(ex, "Error al actualizar reporte Id {IdReporte}", entity.IdReporte);
-                return OperationResult.FailureResult($"Error al actualizar reporte: {ex.Message}");
-            }
-        }
+                    var listaFiltrada = ((List<Reporte>)all.Data).AsQueryable().Where(filter.Compile()).ToList();
+                    return OperationResult.SuccessResult("Reportes filtrados correctamente", listaFiltrada);
+                },
+                filter
+            );
+
+        public Task<List<Reporte>> GetByAdministradorId(int adminId) =>
+            RepositoryLoggerHelper.ExecuteLoggedAsync<Reporte>(
+                _logger,
+                nameof(GetByAdministradorId),
+                async () =>
+                {
+                    var parameters = new Dictionary<string, object> { { "@AdministradorId", adminId } };
+                    var reportesGet = await _spExecutor.QueryAsync("sp_GetReportesByAdministrador", ReporteRepositoryHelper.MapToReporteGetModel, parameters);
+                    var reportes = reportesGet.Select(ReporteRepositoryHelper.MapToReporte).ToList();
+                    return OperationResult.SuccessResult("Reportes obtenidos correctamente", reportes);
+                },
+                adminId
+            ).ContinueWith(t => (List<Reporte>)t.Result.Data!);
+
+        public Task<List<Reporte>> GetByFecha(DateTime fechaInicio, DateTime fechaFin) =>
+     RepositoryLoggerHelper.ExecuteLoggedAsync<Reporte>(
+         _logger,
+         nameof(GetByFecha),
+         async () =>
+         {
+             var parameters = new Dictionary<string, object>
+             {
+                { "@FechaInicio", fechaInicio },
+                { "@FechaFin", fechaFin }
+             };
+             var reportesGet = await _spExecutor.QueryAsync(
+                 "sp_GetReportesByFecha",
+                 ReporteRepositoryHelper.MapToReporteGetModel,
+                 parameters
+             );
+             var reportes = reportesGet.Select(ReporteRepositoryHelper.MapToReporte).ToList();
+             return OperationResult.SuccessResult("Reportes obtenidos correctamente", reportes);
+         },
+         new object[] { fechaInicio, fechaFin } 
+     ).ContinueWith(t => (List<Reporte>)t.Result.Data!);
     }
 }
+

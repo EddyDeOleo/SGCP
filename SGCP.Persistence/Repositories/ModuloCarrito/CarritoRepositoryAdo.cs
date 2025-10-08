@@ -1,11 +1,10 @@
-﻿using Microsoft.Data.SqlClient;
-using Microsoft.Extensions.Logging;
+﻿using Microsoft.Extensions.Logging;
 using SGCP.Application.Repositories.ModuloCarrito;
 using SGCP.Domain.Base;
 using SGCP.Domain.Entities.ModuloDeCarrito;
-using SGCP.Domain.Entities.ModuloDeProducto;
 using SGCP.Persistence.Base;
-using SGCP.Persistence.Models.ModuloCarrito.Carrito;
+using SGCP.Persistence.Base.EntityHelper.ModuloCarrito;
+using SGCP.Persistence.Base.EntityValidator.ModuloCarrito;
 using System.Data;
 using System.Linq.Expressions;
 
@@ -17,254 +16,162 @@ namespace SGCP.Persistence.Repositories.ModuloCarrito
 
         private readonly IStoredProcedureExecutor _spExecutor;
         private readonly ILogger<CarritoRepositoryAdo> _logger;
+        private readonly CarritoValidator _carritoValidator;
 
-        public CarritoRepositoryAdo(IStoredProcedureExecutor spExecutor, ILogger<CarritoRepositoryAdo> logger)
+
+        public CarritoRepositoryAdo(IStoredProcedureExecutor spExecutor, ILogger<CarritoRepositoryAdo> logger, CarritoValidator carritoValidator)
         {
             _spExecutor = spExecutor;
             _logger = logger;
+            _carritoValidator = carritoValidator;
         }
-
 
 
 
         public async Task<bool> Exists(Expression<Func<Carrito, bool>> filter)
         {
-            _logger.LogInformation("Verificando existencia de carritos con filtro {Filter}", filter);
-            try
-            {
-                var result = await GetAll();
-                if (!result.Success || result.Data == null)
+            var result = await RepositoryLoggerHelper.ExecuteLoggedAsync<Carrito>(
+                _logger,
+                nameof(Exists),
+                async () =>
                 {
-                    _logger.LogWarning("No se pudo obtener carritos para verificar existencia");
-                    return false;
+                    var all = await GetAll();
+                    if (!all.Success || all.Data == null)
+                        return OperationResult.FailureResult("No se pudo obtener carritos para verificar existencia");
+
+                    bool exists = ((List<Carrito>)all.Data).AsQueryable().Any(filter.Compile());
+                    return OperationResult.SuccessResult("Existencia verificada", exists);
+                },
+                filter
+            );
+
+            return result.Success && result.Data is bool b && b;
+        }
+
+        public Task<OperationResult> GetAll() =>
+            RepositoryLoggerHelper.ExecuteLoggedAsync<Carrito>(
+                _logger,
+                nameof(GetAll),
+                async () =>
+                {
+                    var carritosGet = await _spExecutor.QueryAsync("sp_GetAllCarritos", CarritoRepositoryHelper.MapToCarritoGetModel);
+                    var carritos = carritosGet.Select(CarritoRepositoryHelper.MapToCarrito).ToList();
+                    return OperationResult.SuccessResult("Carritos obtenidos correctamente", carritos);
                 }
+            );
 
-                var lista = ((List<Carrito>)result.Data).AsQueryable();
-                bool exists = lista.Any(filter.Compile());
-                _logger.LogInformation("Existencia verificada: {Exists}", exists);
-                return exists;
-            }
-            catch (Exception ex)
-            {
-                _logger.LogError(ex, "Error al verificar existencia de carritos");
-                throw;
-            }
-        }
-
-        public async Task<OperationResult> GetAll()
-        {
-            _logger.LogInformation("Obteniendo todos los carritos");
-            try
-            {
-                var carritos = await _spExecutor.QueryAsync(
-                    "sp_GetAllCarritos",
-                    reader => new CarritoGetModel
-                    {
-                        IdCarrito = reader.GetInt32(reader.GetOrdinal("carrito_id")),
-                        ClienteId = reader.GetInt32(reader.GetOrdinal("cliente_id"))
-                    }
-                );
-
-                _logger.LogInformation("{Count} carritos obtenidos", carritos.Count);
-                return OperationResult.SuccessResult("Carritos obtenidos correctamente", carritos);
-            }
-            catch (Exception ex)
-            {
-                _logger.LogError(ex, "Error al obtener carritos");
-                return OperationResult.FailureResult($"Error al obtener carritos: {ex.Message}");
-            }
-        }
-
-        public async Task<OperationResult> GetEntityBy(int id)
-        {
-            _logger.LogInformation("Obteniendo carrito con Id {Id}", id);
-            try
-            {
-                var carritos = await _spExecutor.QueryAsync(
-                    "sp_GetCarritoById",
-                    reader => new CarritoGetModel
-                    {
-                        IdCarrito = reader.GetInt32(reader.GetOrdinal("carrito_id")),
-                        ClienteId = reader.GetInt32(reader.GetOrdinal("cliente_id"))
-                    },
-                    new Dictionary<string, object> { { "@IdCarrito", id } }
-                );
-
-                if (!carritos.Any())
+        public Task<OperationResult> GetEntityBy(int id) =>
+            RepositoryLoggerHelper.ExecuteLoggedAsync<Carrito>(
+                _logger,
+                nameof(GetEntityBy),
+                async () =>
                 {
-                    _logger.LogWarning("Carrito con Id {Id} no encontrado", id);
-                    return OperationResult.FailureResult("Carrito no encontrado");
-                }
+                    var carritosGet = await _spExecutor.QueryAsync(
+                        "sp_GetCarritoById",
+                        CarritoRepositoryHelper.MapToCarritoGetModel,
+                        new Dictionary<string, object> { { "@IdCarrito", id } }
+                    );
 
-                _logger.LogInformation("Carrito con Id {Id} obtenido correctamente", id);
-                return OperationResult.SuccessResult("Carrito obtenido correctamente", carritos.First());
-            }
-            catch (Exception ex)
-            {
-                _logger.LogError(ex, "Error al obtener carrito con Id {Id}", id);
-                return OperationResult.FailureResult($"Error al obtener carrito: {ex.Message}");
-            }
-        }
+                    if (!carritosGet.Any())
+                        return OperationResult.FailureResult("Carrito no encontrado");
 
-        public async Task<OperationResult> Save(Carrito entity)
+                    var carrito = CarritoRepositoryHelper.MapToCarrito(carritosGet.First());
+                    return OperationResult.SuccessResult("Carrito obtenido correctamente", carrito);
+                },
+                id
+            );
+
+        public Task<OperationResult> Save(Carrito entity) =>
+    RepositoryLoggerHelper.ExecuteLoggedAsync<Carrito>(
+        _logger,
+        nameof(Save),
+        async () =>
         {
-            _logger.LogInformation("Creando carrito para ClienteId {ClienteId}", entity?.ClienteId);
-            if (entity == null)
-            {
-                _logger.LogWarning("Carrito nulo no puede ser guardado");
-                return OperationResult.FailureResult("El carrito no puede ser nulo.");
-            }
+            var validation = _carritoValidator.ValidateForSave(entity);
+            if (!validation.Success) return validation;
 
-            try
-            {
-                var parameters = new Dictionary<string, object> { { "@ClienteId", entity.ClienteId } };
-                var outputParam = new SqlParameter("@IdCarrito", SqlDbType.Int) { Direction = ParameterDirection.Output };
+            var (parameters, outputParam) = CarritoRepositoryHelper.GetInsertParameters(entity);
 
-                await _spExecutor.ExecuteAsync("sp_InsertCarrito", parameters, outputParam);
-                entity.IdCarrito = (int)outputParam.Value;
+            await _spExecutor.ExecuteAsync("sp_InsertCarrito", parameters, outputParam);
 
-                _logger.LogInformation("Carrito creado correctamente con Id {IdCarrito}", entity.IdCarrito);
-                return OperationResult.SuccessResult("Carrito creado correctamente", entity);
-            }
-            catch (Exception ex)
-            {
-                _logger.LogError(ex, "Error al crear carrito para ClienteId {ClienteId}", entity.ClienteId);
-                return OperationResult.FailureResult($"Error al crear carrito: {ex.Message}");
-            }
-        }
+            entity.IdCarrito = (int)outputParam.Value;
 
-        public async Task<OperationResult> Update(Carrito entity)
-        {
-            _logger.LogInformation("Actualizando carrito Id {IdCarrito}", entity?.IdCarrito);
-            if (entity == null)
-            {
-                _logger.LogWarning("Carrito nulo no puede ser actualizado");
-                return OperationResult.FailureResult("El carrito no puede ser nulo.");
-            }
+            return OperationResult.SuccessResult("Carrito creado correctamente", entity);
+        },
+        entity.ClienteId
+    );
 
-            try
-            {
-                var parameters = new Dictionary<string, object>
+        public Task<OperationResult> Update(Carrito entity) =>
+            RepositoryLoggerHelper.ExecuteLoggedAsync<Carrito>(
+                _logger,
+                nameof(Update),
+                async () =>
                 {
-                    { "@IdCarrito", entity.IdCarrito },
-                    { "@ClienteId", entity.ClienteId }
-                };
+                    var validation = _carritoValidator.ValidateForUpdate(entity);
+                    if (!validation.Success) return validation;
 
-                await _spExecutor.ExecuteAsync("sp_UpdateCarrito", parameters);
+                    var parameters = CarritoRepositoryHelper.GetUpdateParameters(entity);
+                    await _spExecutor.ExecuteAsync("sp_UpdateCarrito", parameters);
 
-                _logger.LogInformation("Carrito actualizado correctamente Id {IdCarrito}", entity.IdCarrito);
-                return OperationResult.SuccessResult("Carrito actualizado correctamente", entity);
-            }
-            catch (Exception ex)
-            {
-                _logger.LogError(ex, "Error al actualizar carrito Id {IdCarrito}", entity.IdCarrito);
-                return OperationResult.FailureResult($"Error al actualizar carrito: {ex.Message}");
-            }
-        }
+                    return OperationResult.SuccessResult("Carrito actualizado correctamente", entity);
+                },
+                entity.IdCarrito
+            );
 
-        public async Task<OperationResult> Remove(Carrito entity)
-        {
-            _logger.LogInformation("Eliminando carrito Id {IdCarrito}", entity?.IdCarrito);
-            if (entity == null)
-            {
-                _logger.LogWarning("Carrito nulo no puede ser eliminado");
-                return OperationResult.FailureResult("El carrito no puede ser nulo.");
-            }
-
-            try
-            {
-                var parameters = new Dictionary<string, object> { { "@IdCarrito", entity.IdCarrito } };
-                await _spExecutor.ExecuteAsync("sp_DeleteCarrito", parameters);
-
-                _logger.LogInformation("Carrito eliminado correctamente Id {IdCarrito}", entity.IdCarrito);
-                return OperationResult.SuccessResult("Carrito eliminado correctamente");
-            }
-            catch (Exception ex)
-            {
-                _logger.LogError(ex, "Error al eliminar carrito Id {IdCarrito}", entity.IdCarrito);
-                return OperationResult.FailureResult($"Error al eliminar carrito: {ex.Message}");
-            }
-        }
-
-        public async Task<OperationResult> GetAll(Expression<Func<Carrito, bool>> filter)
-        {
-            _logger.LogInformation("Obteniendo carritos filtrados");
-            try
-            {
-                var result = await _spExecutor.QueryAsync(
-                    "sp_GetAllCarritos",
-                    reader => new CarritoGetModel
-                    {
-                        IdCarrito = reader.GetInt32(reader.GetOrdinal("carrito_id")),
-                        ClienteId = reader.GetInt32(reader.GetOrdinal("cliente_id"))
-                    }
-                );
-
-                if (!result.Any())
+        public Task<OperationResult> Remove(Carrito entity) =>
+            RepositoryLoggerHelper.ExecuteLoggedAsync<Carrito>(
+                _logger,
+                nameof(Remove),
+                async () =>
                 {
-                    _logger.LogWarning("No se pudieron obtener carritos");
-                    return OperationResult.FailureResult("No se pudieron obtener carritos");
-                }
+                    var validation = _carritoValidator.ValidateForRemove(entity);
+                    if (!validation.Success) return validation;
 
-                var carritos = result.Select(model => new Carrito
+                    var parameters = CarritoRepositoryHelper.GetDeleteParameters(entity);
+                    await _spExecutor.ExecuteAsync("sp_DeleteCarrito", parameters);
+
+                    return OperationResult.SuccessResult("Carrito eliminado correctamente");
+                },
+                entity.IdCarrito
+            );
+
+        public Task<OperationResult> GetAll(Expression<Func<Carrito, bool>> filter) =>
+            RepositoryLoggerHelper.ExecuteLoggedAsync<Carrito>(
+                _logger,
+                nameof(GetAll),
+                async () =>
                 {
-                    IdCarrito = model.IdCarrito,
-                    ClienteId = model.ClienteId,
-                    Productos = new List<Producto>(),
-                    Cantidades = new Dictionary<Producto, int>()
-                }).AsQueryable();
+                    var all = await GetAll();
+                    if (!all.Success || all.Data == null)
+                        return OperationResult.FailureResult("No se pudieron obtener carritos");
 
-                var listaFiltrada = carritos.Where(filter.Compile()).ToList();
+                    var listaFiltrada = ((List<Carrito>)all.Data).AsQueryable().Where(filter.Compile()).ToList();
+                    return OperationResult.SuccessResult("Carritos filtrados correctamente", listaFiltrada);
+                },
+                filter
+            );
 
-                _logger.LogInformation("{Count} carritos filtrados obtenidos", listaFiltrada.Count);
-                return OperationResult.SuccessResult("Carritos filtrados correctamente", listaFiltrada);
-            }
-            catch (Exception ex)
-            {
-                _logger.LogError(ex, "Error al obtener carritos filtrados");
-                return OperationResult.FailureResult($"Error al obtener carritos filtrados: {ex.Message}");
-            }
-        }
-
-        public async Task<Carrito> GetByClienteId(int clienteId)
-        {
-            _logger.LogInformation("Obteniendo carrito del cliente Id {ClienteId}", clienteId);
-            try
-            {
-                var result = await _spExecutor.QueryAsync(
-                    "sp_GetCarritoByClienteId",
-                    reader => new CarritoGetModel
-                    {
-                        IdCarrito = reader.GetInt32(reader.GetOrdinal("carrito_id")),
-                        ClienteId = reader.GetInt32(reader.GetOrdinal("cliente_id"))
-                    },
-                    new Dictionary<string, object> { { "@ClienteId", clienteId } }
-                );
-
-                var model = result.FirstOrDefault();
-                if (model == null)
+        public Task<Carrito?> GetByClienteId(int clienteId) =>
+            RepositoryLoggerHelper.ExecuteLoggedAsync<Carrito>(
+                _logger,
+                nameof(GetByClienteId),
+                async () =>
                 {
-                    _logger.LogWarning("No se encontró carrito para cliente Id {ClienteId}", clienteId);
-                    return null;
-                }
+                    var result = await _spExecutor.QueryAsync(
+                        "sp_GetCarritoByClienteId",
+                        CarritoRepositoryHelper.MapToCarritoGetModel,
+                        new Dictionary<string, object> { { "@ClienteId", clienteId } }
+                    );
 
-                var carrito = new Carrito
-                {
-                    IdCarrito = model.IdCarrito,
-                    ClienteId = model.ClienteId,
-                    Productos = new List<Producto>(),
-                    Cantidades = new Dictionary<Producto, int>()
-                };
+                    var model = result.FirstOrDefault();
+                    if (model == null)
+                        return OperationResult.FailureResult("No se encontró carrito para el cliente");
 
-                _logger.LogInformation("Carrito obtenido para cliente Id {ClienteId}", clienteId);
-                return carrito;
-            }
-            catch (Exception ex)
-            {
-                _logger.LogError(ex, "Error al obtener carrito para cliente Id {ClienteId}", clienteId);
-                throw;
-            }
-        }
-
+                    var carrito = CarritoRepositoryHelper.MapToCarrito(model);
+                    return OperationResult.SuccessResult("Carrito obtenido", carrito);
+                },
+                clienteId
+            ).ContinueWith(t => (Carrito?)t.Result.Data);
     }
 }
+

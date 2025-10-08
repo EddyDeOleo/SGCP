@@ -3,8 +3,6 @@ using Microsoft.Extensions.Logging;
 using SGCP.Application.Repositories.ModuloUsuarios;
 using SGCP.Domain.Entities.ModuloDeUsuarios;
 using SGCP.Persistence.Repositories.Base;
-using System;
-using System.Threading.Tasks;
 
 namespace SGCP.Persistence.Repositories.ModuloUsuarios
 {

@@ -1,9 +1,7 @@
-﻿
-using Microsoft.EntityFrameworkCore;
+﻿using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using SGCP.Domain.Base;
 using SGCP.Domain.Repository;
-using System;
 using System.Linq.Expressions;
 
 namespace SGCP.Persistence.Repositories.Base

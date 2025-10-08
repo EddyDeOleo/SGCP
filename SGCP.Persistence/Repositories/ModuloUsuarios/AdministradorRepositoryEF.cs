@@ -3,7 +3,6 @@ using Microsoft.Extensions.Logging;
 using SGCP.Application.Repositories.ModuloUsuarios;
 using SGCP.Domain.Entities.ModuloDeReporte;
 using SGCP.Domain.Entities.ModuloDeUsuarios;
-
 using SGCP.Persistence.Repositories.Base;
 
 

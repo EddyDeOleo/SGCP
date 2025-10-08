@@ -1,10 +1,10 @@
-﻿using Microsoft.Data.SqlClient;
-using Microsoft.Extensions.Logging;
+﻿using Microsoft.Extensions.Logging;
 using SGCP.Application.Repositories.ModuloProducto;
 using SGCP.Domain.Base;
 using SGCP.Domain.Entities.ModuloDeProducto;
 using SGCP.Persistence.Base;
-using SGCP.Persistence.Models.ModuloProducto.Producto;
+using SGCP.Persistence.Base.EntityHelper.ModuloProducto;
+using SGCP.Persistence.Base.EntityValidator.ModuloProducto;
 using System.Data;
 using System.Linq.Expressions;
 
@@ -15,315 +15,171 @@ namespace SGCP.Persistence.Repositories.ModuloProducto
 
         private readonly IStoredProcedureExecutor _spExecutor;
         private readonly ILogger<ProductoRepositoryAdo> _logger;
+        private readonly ProductoValidator _productoValidator;
 
-        public ProductoRepositoryAdo(IStoredProcedureExecutor spExecutor, ILogger<ProductoRepositoryAdo> logger)
+        public ProductoRepositoryAdo(IStoredProcedureExecutor spExecutor, ILogger<ProductoRepositoryAdo> logger, ProductoValidator productoValidator)
         {
             _spExecutor = spExecutor;
             _logger = logger;
+            _productoValidator = productoValidator;
         }
-
         public async Task<bool> Exists(Expression<Func<Producto, bool>> filter)
         {
-            _logger.LogInformation("Verificando existencia de productos con filtro {Filter}", filter);
-            try
-            {
-                var result = await GetAll();
-                if (!result.Success || result.Data == null)
+            var result = await RepositoryLoggerHelper.ExecuteLoggedAsync<Producto>(
+                _logger,
+                nameof(Exists),
+                async () =>
                 {
-                    _logger.LogWarning("No se pudieron obtener productos para verificar existencia");
-                    return false;
+                    var allResult = await GetAll();
+                    if (!allResult.Success || allResult.Data == null)
+                        return OperationResult.FailureResult("No se pudo obtener productos para verificar existencia");
+
+                    var productos = ((List<Producto>)allResult.Data).AsQueryable();
+                    bool exists = productos.Any(filter.Compile());
+
+                    return OperationResult.SuccessResult("Existencia verificada", exists);
+                },
+                filter
+            );
+
+            return result.Success && result.Data is bool exists && exists;
+        }
+
+        public Task<OperationResult> GetAll() =>
+            RepositoryLoggerHelper.ExecuteLoggedAsync<Producto>(
+                _logger,
+                nameof(GetAll),
+                async () =>
+                {
+                    var productosGet = await _spExecutor.QueryAsync(
+                        "sp_GetAllProductos",
+                        ProductoRepositoryHelper.MapToProductoGetModel
+                    );
+
+                    var productos = productosGet.Select(ProductoRepositoryHelper.MapToProducto).ToList();
+                    return OperationResult.SuccessResult("Productos obtenidos correctamente", productos);
                 }
+            );
 
-                var lista = ((List<ProductoGetModel>)result.Data)
-                    .Select(pgm => new Producto(
-                        pgm.IdProducto,
-                        pgm.Nombre,
-                        pgm.Descripcion,
-                        pgm.Precio,
-                        pgm.Stock,
-                        pgm.Categoria
-                    ))
-                    .AsQueryable();
-
-                bool exists = lista.Any(filter.Compile());
-                _logger.LogInformation("Existencia verificada: {Exists}", exists);
-                return exists;
-            }
-            catch (Exception ex)
-            {
-                _logger.LogError(ex, "Error al verificar existencia de productos");
-                throw;
-            }
-        }
-
-        public async Task<OperationResult> GetAll()
-        {
-            _logger.LogInformation("Obteniendo todos los productos");
-            try
-            {
-                var productos = await _spExecutor.QueryAsync(
-                    "sp_GetAllProductos",
-                    reader => new ProductoGetModel
-                    {
-                        IdProducto = reader.GetInt32(reader.GetOrdinal("producto_id")),
-                        Nombre = reader.GetString(reader.GetOrdinal("nombre")),
-                        Descripcion = reader.IsDBNull(reader.GetOrdinal("descripcion")) ? "" : reader.GetString(reader.GetOrdinal("descripcion")),
-                        Categoria = reader.IsDBNull(reader.GetOrdinal("categoria")) ? "" : reader.GetString(reader.GetOrdinal("categoria")),
-                        Precio = reader.GetDecimal(reader.GetOrdinal("precio")),
-                        Stock = reader.GetInt32(reader.GetOrdinal("stock"))
-                    }
-                );
-
-                _logger.LogInformation("{Count} productos obtenidos", productos.Count);
-                return OperationResult.SuccessResult("Productos obtenidos correctamente", productos);
-            }
-            catch (Exception ex)
-            {
-                _logger.LogError(ex, "Error al obtener productos");
-                return OperationResult.FailureResult($"Error al obtener productos: {ex.Message}");
-            }
-        }
-
-        public async Task<OperationResult> GetAll(Expression<Func<Producto, bool>> filter)
-        {
-            _logger.LogInformation("Obteniendo productos filtrados");
-            try
-            {
-                var result = await GetAll();
-                if (!result.Success || result.Data == null)
+        public Task<OperationResult> GetAll(Expression<Func<Producto, bool>> filter) =>
+            RepositoryLoggerHelper.ExecuteLoggedAsync<Producto>(
+                _logger,
+                nameof(GetAll),
+                async () =>
                 {
-                    _logger.LogWarning("No se pudieron obtener productos");
-                    return OperationResult.FailureResult("No se pudieron obtener productos");
-                }
+                    var result = await GetAll();
+                    if (!result.Success || result.Data == null)
+                        return OperationResult.FailureResult("No se pudieron obtener productos");
 
-                var productos = ((List<ProductoGetModel>)result.Data)
-                    .Select(pgm => new Producto(
-                        pgm.IdProducto,
-                        pgm.Nombre,
-                        pgm.Descripcion,
-                        pgm.Precio,
-                        pgm.Stock,
-                        pgm.Categoria
-                    ))
-                    .AsQueryable()
-                    .Where(filter.Compile())
-                    .ToList();
+                    var productos = ((List<Producto>)result.Data)
+                        .AsQueryable()
+                        .Where(filter.Compile())
+                        .ToList();
 
-                _logger.LogInformation("{Count} productos filtrados obtenidos", productos.Count);
-                return OperationResult.SuccessResult("Productos filtrados correctamente", productos);
-            }
-            catch (Exception ex)
-            {
-                _logger.LogError(ex, "Error al obtener productos filtrados");
-                return OperationResult.FailureResult($"Error al obtener productos filtrados: {ex.Message}");
-            }
-        }
+                    return OperationResult.SuccessResult("Productos filtrados correctamente", productos);
+                },
+                filter
+            );
 
-        public async Task<OperationResult> GetEntityBy(int id)
-        {
-            _logger.LogInformation("Obteniendo producto con Id {Id}", id);
-            try
-            {
-                var productos = await _spExecutor.QueryAsync(
-                    "sp_GetProductoById",
-                    reader => new ProductoGetModel
-                    {
-                        IdProducto = reader.GetInt32(reader.GetOrdinal("producto_id")),
-                        Nombre = reader.GetString(reader.GetOrdinal("nombre")),
-                        Descripcion = reader.IsDBNull(reader.GetOrdinal("descripcion")) ? "" : reader.GetString(reader.GetOrdinal("descripcion")),
-                        Categoria = reader.IsDBNull(reader.GetOrdinal("categoria")) ? "" : reader.GetString(reader.GetOrdinal("categoria")),
-                        Precio = reader.GetDecimal(reader.GetOrdinal("precio")),
-                        Stock = reader.GetInt32(reader.GetOrdinal("stock"))
-                    },
-                    new Dictionary<string, object> { { "@IdProducto", id } }
-                );
-
-                if (!productos.Any())
+        public Task<OperationResult> GetEntityBy(int id) =>
+            RepositoryLoggerHelper.ExecuteLoggedAsync<Producto>(
+                _logger,
+                nameof(GetEntityBy),
+                async () =>
                 {
-                    _logger.LogWarning("Producto con Id {Id} no encontrado", id);
-                    return OperationResult.FailureResult("Producto no encontrado");
-                }
+                    var productosGet = await _spExecutor.QueryAsync(
+                        "sp_GetProductoById",
+                        ProductoRepositoryHelper.MapToProductoGetModel,
+                        new Dictionary<string, object> { { "@IdProducto", id } }
+                    );
 
-                _logger.LogInformation("Producto con Id {Id} obtenido correctamente", id);
-                return OperationResult.SuccessResult("Producto obtenido correctamente", productos.First());
-            }
-            catch (Exception ex)
-            {
-                _logger.LogError(ex, "Error al obtener producto con Id {Id}", id);
-                return OperationResult.FailureResult($"Error al obtener producto: {ex.Message}");
-            }
-        }
+                    if (!productosGet.Any())
+                        return OperationResult.FailureResult("Producto no encontrado");
 
-        public async Task<List<Producto>> GetProductosByCategoria(string categoria)
-        {
-            _logger.LogInformation("Obteniendo productos de la categoría {Categoria}", categoria);
-            try
-            {
-                var parameters = new Dictionary<string, object> { { "@Categoria", categoria } };
+                    var producto = ProductoRepositoryHelper.MapToProducto(productosGet.First());
+                    return OperationResult.SuccessResult("Producto obtenido correctamente", producto);
+                },
+                id
+            );
 
-                var productosGet = await _spExecutor.QueryAsync(
-                    "sp_GetProductosByCategoria",
-                    reader => new ProductoGetModel
-                    {
-                        IdProducto = reader.GetInt32(reader.GetOrdinal("producto_id")),
-                        Nombre = reader.GetString(reader.GetOrdinal("nombre")),
-                        Descripcion = reader.IsDBNull(reader.GetOrdinal("descripcion")) ? "" : reader.GetString(reader.GetOrdinal("descripcion")),
-                        Categoria = reader.IsDBNull(reader.GetOrdinal("categoria")) ? "" : reader.GetString(reader.GetOrdinal("categoria")),
-                        Precio = reader.GetDecimal(reader.GetOrdinal("precio")),
-                        Stock = reader.GetInt32(reader.GetOrdinal("stock"))
-                    },
-                    parameters
-                );
-
-                var productos = productosGet.Select(pgm => new Producto(
-                    pgm.IdProducto,
-                    pgm.Nombre,
-                    pgm.Descripcion,
-                    pgm.Precio,
-                    pgm.Stock,
-                    pgm.Categoria
-                )).ToList();
-
-                _logger.LogInformation("{Count} productos obtenidos de la categoría {Categoria}", productos.Count, categoria);
-                return productos;
-            }
-            catch (Exception ex)
-            {
-                _logger.LogError(ex, "Error al obtener productos de la categoría {Categoria}", categoria);
-                throw;
-            }
-        }
-
-        public async Task<OperationResult> Save(Producto entity)
-        {
-            _logger.LogInformation("Creando producto {Nombre}", entity?.Nombre);
-            if (entity == null)
-            {
-                _logger.LogWarning("Producto nulo no puede ser guardado");
-                return OperationResult.FailureResult("El producto no puede ser nulo.");
-            }
-
-            if (string.IsNullOrWhiteSpace(entity.Nombre) || entity.Nombre.Length > 100)
-            {
-                _logger.LogWarning("Nombre inválido para el producto");
-                return OperationResult.FailureResult("El nombre del producto es obligatorio y no puede exceder 100 caracteres.");
-            }
-            if (!string.IsNullOrEmpty(entity.Descripcion) && entity.Descripcion.Length > 255)
-            {
-                _logger.LogWarning("Descripción demasiado larga para el producto");
-                return OperationResult.FailureResult("La descripción no puede exceder 255 caracteres.");
-            }
-            if (!string.IsNullOrEmpty(entity.Categoria) && entity.Categoria.Length > 50)
-            {
-                _logger.LogWarning("Categoría demasiado larga para el producto");
-                return OperationResult.FailureResult("La categoría no puede exceder 50 caracteres.");
-            }
-            if (entity.Precio <= 0)
-            {
-                _logger.LogWarning("Precio inválido para el producto");
-                return OperationResult.FailureResult("El precio debe ser mayor a cero.");
-            }
-            if (entity.Stock < 0)
-            {
-                _logger.LogWarning("Stock negativo no permitido para el producto");
-                return OperationResult.FailureResult("El stock no puede ser negativo.");
-            }
-
-            try
-            {
-                var parameters = new Dictionary<string, object>
+        public Task<List<Producto>> GetProductosByCategoria(string categoria) =>
+            RepositoryLoggerHelper.ExecuteLoggedAsync<Producto>(
+                _logger,
+                nameof(GetProductosByCategoria),
+                async () =>
                 {
-                    { "@Nombre", entity.Nombre },
-                    { "@Descripcion", entity.Descripcion },
-                    { "@Categoria", entity.Categoria },
-                    { "@Precio", entity.Precio },
-                    { "@Stock", entity.Stock }
-                };
+                    var parameters = new Dictionary<string, object> { { "@Categoria", categoria } };
 
-                var outputParam = new SqlParameter("@IdProducto", SqlDbType.Int) { Direction = ParameterDirection.Output };
-                int rowsAffected = await _spExecutor.ExecuteAsync("sp_InsertProducto", parameters, outputParam);
+                    var productosGet = await _spExecutor.QueryAsync(
+                        "sp_GetProductosByCategoria",
+                        ProductoRepositoryHelper.MapToProductoGetModel,
+                        parameters
+                    );
 
-                if (rowsAffected > 0)
+                    var productos = productosGet.Select(ProductoRepositoryHelper.MapToProducto).ToList();
+                    return OperationResult.SuccessResult("Productos obtenidos", productos);
+                },
+                categoria
+            ).ContinueWith(t => t.Result.Data as List<Producto> ?? new List<Producto>());
+
+        public Task<OperationResult> Save(Producto entity) =>
+            RepositoryLoggerHelper.ExecuteLoggedAsync<Producto>(
+                _logger,
+                nameof(Save),
+                async () =>
                 {
+                    var validation = _productoValidator.ValidateForSave(entity);
+                    if (!validation.Success)
+                        return validation;
+
+                    var (parameters, outputParam) = ProductoRepositoryHelper.GetInsertParameters(entity);
+                    await _spExecutor.ExecuteAsync("sp_InsertProducto", parameters, outputParam);
                     entity.IdProducto = (int)outputParam.Value;
-                    _logger.LogInformation("Producto creado correctamente con Id {IdProducto}", entity.IdProducto);
-                    return OperationResult.SuccessResult("Producto creado correctamente.", entity);
-                }
-                else
+
+                    return OperationResult.SuccessResult("Producto creado correctamente", entity);
+                },
+                entity.Nombre
+            );
+
+        public Task<OperationResult> Update(Producto entity) =>
+            RepositoryLoggerHelper.ExecuteLoggedAsync<Producto>(
+                _logger,
+                nameof(Update),
+                async () =>
                 {
-                    _logger.LogWarning("No se pudo crear el producto");
-                    return OperationResult.FailureResult("No se pudo crear el producto.");
-                }
-            }
-            catch (Exception ex)
-            {
-                _logger.LogError(ex, "Error al crear producto {Nombre}", entity.Nombre);
-                return OperationResult.FailureResult($"Error al crear producto: {ex.Message}");
-            }
-        }
+                    var validation = _productoValidator.ValidateForUpdate(entity);
+                    if (!validation.Success) return validation;
 
-        public async Task<OperationResult> Update(Producto entity)
-        {
-            _logger.LogInformation("Actualizando producto Id {IdProducto}", entity?.IdProducto);
-            if (entity == null)
-            {
-                _logger.LogWarning("Producto nulo no puede ser actualizado");
-                return OperationResult.FailureResult("El producto no puede ser nulo.");
-            }
+                    var parameters = ProductoRepositoryHelper.GetUpdateParameters(entity);
+                    await _spExecutor.ExecuteAsync("sp_UpdateProducto", parameters);
 
-            if (string.IsNullOrWhiteSpace(entity.Nombre) || entity.Nombre.Length > 100 ||
-                (!string.IsNullOrEmpty(entity.Descripcion) && entity.Descripcion.Length > 255) ||
-                (!string.IsNullOrEmpty(entity.Categoria) && entity.Categoria.Length > 50) ||
-                entity.Precio <= 0 || entity.Stock < 0)
-            {
-                _logger.LogWarning("Datos inválidos para actualizar producto Id {IdProducto}", entity.IdProducto);
-                return OperationResult.FailureResult("Datos inválidos para actualizar el producto.");
-            }
-
-            try
-            {
-                var parameters = new Dictionary<string, object>
-                {
-                    { "@IdProducto", entity.IdProducto },
-                    { "@Nombre", entity.Nombre },
-                    { "@Descripcion", entity.Descripcion },
-                    { "@Categoria", entity.Categoria },
-                    { "@Precio", entity.Precio },
-                    { "@Stock", entity.Stock }
-                };
-
-                await _spExecutor.ExecuteAsync("sp_UpdateProducto", parameters);
-                _logger.LogInformation("Producto actualizado correctamente Id {IdProducto}", entity.IdProducto);
-                return OperationResult.SuccessResult("Producto actualizado correctamente", entity);
-            }
-            catch (Exception ex)
-            {
-                _logger.LogError(ex, "Error al actualizar producto Id {IdProducto}", entity.IdProducto);
-                return OperationResult.FailureResult($"Error al actualizar producto: {ex.Message}");
-            }
-        }
+                    return OperationResult.SuccessResult("Producto actualizado correctamente", entity);
+                },
+                entity.IdProducto
+            );
 
         public async Task<OperationResult> Remove(Producto entity)
         {
-            _logger.LogInformation("Eliminando producto Id {IdProducto}", entity?.IdProducto);
-            if (entity == null)
-            {
-                _logger.LogWarning("Producto nulo no puede ser eliminado");
-                return OperationResult.FailureResult("El producto no puede ser nulo.");
-            }
+            return await RepositoryLoggerHelper.ExecuteLoggedAsync<Producto>(
+                _logger,
+                nameof(Remove),
+                async () =>
+                {
+                    if (entity == null)
+                        return OperationResult.FailureResult("El producto no puede ser nulo.");
 
-            try
-            {
-                var parameters = new Dictionary<string, object> { { "@IdProducto", entity.IdProducto } };
-                await _spExecutor.ExecuteAsync("sp_DeleteProducto", parameters);
-                _logger.LogInformation("Producto eliminado correctamente Id {IdProducto}", entity.IdProducto);
-                return OperationResult.SuccessResult("Producto eliminado correctamente");
-            }
-            catch (Exception ex)
-            {
-                _logger.LogError(ex, "Error al eliminar producto Id {IdProducto}", entity.IdProducto);
-                return OperationResult.FailureResult($"Error al eliminar producto: {ex.Message}");
-            }
+                    var validation = _productoValidator.ValidateForRemove(entity);
+                    if (!validation.Success)
+                        return validation;
+
+                    var parameters = ProductoRepositoryHelper.GetDeleteParameters(entity); 
+                    await _spExecutor.ExecuteAsync("sp_DeleteProducto", parameters);
+
+                    return OperationResult.SuccessResult("Producto eliminado correctamente");
+                },
+                entity?.IdProducto
+            );
         }
-        }
+    }
 }
+

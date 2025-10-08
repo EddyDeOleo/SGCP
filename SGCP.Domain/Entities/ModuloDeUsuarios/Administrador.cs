@@ -1,11 +1,6 @@
 ﻿using SGCP.Domain.Entities.ModuloDePedido;
 using SGCP.Domain.Entities.ModuloDeProducto;
 using SGCP.Domain.Entities.ModuloDeReporte;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace SGCP.Domain.Entities.ModuloDeUsuarios
 {

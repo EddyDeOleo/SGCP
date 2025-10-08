@@ -1,7 +1,6 @@
 ﻿
 using SGCP.Domain.Base;
 using System.Linq.Expressions;
-using System.Xml.Linq;
 
 namespace SGCP.Domain.Repository
 {

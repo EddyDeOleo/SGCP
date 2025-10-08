@@ -1,6 +1,4 @@
 ﻿
-using System.Data;
-
 namespace SGCP.Domain.Base
 {
     public abstract class BaseEntity
