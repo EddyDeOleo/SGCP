@@ -1,0 +1,19 @@
+﻿
+using SGCP.Application.Base;
+using SGCP.Application.Dtos.ModuloCarrito.Carrito;
+
+namespace SGCP.Application.Interfaces
+{
+    public interface ICarritoService 
+    {
+        Task<ServiceResult> GetCarrito();
+
+        Task<ServiceResult> GetCarritoById(int id);
+
+        Task<ServiceResult> CreateCarrito(CreateCarritoDTO createCarritoDto);
+
+        Task<ServiceResult> UpdateCarrito(UpdateCarritoDTO updateCarritoDto);
+
+        Task<ServiceResult> RemoveCarrito(DeleteCarritoDTO deleteCarritoDto);
+    }
+}

@@ -9,12 +9,15 @@ namespace SGCP.Domain.Entities.ModuloDeUsuarios
         public Carrito Carrito { get; private set; }
         public List<Pedido> HistorialPedidos { get; private set; }
 
+
         public Cliente(int idUsuario, string nombre, string apellido, string username, string password)
             : base(idUsuario, nombre, apellido, username, password)
         {
             Carrito = new Carrito();
             HistorialPedidos = new List<Pedido>();
         }
+
+       
 
         public void VerCatalogo(List<Producto> productos)
         {

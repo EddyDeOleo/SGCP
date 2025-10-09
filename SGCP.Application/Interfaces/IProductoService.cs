@@ -7,7 +7,7 @@ namespace SGCP.Application.Interfaces
     internal interface IProductoService
     {
 
-        Task<ServiceResult> GetProductos();
+        Task<ServiceResult> GetProducto();
 
         Task<ServiceResult> GetProductoById(int id);
 

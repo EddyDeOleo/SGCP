@@ -3,9 +3,9 @@ using System.ComponentModel.DataAnnotations;
 
 namespace SGCP.Application.Dtos.ModuloPedido.Pedido
 {
-    public record PedidoBaseDTO
+    public abstract record PedidoBaseDTO
     {
-        [Required(ErrorMessage = "El cliente es obligatorio.")]
+         [Required(ErrorMessage = "El cliente es obligatorio.")]
         public int ClienteId { get; set; }
 
         [Range(0, double.MaxValue, ErrorMessage = "El total del pedido no puede ser negativo.")]
@@ -16,5 +16,8 @@ namespace SGCP.Application.Dtos.ModuloPedido.Pedido
         public string Estado { get; set; }
 
         public int? CarritoId { get; set; }
+
+        [Required(ErrorMessage = "La fecha del pedido es obligatoria.")]
+        public DateTime FechaCreacion { get; set; }
     }
 }

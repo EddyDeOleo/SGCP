@@ -50,5 +50,12 @@ namespace SGCP.Persistence.Base.EntityHelper.ModuloPedido
                 { "@Total", entity.Total },
                 { "@Estado", entity.Estado }
             };
+
+        public static Dictionary<string, object> GetDeleteParameters(Pedido entity) =>
+      new Dictionary<string, object>
+      {
+        { "@IdPedido", entity.IdPedido }
+      };
+
     }
 }

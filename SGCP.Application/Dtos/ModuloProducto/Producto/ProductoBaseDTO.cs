@@ -3,7 +3,7 @@ using System.ComponentModel.DataAnnotations;
 
 namespace SGCP.Application.Dtos.ModuloProducto.Producto
 {
-    public record ProductoBaseDTO
+    public abstract record ProductoBaseDTO
     {
         [Required(ErrorMessage = "El nombre del producto es obligatorio")]
         [MaxLength(100, ErrorMessage = "El nombre no debe exceder X caracteres")]

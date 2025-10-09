@@ -124,21 +124,21 @@ namespace SGCP.Persistence.Repositories.ModuloPedido
             );
 
         public Task<OperationResult> Remove(Pedido entity) =>
-     RepositoryLoggerHelper.ExecuteLoggedAsync<Pedido>(
-         _logger,
-         nameof(Remove),
-         async () =>
-         {
-             if (entity == null)
-                 return OperationResult.FailureResult("El pedido no puede ser nulo.");
+    RepositoryLoggerHelper.ExecuteLoggedAsync<Pedido>(
+        _logger,
+        nameof(Remove),
+        async () =>
+        {
+            var validation = _pedidoValidator.ValidateForRemove(entity);
+            if (!validation.Success) return validation;
 
-             var parameters = new Dictionary<string, object> { { "@IdPedido", entity.IdPedido } };
-             await _spExecutor.ExecuteAsync("sp_DeletePedido", parameters);
+            var parameters = PedidoRepositoryHelper.GetDeleteParameters(entity);
+            await _spExecutor.ExecuteAsync("sp_DeletePedido", parameters);
 
-             return OperationResult.SuccessResult("Pedido eliminado correctamente");
-         },
-         entity?.IdPedido
-     );
+            return OperationResult.SuccessResult("Pedido eliminado correctamente");
+        },
+        entity.IdPedido
+    );
 
 
         public Task<OperationResult> GetAll(Expression<Func<Pedido, bool>> filter) =>

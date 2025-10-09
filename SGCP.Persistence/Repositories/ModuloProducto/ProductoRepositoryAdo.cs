@@ -165,8 +165,7 @@ namespace SGCP.Persistence.Repositories.ModuloProducto
                 nameof(Remove),
                 async () =>
                 {
-                    if (entity == null)
-                        return OperationResult.FailureResult("El producto no puede ser nulo.");
+                    
 
                     var validation = _productoValidator.ValidateForRemove(entity);
                     if (!validation.Success)
