@@ -79,6 +79,7 @@ namespace SGCP.Application.Services
 
             try
             {
+                /*
                 // Precondición CU-08: Usuario debe haber iniciado sesión
                 if (!_sessionService.ClienteIdLogueado.HasValue)
                 {
@@ -86,6 +87,7 @@ namespace SGCP.Application.Services
                     result.Message = "Debe iniciar sesión para consultar los clientes";
                     return result;
                 }
+                */
 
                 var opResult = await _repository.GetAll();
                 if (!opResult.Success || opResult.Data == null)
@@ -125,6 +127,7 @@ namespace SGCP.Application.Services
 
             try
             {
+                /*
                 // Precondición CU-08: Usuario debe haber iniciado sesión
                 if (!_sessionService.ClienteIdLogueado.HasValue)
                 {
@@ -132,6 +135,7 @@ namespace SGCP.Application.Services
                     result.Message = "Debe iniciar sesión para consultar el cliente";
                     return result;
                 }
+                */
 
                 var opResult = await _repository.GetEntityBy(id);
                 if (!opResult.Success || opResult.Data == null)
@@ -173,6 +177,7 @@ namespace SGCP.Application.Services
 
             try
             {
+                /*
                 // Precondición CU-08: Usuario debe haber iniciado sesión
                 if (!_sessionService.ClienteIdLogueado.HasValue)
                 {
@@ -180,6 +185,7 @@ namespace SGCP.Application.Services
                     result.Message = "Debe iniciar sesión para actualizar el cliente";
                     return result;
                 }
+                */
 
                 var existingResult = await _repository.GetEntityBy(updateClienteDto.ClienteId);
                 if (!existingResult.Success || existingResult.Data == null)
@@ -225,6 +231,7 @@ namespace SGCP.Application.Services
 
             try
             {
+                /*
                 // Precondición CU-08: Usuario debe haber iniciado sesión
                 if (!_sessionService.ClienteIdLogueado.HasValue)
                 {
@@ -232,6 +239,7 @@ namespace SGCP.Application.Services
                     result.Message = "Debe iniciar sesión para eliminar el cliente";
                     return result;
                 }
+                */
 
                 var existingResult = await _repository.GetEntityBy(deleteClienteDto.ClienteId);
                 if (!existingResult.Success || existingResult.Data == null)

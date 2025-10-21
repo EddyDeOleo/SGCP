@@ -1,8 +1,11 @@
 ﻿
+using System.ComponentModel.DataAnnotations;
+
 namespace SGCP.Domain.Entities.ModuloDeProducto
 {
     public sealed class Producto : Base.BaseEntity
     {
+        [Key]
         public int IdProducto { get; set; }
         public string Nombre { get; set; }
         public string Descripcion { get; set; }

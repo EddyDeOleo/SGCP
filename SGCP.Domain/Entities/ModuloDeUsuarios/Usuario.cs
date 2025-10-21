@@ -1,13 +1,19 @@
 ﻿
+using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
+
 namespace SGCP.Domain.Entities.ModuloDeUsuarios
 {
-    public abstract class Usuario : Base.BaseEntity
+    public abstract class Usuario 
     {
+        [Key]
+        [Column("usuario_id")]
         public int IdUsuario { get; set; }
         public string Nombre { get; set; }
         public string Apellido { get;  set; }
         public string Username { get; set; }
         public string Password { get; set; }
+
 
         protected Usuario(int idUsuario, string nombre, string apellido, string username, string password)
         {

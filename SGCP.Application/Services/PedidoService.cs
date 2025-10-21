@@ -38,12 +38,14 @@ namespace SGCP.Application.Services
             try
             {
                 // CU-09: Validar cliente logueado
+                /*
                 if (!_sessionService.ClienteIdLogueado.HasValue)
                 {
                     result.Success = false;
                     result.Message = "Debe iniciar sesión para realizar un pedido";
                     return result;
                 }
+                */
 
                 int clienteId = _sessionService.ClienteIdLogueado.Value;
 
@@ -112,12 +114,14 @@ namespace SGCP.Application.Services
 
             try
             {
+                /*
                 if (!_sessionService.ClienteIdLogueado.HasValue)
                 {
                     result.Success = false;
                     result.Message = "Debe iniciar sesión para consultar pedidos";
                     return result;
                 }
+                */
 
                 var opResult = await _pedidoRepository.GetAll();
                 if (!opResult.Success || opResult.Data == null)
@@ -164,12 +168,14 @@ namespace SGCP.Application.Services
 
             try
             {
+                /*
                 if (!_sessionService.ClienteIdLogueado.HasValue)
                 {
                     result.Success = false;
                     result.Message = "Debe iniciar sesión para consultar pedidos";
                     return result;
                 }
+                */
 
                 var opResult = await _pedidoRepository.GetEntityBy(id);
                 if (!opResult.Success || opResult.Data == null)
@@ -221,12 +227,14 @@ namespace SGCP.Application.Services
 
             try
             {
+                /*
                 if (!_sessionService.ClienteIdLogueado.HasValue)
                 {
                     result.Success = false;
                     result.Message = "Debe iniciar sesión para actualizar pedidos";
                     return result;
                 }
+                */
 
                 var opResult = await _pedidoRepository.GetEntityBy(updatePedidoDto.IdPedido);
                 if (!opResult.Success || opResult.Data == null)
@@ -276,12 +284,14 @@ namespace SGCP.Application.Services
 
             try
             {
+                /*
                 if (!_sessionService.ClienteIdLogueado.HasValue)
                 {
                     result.Success = false;
                     result.Message = "Debe iniciar sesión para eliminar pedidos";
                     return result;
                 }
+                */
 
                 var opResult = await _pedidoRepository.GetEntityBy(deletePedidoDto.IdPedido);
                 if (!opResult.Success || opResult.Data == null)

@@ -30,13 +30,14 @@ namespace SGCP.Application.Services
                 try
                 {
                     // CU-01: Verificar sesión de cliente
+                    /*
                     if (!_sessionService.ClienteIdLogueado.HasValue)
                     {
                         result.Success = false;
                         result.Message = "Debe iniciar sesión para crear un carrito";
                         return result;
                     }
-
+                    */
                     var carrito = new Carrito
                     {
                         ClienteId = _sessionService.ClienteIdLogueado.Value
@@ -78,13 +79,14 @@ namespace SGCP.Application.Services
 
                 try
                 {
+                /*
                     if (!_sessionService.ClienteIdLogueado.HasValue)
                     {
                         result.Success = false;
                         result.Message = "Debe iniciar sesión para consultar carritos";
                         return result;
                     }
-
+                */
                     var opResult = await _carritoRepository.GetAll();
 
                     if (!opResult.Success || opResult.Data == null)
@@ -125,13 +127,14 @@ namespace SGCP.Application.Services
 
                 try
                 {
+                /*
                     if (!_sessionService.ClienteIdLogueado.HasValue)
                     {
                         result.Success = false;
                         result.Message = "Debe iniciar sesión para consultar carritos";
                         return result;
                     }
-
+                */
                     var opResult = await _carritoRepository.GetEntityBy(id);
                     if (!opResult.Success || opResult.Data == null)
                     {
@@ -179,13 +182,14 @@ namespace SGCP.Application.Services
 
                 try
                 {
+                /*
                     if (!_sessionService.ClienteIdLogueado.HasValue)
                     {
                         result.Success = false;
                         result.Message = "Debe iniciar sesión para actualizar carritos";
                         return result;
                     }
-
+                */
                     // Validar que el carrito pertenece al cliente logueado
                     var existingResult = await _carritoRepository.GetEntityBy(updateCarritoDto.CarritoId);
                     if (!existingResult.Success || existingResult.Data == null)
@@ -235,13 +239,15 @@ namespace SGCP.Application.Services
 
                 try
                 {
+
+                /*
                     if (!_sessionService.ClienteIdLogueado.HasValue)
                     {
                         result.Success = false;
                         result.Message = "Debe iniciar sesión para eliminar carritos";
                         return result;
                     }
-
+                */
                     var existingResult = await _carritoRepository.GetEntityBy(deleteCarritoDto.CarritoId);
                     if (!existingResult.Success || existingResult.Data == null)
                     {

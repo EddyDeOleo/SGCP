@@ -11,5 +11,7 @@ namespace SGCP.Persistence.Models.ModuloPedido.Pedido
         public decimal Total { get; set; }
         public string Estado { get; set; }
 
+        public DateTime FechaCreacion { get; set; }
+
     }
 }

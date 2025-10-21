@@ -27,12 +27,14 @@ namespace SGCP.Application.Services
                 _logger.LogInformation("Iniciando la creación de un nuevo reporte");
 
                 // Precondición: admin logueado
+                /*
                 if (_sessionService.AdminIdLogueado == null)
                 {
                     result.Success = false;
                     result.Message = "El administrador debe iniciar sesión para crear reportes.";
                     return result;
                 }
+                */
 
                 try
                 {
@@ -163,13 +165,14 @@ namespace SGCP.Application.Services
                 var result = new ServiceResult();
                 _logger.LogInformation($"Iniciando actualización del reporte con ID: {updateReporteDto.IdReporte}");
 
+            /*
                 if (_sessionService.AdminIdLogueado == null)
                 {
                     result.Success = false;
                     result.Message = "El administrador debe iniciar sesión para actualizar reportes.";
                     return result;
                 }
-
+            */
                 try
                 {
                     var existingResult = await _reporteRepository.GetEntityBy(updateReporteDto.IdReporte);
@@ -217,13 +220,14 @@ namespace SGCP.Application.Services
                 var result = new ServiceResult();
                 _logger.LogInformation($"Iniciando eliminación del reporte con ID: {deleteReporteDto.IdReporte}");
 
+            /*
                 if (_sessionService.AdminIdLogueado == null)
                 {
                     result.Success = false;
                     result.Message = "El administrador debe iniciar sesión para eliminar reportes.";
                     return result;
                 }
-
+            */
                 try
                 {
                     var existingResult = await _reporteRepository.GetEntityBy(deleteReporteDto.IdReporte);

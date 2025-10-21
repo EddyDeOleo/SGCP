@@ -4,7 +4,7 @@ using SGCP.Application.Dtos.ModuloProducto.Producto;
 
 namespace SGCP.Application.Interfaces
 {
-    internal interface IProductoService
+    public interface IProductoService
     {
 
         Task<ServiceResult> GetProducto();

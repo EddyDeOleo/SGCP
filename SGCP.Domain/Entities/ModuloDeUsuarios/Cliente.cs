@@ -6,8 +6,14 @@ namespace SGCP.Domain.Entities.ModuloDeUsuarios
 {
     public sealed class Cliente : Usuario
     {
-        public Carrito Carrito { get; private set; }
-        public List<Pedido> HistorialPedidos { get; private set; }
+        public Carrito Carrito { get; set; }
+        public List<Pedido> HistorialPedidos { get; set; } = new();
+
+        //
+        /*
+        public Carrito Carrito { get; set; }
+        public List<Pedido> HistorialPedidos { get; set; }
+        */
 
 
         public Cliente(int idUsuario, string nombre, string apellido, string username, string password)

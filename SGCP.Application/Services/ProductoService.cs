@@ -27,12 +27,14 @@ namespace SGCP.Application.Services
                 _logger.LogInformation("Iniciando la creación de un nuevo producto");
 
                 // Validación de precondición: admin logueado
+                /*
                 if (_sessionService.AdminIdLogueado == null)
                 {
                     result.Success = false;
                     result.Message = "El administrador debe iniciar sesión para crear productos.";
                     return result;
                 }
+                */
 
                 try
                 {
@@ -165,12 +167,15 @@ namespace SGCP.Application.Services
                 var result = new ServiceResult();
                 _logger.LogInformation($"Iniciando actualización del producto con ID: {updateProductoDto.IdProducto}");
 
+
+                /*
                 if (_sessionService.AdminIdLogueado == null)
                 {
                     result.Success = false;
                     result.Message = "El administrador debe iniciar sesión para actualizar productos.";
                     return result;
                 }
+                */
 
                 try
                 {
@@ -219,12 +224,13 @@ namespace SGCP.Application.Services
                 var result = new ServiceResult();
                 _logger.LogInformation($"Iniciando eliminación del producto con ID: {deleteProductoDto.IdProducto}");
 
+                /*
                 if (_sessionService.AdminIdLogueado == null)
                 {
                     result.Success = false;
                     result.Message = "El administrador debe iniciar sesión para eliminar productos.";
                     return result;
-                }
+                }\*/
 
                 try
                 {

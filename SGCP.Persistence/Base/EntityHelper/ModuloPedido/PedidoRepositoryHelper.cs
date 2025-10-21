@@ -16,7 +16,8 @@ namespace SGCP.Persistence.Base.EntityHelper.ModuloPedido
                 Cliente = new Cliente(reader.GetInt32(reader.GetOrdinal("cliente_id")), "", "", "", ""),
                 Carrito = new Carrito { IdCarrito = reader.GetInt32(reader.GetOrdinal("carrito_id")) },
                 Total = reader.GetDecimal(reader.GetOrdinal("total")),
-                Estado = reader.GetString(reader.GetOrdinal("estado"))
+                Estado = reader.GetString(reader.GetOrdinal("estado")),
+                FechaCreacion = reader.GetDateTime(reader.GetOrdinal("fecha_creacion"))
             };
 
         public static Pedido MapToPedido(PedidoGetModel model) =>
@@ -24,7 +25,8 @@ namespace SGCP.Persistence.Base.EntityHelper.ModuloPedido
             {
                 IdPedido = model.IdPedido,
                 Total = model.Total,
-                Estado = model.Estado
+                Estado = model.Estado,
+                FechaCreacion = model.FechaCreacion
             };
 
         public static (Dictionary<string, object> parameters, SqlParameter outputParam) GetInsertParameters(Pedido entity)
@@ -34,7 +36,8 @@ namespace SGCP.Persistence.Base.EntityHelper.ModuloPedido
                 { "@ClienteId", entity.Cliente.IdUsuario },
                 { "@CarritoId", entity.Carrito.IdCarrito },
                 { "@Total", entity.Total },
-                { "@Estado", entity.Estado }
+                { "@Estado", entity.Estado },
+                { "@FechaCreacion", entity.FechaCreacion }
             };
 
             var outputParam = new SqlParameter("@IdPedido", SqlDbType.Int) { Direction = ParameterDirection.Output };
@@ -48,14 +51,14 @@ namespace SGCP.Persistence.Base.EntityHelper.ModuloPedido
                 { "@ClienteId", entity.Cliente.IdUsuario },
                 { "@CarritoId", entity.Carrito.IdCarrito },
                 { "@Total", entity.Total },
-                { "@Estado", entity.Estado }
+                { "@Estado", entity.Estado },
+                { "@FechaCreacion", entity.FechaCreacion }
             };
 
         public static Dictionary<string, object> GetDeleteParameters(Pedido entity) =>
-      new Dictionary<string, object>
-      {
-        { "@IdPedido", entity.IdPedido }
-      };
-
+            new Dictionary<string, object>
+            {
+                { "@IdPedido", entity.IdPedido }
+            };
     }
 }

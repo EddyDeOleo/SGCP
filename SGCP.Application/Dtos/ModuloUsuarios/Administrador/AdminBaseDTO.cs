@@ -2,6 +2,7 @@
 using SGCP.Application.Dtos.ModuloUsuarios.Usuario;
 using System.ComponentModel.DataAnnotations;
 
+
 namespace SGCP.Application.Dtos.ModuloUsuarios.Administrador
 {
     public record AdminBaseDTO : UsuarioBaseDTO
