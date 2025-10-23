@@ -8,6 +8,7 @@ namespace SGCP.Domain.Entities.ModuloDeCarrito
     public sealed class Carrito : Base.BaseEntity   
 
     {
+        [Column("cliente_id")]
         public int ClienteId { get; set; }
 
         [Key]
@@ -16,6 +17,7 @@ namespace SGCP.Domain.Entities.ModuloDeCarrito
         public List<Producto> Productos { get; set; } = new List<Producto>();
 
         //
+       
         public Cliente Cliente { get; set; }
 
         [NotMapped]

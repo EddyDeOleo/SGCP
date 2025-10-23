@@ -29,7 +29,7 @@ namespace SGCP.Application.Services
 
             try
             {
-                // Precondición CU-07: Usuario no debe estar previamente registrado
+                // Validación de username existente...
                 var existingResult = await _repository.GetAll();
                 if (existingResult.Success && existingResult.Data != null)
                 {
@@ -43,12 +43,15 @@ namespace SGCP.Application.Services
                 }
 
                 var cliente = new Cliente(
-                    createClienteDto.ClienteId,
+                    0,
                     createClienteDto.Nombre,
                     createClienteDto.Apellido,
                     createClienteDto.Username,
                     createClienteDto.Password
                 );
+
+                // ✅ NO crear el Carrito aquí, dejarlo null
+                cliente.Carrito = null;  // Asegurar que sea null
 
                 var opResult = await _repository.Save(cliente);
                 if (!opResult.Success)
@@ -71,7 +74,6 @@ namespace SGCP.Application.Services
 
             return result;
         }
-
         public async Task<ServiceResult> GetCliente()
         {
             var result = new ServiceResult();

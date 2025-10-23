@@ -16,32 +16,48 @@ public class SGCPDbContext : DbContext
         base.OnModelCreating(modelBuilder);
 
         // ===============================
-        // Usuario + herencia (TPH)
+        // Usuario (Tabla base)
         // ===============================
         modelBuilder.Entity<Usuario>(entity =>
         {
             entity.ToTable("Usuario");
-
-            // PK
             entity.HasKey(u => u.IdUsuario);
-            entity.Property(u => u.IdUsuario).HasColumnName("usuario_id");
+            entity.Property(u => u.IdUsuario)
+                .HasColumnName("usuario_id")
+                .ValueGeneratedOnAdd();  // ✅ Agregar esto para IDENTITY
 
-            // Propiedades
-            entity.Property(u => u.Nombre).HasMaxLength(50).IsRequired();
-            entity.Property(u => u.Apellido).HasMaxLength(50).IsRequired();
-            entity.Property(u => u.Username).HasMaxLength(50).IsRequired();
-            entity.Property(u => u.Password).HasMaxLength(255).IsRequired();
+            entity.Property(u => u.Nombre).HasColumnName("nombre").HasMaxLength(50).IsRequired();
+            entity.Property(u => u.Apellido).HasColumnName("apellido").HasMaxLength(50).IsRequired();
+            entity.Property(u => u.Username).HasColumnName("username").HasMaxLength(50).IsRequired();
+            entity.Property(u => u.Password).HasColumnName("password").HasMaxLength(255).IsRequired();
         });
 
-        // Discriminador para TPH
-        modelBuilder.Entity<Usuario>()
-            .HasDiscriminator<string>("TipoUsuario")
-            .HasValue<Usuario>("Usuario")
-            .HasValue<Cliente>("Cliente")
-            .HasValue<Administrador>("Administrador");
+        // ===============================
+        // Cliente (TPT) - CONFIGURACIÓN CORREGIDA
+        // ===============================
+        modelBuilder.Entity<Cliente>(entity =>
+        {
+            // Especificar tabla separada para TPT
+            entity.ToTable("Cliente", tb =>
+            {
+                // Configurar que cliente_id es FK a usuario_id
+                tb.HasCheckConstraint("FK_Cliente_Usuario", "cliente_id IS NOT NULL");
+            });
+
+            // NO mapees IdUsuario a cliente_id aquí
+            // La relación se maneja automáticamente por TPT
+        });
 
         // ===============================
-        // Carrito
+        // Administrador (TPT)
+        // ===============================
+        modelBuilder.Entity<Administrador>(entity =>
+        {
+            entity.ToTable("Administrador");
+        });
+
+        // ===============================
+        // Carrito - CONFIGURACIÓN CORREGIDA
         // ===============================
         modelBuilder.Entity<Carrito>(entity =>
         {
@@ -49,34 +65,41 @@ public class SGCPDbContext : DbContext
             entity.HasKey(c => c.IdCarrito);
             entity.Property(c => c.IdCarrito).HasColumnName("carrito_id");
 
-            // Relación uno a uno con Cliente
+            // Aquí está el problema: cliente_id debe referenciar la PK de Usuario,
+            // que Cliente hereda, NO cliente_id directamente
+            entity.Property<int>("ClienteId").HasColumnName("cliente_id");
+
             entity.HasOne(c => c.Cliente)
-                  .WithOne(cl => cl.Carrito)
-                  .HasForeignKey<Carrito>(c => c.IdCarrito)
-                  .OnDelete(DeleteBehavior.Cascade);
+                .WithOne(cl => cl.Carrito)
+                .HasForeignKey<Carrito>("ClienteId")
+                .HasPrincipalKey<Cliente>(cl => cl.IdUsuario)  // ✅ IdUsuario (heredado)
+                .OnDelete(DeleteBehavior.Cascade);
         });
 
         // ===============================
-        // Pedido
+        // Pedido - CONFIGURACIÓN CORREGIDA
         // ===============================
         modelBuilder.Entity<Pedido>(entity =>
         {
             entity.ToTable("Pedido");
             entity.HasKey(p => p.IdPedido);
-            entity.Property(p => p.IdPedido).HasColumnName("pedido_id");
+            entity.Property(p => p.IdPedido)
+                .HasColumnName("pedido_id")
+                .ValueGeneratedOnAdd();
 
-            // FK a Cliente
+            entity.Property(p => p.ClienteId).HasColumnName("cliente_id");
+            entity.Property(p => p.CarritoId).HasColumnName("carrito_id");
+
             entity.HasOne(p => p.Cliente)
-                  .WithMany(c => c.HistorialPedidos)
-                  .HasForeignKey("usuario_id")  // FK apunta a usuario_id de Cliente
-                  .IsRequired()
-                  .OnDelete(DeleteBehavior.Cascade);
+                .WithMany(c => c.HistorialPedidos)
+                .HasForeignKey(p => p.ClienteId)
+                .IsRequired()
+                .OnDelete(DeleteBehavior.Cascade);  // ✅ Cambiar de Restrict a Cascade
 
-            // FK a Carrito (opcional)
             entity.HasOne(p => p.Carrito)
-                  .WithOne()
-                  .HasForeignKey<Pedido>(p => p.IdPedido)
-                  .OnDelete(DeleteBehavior.Cascade);
+                .WithMany()
+                .HasForeignKey(p => p.CarritoId)
+                .OnDelete(DeleteBehavior.SetNull);  // ✅ O SetNull si el carrito es nullable
         });
     }
 }
