@@ -1,10 +1,12 @@
 
 using SGCP.Application.Interfaces;
 using SGCP.Application.Repositories.ModuloReporte;
+using SGCP.Application.Repositories.ModuloUsuarios;
 using SGCP.Application.Services;
 using SGCP.Persistence.Base;
 using SGCP.Persistence.Base.EntityValidator.ModuloReporte;
 using SGCP.Persistence.Repositories.ModuloReporte;
+using SGCP.Persistence.Repositories.ModuloUsuarios;
 
 namespace SGCP.ModuloReporte.Api
 {
@@ -20,6 +22,9 @@ namespace SGCP.ModuloReporte.Api
             builder.Services.AddScoped<IReporte, ReporteRepositoryAdo>();
             builder.Services.AddScoped<ISessionService, SessionService>();
             builder.Services.AddTransient<IReporteService, ReporteService>();
+            
+          
+
 
             builder.Services.AddControllers();
             // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle

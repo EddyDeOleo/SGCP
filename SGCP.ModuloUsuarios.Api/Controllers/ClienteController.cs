@@ -1,8 +1,6 @@
 ﻿using Microsoft.AspNetCore.Mvc;
-using SGCP.Application.Dtos.ModuloReporte.Reporte;
 using SGCP.Application.Dtos.ModuloUsuarios.Cliente;
 using SGCP.Application.Interfaces;
-using SGCP.Application.Services;
 
 
 namespace SGCP.ModuloUsuarios.Api.Controllers

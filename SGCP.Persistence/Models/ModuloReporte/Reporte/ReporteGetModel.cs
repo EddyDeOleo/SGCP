@@ -6,6 +6,7 @@ namespace SGCP.Persistence.Models.ModuloReporte.Reporte
     {
 
         public int IdReporte { get; set; }
+        public int AdminId { get; set; }
         public decimal TotalVentas { get; set; }
         public int TotalPedidos { get; set; }
 

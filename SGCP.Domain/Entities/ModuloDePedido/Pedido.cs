@@ -15,7 +15,7 @@ namespace SGCP.Domain.Entities.ModuloDePedido
         public int ClienteId { get; set; }
 
         [Column("carrito_id")]
-        public int CarritoId { get; set; }
+        public int? CarritoId { get; set; }
         public Cliente Cliente { get; set; }
         public Carrito Carrito { get; set; }
         [Column("total")]

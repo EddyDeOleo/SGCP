@@ -9,6 +9,7 @@ namespace SGCP.Persistence.Base.EntityHelper.ModuloReporte
         public static ReporteGetModel MapToReporteGetModel(SqlDataReader reader) => new ReporteGetModel
         {
             IdReporte = reader.GetInt32(reader.GetOrdinal("reporte_id")),
+            AdminId = reader.GetInt32(reader.GetOrdinal("admin_id")),
             TotalVentas = reader.GetDecimal(reader.GetOrdinal("total_ventas")),
             TotalPedidos = reader.GetInt32(reader.GetOrdinal("total_pedidos"))
         };
@@ -16,6 +17,7 @@ namespace SGCP.Persistence.Base.EntityHelper.ModuloReporte
         public static Reporte MapToReporte(ReporteGetModel rgm) => new Reporte
         {
             IdReporte = rgm.IdReporte,
+            AdminId = rgm.AdminId,
             TotalVentas = rgm.TotalVentas,
             TotalPedidos = rgm.TotalPedidos
         };

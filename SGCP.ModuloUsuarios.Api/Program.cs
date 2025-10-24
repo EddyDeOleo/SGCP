@@ -20,6 +20,10 @@ namespace SGCP.ModuloUsuarios.Api
 
             builder.Services.AddScoped<ICliente, ClienteRepositoryEF>();
             builder.Services.AddTransient<IClienteService, ClienteService>();
+
+            builder.Services.AddScoped<IAdministrador, AdministradorRepositoryEF>();
+            builder.Services.AddTransient<IAdminService, AdminService>();   
+
             builder.Services.AddScoped<ISessionService, SessionService>();
 
             builder.Services.AddControllers();

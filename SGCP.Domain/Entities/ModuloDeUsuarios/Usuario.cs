@@ -8,6 +8,7 @@ namespace SGCP.Domain.Entities.ModuloDeUsuarios
     {
         [Key]
         [Column("usuario_id")]
+        [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
         public int IdUsuario { get; set; }
         public string Nombre { get; set; }
         public string Apellido { get;  set; }
@@ -18,6 +19,14 @@ namespace SGCP.Domain.Entities.ModuloDeUsuarios
         protected Usuario(int idUsuario, string nombre, string apellido, string username, string password)
         {
             IdUsuario = idUsuario;
+            Nombre = nombre;
+            Apellido = apellido;
+            Username = username;
+            Password = password;
+        }
+
+        protected Usuario(string nombre, string apellido, string username, string password)
+        {
             Nombre = nombre;
             Apellido = apellido;
             Username = username;

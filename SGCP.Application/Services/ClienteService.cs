@@ -43,7 +43,7 @@ namespace SGCP.Application.Services
                 }
 
                 var cliente = new Cliente(
-                    0,
+                
                     createClienteDto.Nombre,
                     createClienteDto.Apellido,
                     createClienteDto.Username,

@@ -1,15 +1,26 @@
 ﻿using Microsoft.EntityFrameworkCore;
-using SGCP.Domain.Entities.ModuloDeUsuarios;
 using SGCP.Domain.Entities.ModuloDeCarrito;
 using SGCP.Domain.Entities.ModuloDePedido;
+using SGCP.Domain.Entities.ModuloDeReporte;
+using SGCP.Domain.Entities.ModuloDeUsuarios;
+using Microsoft.Extensions.Logging;
 
 public class SGCPDbContext : DbContext
 {
     public SGCPDbContext(DbContextOptions<SGCPDbContext> options) : base(options) { }
 
-    public DbSet<Usuario> Usuario { get; set; }  // Aquí estarán Usuario, Cliente y Administrador
+    // ✅ AGREGAR ESTO TEMPORALMENTE
+    protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
+    {
+        optionsBuilder.LogTo(Console.WriteLine, new[] { DbLoggerCategory.Database.Command.Name }, LogLevel.Information);
+    }
+
+    public DbSet<Usuario> Usuario { get; set; }
+    public DbSet<Cliente> Cliente { get; set; }
+    public DbSet<Administrador> Administrador { get; set; }
     public DbSet<Carrito> Carrito { get; set; }
     public DbSet<Pedido> Pedido { get; set; }
+    public DbSet<Reporte> Reporte { get; set; }
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
@@ -24,7 +35,7 @@ public class SGCPDbContext : DbContext
             entity.HasKey(u => u.IdUsuario);
             entity.Property(u => u.IdUsuario)
                 .HasColumnName("usuario_id")
-                .ValueGeneratedOnAdd();  // ✅ Agregar esto para IDENTITY
+                .ValueGeneratedOnAdd();
 
             entity.Property(u => u.Nombre).HasColumnName("nombre").HasMaxLength(50).IsRequired();
             entity.Property(u => u.Apellido).HasColumnName("apellido").HasMaxLength(50).IsRequired();
@@ -33,19 +44,12 @@ public class SGCPDbContext : DbContext
         });
 
         // ===============================
-        // Cliente (TPT) - CONFIGURACIÓN CORREGIDA
+        // Cliente (TPT)
         // ===============================
         modelBuilder.Entity<Cliente>(entity =>
         {
-            // Especificar tabla separada para TPT
-            entity.ToTable("Cliente", tb =>
-            {
-                // Configurar que cliente_id es FK a usuario_id
-                tb.HasCheckConstraint("FK_Cliente_Usuario", "cliente_id IS NOT NULL");
-            });
-
-            // NO mapees IdUsuario a cliente_id aquí
-            // La relación se maneja automáticamente por TPT
+            entity.ToTable("Cliente");
+            // ❌ NO mapear IdUsuario aquí
         });
 
         // ===============================
@@ -54,30 +58,29 @@ public class SGCPDbContext : DbContext
         modelBuilder.Entity<Administrador>(entity =>
         {
             entity.ToTable("Administrador");
+            // ❌ NO mapear IdUsuario aquí
         });
-
         // ===============================
-        // Carrito - CONFIGURACIÓN CORREGIDA
+        // Carrito
         // ===============================
         modelBuilder.Entity<Carrito>(entity =>
         {
             entity.ToTable("Carrito");
             entity.HasKey(c => c.IdCarrito);
-            entity.Property(c => c.IdCarrito).HasColumnName("carrito_id");
+            entity.Property(c => c.IdCarrito)
+                .HasColumnName("carrito_id")
+                .ValueGeneratedOnAdd();
 
-            // Aquí está el problema: cliente_id debe referenciar la PK de Usuario,
-            // que Cliente hereda, NO cliente_id directamente
-            entity.Property<int>("ClienteId").HasColumnName("cliente_id");
+            entity.Property(c => c.ClienteId).HasColumnName("cliente_id");
 
             entity.HasOne(c => c.Cliente)
                 .WithOne(cl => cl.Carrito)
-                .HasForeignKey<Carrito>("ClienteId")
-                .HasPrincipalKey<Cliente>(cl => cl.IdUsuario)  // ✅ IdUsuario (heredado)
+                .HasForeignKey<Carrito>(c => c.ClienteId)
                 .OnDelete(DeleteBehavior.Cascade);
         });
 
         // ===============================
-        // Pedido - CONFIGURACIÓN CORREGIDA
+        // Pedido
         // ===============================
         modelBuilder.Entity<Pedido>(entity =>
         {
@@ -89,17 +92,43 @@ public class SGCPDbContext : DbContext
 
             entity.Property(p => p.ClienteId).HasColumnName("cliente_id");
             entity.Property(p => p.CarritoId).HasColumnName("carrito_id");
+            entity.Property(p => p.FechaCreacion).HasColumnName("fecha");
+            entity.Property(p => p.Estado).HasColumnName("estado").HasMaxLength(30).IsRequired();
+            entity.Property(p => p.Total).HasColumnName("total").HasColumnType("decimal(10,2)").IsRequired();
 
             entity.HasOne(p => p.Cliente)
                 .WithMany(c => c.HistorialPedidos)
                 .HasForeignKey(p => p.ClienteId)
                 .IsRequired()
-                .OnDelete(DeleteBehavior.Cascade);  // ✅ Cambiar de Restrict a Cascade
+                .OnDelete(DeleteBehavior.Cascade);
 
             entity.HasOne(p => p.Carrito)
                 .WithMany()
                 .HasForeignKey(p => p.CarritoId)
-                .OnDelete(DeleteBehavior.SetNull);  // ✅ O SetNull si el carrito es nullable
+                .OnDelete(DeleteBehavior.Restrict);
+        });
+
+        // ===============================
+        // Reporte
+        // ===============================
+        modelBuilder.Entity<Reporte>(entity =>
+        {
+            entity.ToTable("Reporte");
+            entity.HasKey(r => r.IdReporte);
+            entity.Property(r => r.IdReporte)
+                .HasColumnName("reporte_id")
+                .ValueGeneratedOnAdd();
+
+            entity.Property(r => r.AdminId).HasColumnName("admin_id");
+            entity.Property(r => r.FechaCreacion).HasColumnName("fecha");
+            entity.Property(r => r.TotalVentas).HasColumnName("total_ventas");
+            entity.Property(r => r.TotalPedidos).HasColumnName("total_pedidos");
+
+            entity.HasOne<Administrador>()
+                .WithMany()
+                .HasForeignKey(r => r.AdminId)
+                .HasPrincipalKey(a => a.IdUsuario)
+                .OnDelete(DeleteBehavior.Restrict);
         });
     }
 }

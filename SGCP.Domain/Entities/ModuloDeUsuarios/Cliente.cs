@@ -23,7 +23,14 @@ namespace SGCP.Domain.Entities.ModuloDeUsuarios
             HistorialPedidos = new List<Pedido>();
         }
 
-       
+        public Cliente(string nombre, string apellido, string username, string password)
+    : base(nombre, apellido, username, password)
+        {
+            Carrito = new Carrito();
+            HistorialPedidos = new List<Pedido>();
+        }
+
+
 
         public void VerCatalogo(List<Producto> productos)
         {
