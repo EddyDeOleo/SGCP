@@ -1,4 +1,5 @@
 
+using Microsoft.EntityFrameworkCore;
 using SGCP.Application.Interfaces;
 using SGCP.Application.Repositories.ModuloReporte;
 using SGCP.Application.Repositories.ModuloUsuarios;
@@ -16,14 +17,17 @@ namespace SGCP.ModuloReporte.Api
         {
             var builder = WebApplication.CreateBuilder(args);
 
+            builder.Services.AddDbContext<SGCPDbContext>(options => options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
+
             // Add services to the container.
             builder.Services.AddScoped<IStoredProcedureExecutor, StoredProcedureExecutor>();
             builder.Services.AddScoped<ReporteValidator>();
             builder.Services.AddScoped<IReporte, ReporteRepositoryAdo>();
             builder.Services.AddScoped<ISessionService, SessionService>();
             builder.Services.AddTransient<IReporteService, ReporteService>();
-            
-          
+            builder.Services.AddScoped<IAdministrador, AdministradorRepositoryEF>();
+
+
 
 
             builder.Services.AddControllers();

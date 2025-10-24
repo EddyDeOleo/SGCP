@@ -4,7 +4,9 @@ using SGCP.Application.Base;
 using SGCP.Application.Dtos.ModuloReporte.Reporte;
 using SGCP.Application.Interfaces;
 using SGCP.Application.Repositories.ModuloReporte;
+using SGCP.Application.Repositories.ModuloUsuarios;
 using SGCP.Domain.Entities.ModuloDeReporte;
+using SGCP.Domain.Entities.ModuloDeUsuarios;
 
 namespace SGCP.Application.Services
     {
@@ -13,71 +15,75 @@ namespace SGCP.Application.Services
             private readonly IReporte _reporteRepository;
             private readonly ILogger<ReporteService> _logger;
             private readonly ISessionService _sessionService;
+            private readonly IAdministrador _adminRepository;
 
-            public ReporteService(IReporte reporteRepository, ILogger<ReporteService> logger, ISessionService sessionService)
+        public ReporteService(IReporte reporteRepository, ILogger<ReporteService> logger, ISessionService sessionService, IAdministrador adminRepository)
             {
                 _reporteRepository = reporteRepository;
                 _logger = logger;
                 _sessionService = sessionService;
-            }
+                _adminRepository = adminRepository;
+        }
 
-            public async Task<ServiceResult> CreateReporte(CreateReporteDTO createReporteDto)
+        public async Task<ServiceResult> CreateReporte(CreateReporteDTO createReporteDto)
+        {
+            var result = new ServiceResult();
+            _logger.LogInformation("Iniciando la creación de un nuevo reporte");
+
+            // Validación: admin existe
+            var adminResult = await _adminRepository.GetEntityBy(createReporteDto.AdminId);
+            if (!adminResult.Success)
             {
-                var result = new ServiceResult();
-                _logger.LogInformation("Iniciando la creación de un nuevo reporte");
-
-                // Precondición: admin logueado
-                /*
-                if (_sessionService.AdminIdLogueado == null)
-                {
-                    result.Success = false;
-                    result.Message = "El administrador debe iniciar sesión para crear reportes.";
-                    return result;
-                }
-                */
-
-                try
-                {
-                    if (createReporteDto.FechaCreacion == default)
-                    {
-                        result.Success = false;
-                        result.Message = "La fecha del reporte es obligatoria";
-                        return result;
-                    }
-
-                    var reporte = new Reporte
-                    {
-                        AdminId = createReporteDto.AdminId,
-                        FechaCreacion = createReporteDto.FechaCreacion,
-                        TotalVentas = createReporteDto.TotalVentas,
-                        TotalPedidos = createReporteDto.TotalPedidos
-                    };
-
-                    var opResult = await _reporteRepository.Save(reporte);
-                    if (!opResult.Success)
-                    {
-                        result.Success = false;
-                        result.Message = opResult.Message;
-                        _logger.LogWarning("No se pudo guardar el reporte en la base de datos.");
-                        return result;
-                    }
-
-                    result.Success = true;
-                    result.Message = "Reporte creado correctamente";
-                    result.Data = reporte;
-                    _logger.LogInformation($"Reporte creado exitosamente con ID: {reporte.IdReporte}");
-                }
-                catch (Exception ex)
-                {
-                    _logger.LogError(ex, "Error al crear el reporte");
-                    result.Success = false;
-                    result.Message = "Ocurrió un error al crear el reporte";
-                }
-
+                result.Success = false;
+                result.Message = "Administrador inválido";
                 return result;
             }
 
-            public async Task<ServiceResult> GetReporte()
+            var adminExiste = (Administrador)adminResult.Data;
+
+            // Validación: fecha obligatoria
+            if (createReporteDto.FechaCreacion == default)
+            {
+                result.Success = false;
+                result.Message = "La fecha del reporte es obligatoria";
+                return result;
+            }
+
+            try
+            {
+                var reporte = new Reporte
+                {
+                    AdminId = adminExiste.IdUsuario, // se asegura que sea un admin real
+                    FechaCreacion = createReporteDto.FechaCreacion,
+                    TotalVentas = createReporteDto.TotalVentas,
+                    TotalPedidos = createReporteDto.TotalPedidos
+                };
+
+                var opResult = await _reporteRepository.Save(reporte);
+                if (!opResult.Success)
+                {
+                    result.Success = false;
+                    result.Message = opResult.Message;
+                    _logger.LogWarning("No se pudo guardar el reporte en la base de datos.");
+                    return result;
+                }
+
+                result.Success = true;
+                result.Message = "Reporte creado correctamente";
+                result.Data = reporte;
+                _logger.LogInformation($"Reporte creado exitosamente con ID: {reporte.IdReporte}");
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error al crear el reporte");
+                result.Success = false;
+                result.Message = "Ocurrió un error al crear el reporte";
+            }
+
+            return result;
+        }
+
+        public async Task<ServiceResult> GetReporte()
             {
                 var result = new ServiceResult();
                 _logger.LogInformation("Obteniendo todos los reportes");
