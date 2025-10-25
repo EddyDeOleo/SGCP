@@ -11,8 +11,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\SGCP.Application\SGCP.Application.csproj" />
-    <ProjectReference Include="..\SGCP.Persistence\SGCP.Persistence.csproj" />
+    <ProjectReference Include="..\SGCP.Infraestructure\SGCP.Infraestructure.csproj" />
   </ItemGroup>
 
 </Project>

@@ -1,13 +1,5 @@
 
-using SGCP.Application.Interfaces;
-using SGCP.Application.Repositories.ModuloCarrito;
-using SGCP.Application.Repositories.ModuloProducto;
-using SGCP.Application.Services;
-using SGCP.Persistence.Base;
-using SGCP.Persistence.Base.EntityValidator.ModuloCarrito;
-using SGCP.Persistence.Base.EntityValidator.ModuloProducto;
-using SGCP.Persistence.Repositories.ModuloCarrito;
-using SGCP.Persistence.Repositories.ModuloProducto;
+using SGCP.Infraestructure.Dependencies.ModuloCarrito;
 
 namespace SGCP.ModuloCarrito.Api
 {
@@ -17,18 +9,10 @@ namespace SGCP.ModuloCarrito.Api
         {
             var builder = WebApplication.CreateBuilder(args);
 
-            // Add services to the container.
-            builder.Services.AddScoped<IStoredProcedureExecutor, StoredProcedureExecutor>();
-            builder.Services.AddScoped<CarritoValidator>();
-            builder.Services.AddScoped<ICarrito, CarritoRepositoryAdo>();
-            builder.Services.AddScoped<ISessionService, SessionService>();
-            builder.Services.AddTransient<ICarritoService, CarritoService>();
-            builder.Services.AddScoped<ICarritoProducto, CarritoProductoRepositoryAdo>();
+    
 
-            builder.Services.AddScoped<IProducto, ProductoRepositoryAdo>();
-            builder.Services.AddScoped<ProductoValidator>();
-
-
+            builder.Services.AddCarritoDependencies();
+          
 
             builder.Services.AddControllers();
             // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle

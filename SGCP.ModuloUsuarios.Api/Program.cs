@@ -1,9 +1,6 @@
 
 using Microsoft.EntityFrameworkCore;
-using SGCP.Application.Interfaces;
-using SGCP.Application.Repositories.ModuloUsuarios;
-using SGCP.Application.Services;
-using SGCP.Persistence.Repositories.ModuloUsuarios;
+using SGCP.Infraestructure.Dependencies.ModuloUsuarios;
 
 namespace SGCP.ModuloUsuarios.Api
 {
@@ -15,16 +12,7 @@ namespace SGCP.ModuloUsuarios.Api
 
             // Add services to the container.
 
-            builder.Services.AddDbContext<SGCPDbContext>(options => options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
-
-
-            builder.Services.AddScoped<ICliente, ClienteRepositoryEF>();
-            builder.Services.AddTransient<IClienteService, ClienteService>();
-
-            builder.Services.AddScoped<IAdministrador, AdministradorRepositoryEF>();
-            builder.Services.AddTransient<IAdminService, AdminService>();   
-
-            builder.Services.AddScoped<ISessionService, SessionService>();
+            builder.Services.AddUsuarioDependencies(builder.Configuration);
 
             builder.Services.AddControllers();
             // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle

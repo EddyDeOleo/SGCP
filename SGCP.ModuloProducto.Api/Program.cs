@@ -1,10 +1,5 @@
 
-using SGCP.Application.Interfaces;
-using SGCP.Application.Repositories.ModuloProducto;
-using SGCP.Application.Services;
-using SGCP.Persistence.Base;
-using SGCP.Persistence.Base.EntityValidator.ModuloProducto;
-using SGCP.Persistence.Repositories.ModuloProducto;
+using SGCP.Infraestructure.Dependencies.ModuloProducto;
 
 namespace SGCP.ModuloProducto.Api
 {
@@ -15,11 +10,8 @@ namespace SGCP.ModuloProducto.Api
             var builder = WebApplication.CreateBuilder(args);
 
             // Add services to the container.
-            builder.Services.AddScoped<IStoredProcedureExecutor, StoredProcedureExecutor>();
-            builder.Services.AddScoped<ProductoValidator>();
-            builder.Services.AddScoped<IProducto, ProductoRepositoryAdo>();
-            builder.Services.AddScoped<ISessionService, SessionService>();
-            builder.Services.AddTransient<IProductoService, ProductoService>();
+
+            builder.Services.AddProductoDependencies();
 
             builder.Services.AddControllers();
             // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
