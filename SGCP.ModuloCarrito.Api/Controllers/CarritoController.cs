@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using SGCP.Application.Dtos.ModuloCarrito.Carrito;
+using SGCP.Application.Dtos.ModuloCarrito.CarritoProducto;
 using SGCP.Application.Interfaces;
 
 // For more information on enabling Web API for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
@@ -75,6 +76,16 @@ namespace SGCP.ModuloCarrito.Api.Controllers
                 return BadRequest(result);
             }
             return Ok(result);
-        }   
+        }
+        [HttpPost("agregar-productos-al-carrito")]
+        public async Task<IActionResult> AgregarProducto(int carritoId, [FromBody] AgregarProductoDTO agregarProductoDTO)
+        {
+
+            var result = await _carritoService.AgregarProductoAlCarrito(carritoId, agregarProductoDTO);
+
+            return result.Success ? Ok(result) : BadRequest(result);
+        }
+
+
     }
 }

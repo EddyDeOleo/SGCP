@@ -34,13 +34,7 @@ namespace SGCP.Domain.Entities.ModuloDePedido
 
         public Pedido() { }
 
-        public void ConfirmarPedido()
-        {
-            Estado = "Confirmado";
-            Total = Carrito.CalcularTotal();
-            foreach (var producto in Carrito.Productos)
-                producto.ActualizarStock(Carrito.Cantidades[producto]);
-        }
+        
 
         public void CancelarPedido()
         {

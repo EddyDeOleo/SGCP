@@ -1,6 +1,7 @@
 ﻿
 using SGCP.Application.Base;
 using SGCP.Application.Dtos.ModuloCarrito.Carrito;
+using SGCP.Application.Dtos.ModuloCarrito.CarritoProducto;
 
 namespace SGCP.Application.Interfaces
 {
@@ -15,5 +16,7 @@ namespace SGCP.Application.Interfaces
         Task<ServiceResult> UpdateCarrito(UpdateCarritoDTO updateCarritoDto);
 
         Task<ServiceResult> RemoveCarrito(DeleteCarritoDTO deleteCarritoDto);
+
+        Task<ServiceResult> AgregarProductoAlCarrito(int carritoId, AgregarProductoDTO dto);
     }
 }
