@@ -7,7 +7,7 @@ using SGCP.Application.Services;
 using SGCP.Infraestructure.Dependencies.DB_Context;
 using SGCP.Persistence.Repositories.ModuloUsuarios;
 
-namespace SGCP.Infraestructure.Dependencies.ModuloUsuarios
+namespace SGCP.Ioc.Dependencies.ModuloUsuarios
 {
     public static class UsuarioDependency
     {
@@ -15,6 +15,7 @@ namespace SGCP.Infraestructure.Dependencies.ModuloUsuarios
         {
 
             services.AddDBContextDependencies(configuration);
+
 
             services.AddScoped<ICliente, ClienteRepositoryEF>();
             services.AddTransient<IClienteService, ClienteService>();

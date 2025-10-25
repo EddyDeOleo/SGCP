@@ -11,14 +11,14 @@ using SGCP.Persistence.Base.EntityValidator.ModuloReporte;
 using SGCP.Persistence.Repositories.ModuloReporte;
 using SGCP.Persistence.Repositories.ModuloUsuarios;
 
-namespace SGCP.Infraestructure.Dependencies.ModuloReporte
+namespace SGCP.Ioc.Dependencies.ModuloReporte
 {
     public static class ReporteDependency
     {
         public static void AddReporteDependencies(this IServiceCollection services, IConfiguration configuration)
         {
-            services.AddDBContextDependencies(configuration);
 
+            services.AddDBContextDependencies(configuration);
 
             services.AddScoped<IStoredProcedureExecutor, StoredProcedureExecutor>();
             services.AddScoped<ReporteValidator>();

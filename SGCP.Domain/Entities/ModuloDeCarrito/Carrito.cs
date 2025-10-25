@@ -14,8 +14,9 @@ namespace SGCP.Domain.Entities.ModuloDeCarrito
         [Key]
         [Column("carrito_id")] 
         public int IdCarrito { get; set; }
+        [NotMapped]
         public List<Producto> Productos { get; set; } = new List<Producto>();
-
+        [NotMapped]
         public List<CarritoProducto> CarritoProductos { get; set; } = new List<CarritoProducto>();
 
         //

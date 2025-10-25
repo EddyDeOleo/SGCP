@@ -8,7 +8,7 @@ using SGCP.Persistence.Base;
 using SGCP.Persistence.Base.EntityValidator.ModuloProducto;
 using SGCP.Persistence.Repositories.ModuloProducto;
 
-namespace SGCP.Infraestructure.Dependencies.ModuloProducto
+namespace SGCP.Ioc.Dependencies.ModuloProducto
 {
     public static class ProductoDependency
     {

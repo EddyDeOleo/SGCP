@@ -6,4 +6,13 @@
     <Nullable>enable</Nullable>
   </PropertyGroup>
 
+  <ItemGroup>
+    <Folder Include="Dependencies\ModuloPedido\" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\SGCP.Application\SGCP.Application.csproj" />
+    <ProjectReference Include="..\SGCP.Persistence\SGCP.Persistence.csproj" />
+  </ItemGroup>
+
 </Project>

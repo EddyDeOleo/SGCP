@@ -1,5 +1,5 @@
 
-using SGCP.Infraestructure.Dependencies.ModuloCarrito;
+using SGCP.Ioc.Dependencies.ModuloCarrito;
 
 namespace SGCP.ModuloCarrito.Api
 {

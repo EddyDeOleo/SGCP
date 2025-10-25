@@ -9,7 +9,7 @@ using SGCP.Persistence.Base.EntityValidator.ModuloProducto;
 using SGCP.Persistence.Repositories.ModuloCarrito;
 using SGCP.Persistence.Repositories.ModuloProducto;
 
-namespace SGCP.Infraestructure.Dependencies.ModuloCarrito
+namespace SGCP.Ioc.Dependencies.ModuloCarrito
 {
     public static class CarritoDependency
     {

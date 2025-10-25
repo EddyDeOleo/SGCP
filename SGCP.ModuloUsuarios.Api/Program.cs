@@ -1,6 +1,5 @@
-
 using Microsoft.EntityFrameworkCore;
-using SGCP.Infraestructure.Dependencies.ModuloUsuarios;
+using SGCP.Ioc.Dependencies.ModuloUsuarios;
 
 namespace SGCP.ModuloUsuarios.Api
 {
@@ -10,6 +9,7 @@ namespace SGCP.ModuloUsuarios.Api
         {
             var builder = WebApplication.CreateBuilder(args);
 
+           // builder.Services.AddDbContext<SGCPDbContext>(options => options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
             // Add services to the container.
 
             builder.Services.AddUsuarioDependencies(builder.Configuration);

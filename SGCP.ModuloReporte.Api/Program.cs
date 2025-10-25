@@ -1,6 +1,6 @@
 
 using Microsoft.EntityFrameworkCore;
-using SGCP.Infraestructure.Dependencies.ModuloReporte;
+using SGCP.Ioc.Dependencies.ModuloReporte;
 
 namespace SGCP.ModuloReporte.Api
 {
@@ -10,9 +10,9 @@ namespace SGCP.ModuloReporte.Api
         {
             var builder = WebApplication.CreateBuilder(args);
 
-
+           // builder.Services.AddDbContext<SGCPDbContext>(options => options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
             // Add services to the container.
-           builder.Services.AddReporteDependencies(builder.Configuration);
+            builder.Services.AddReporteDependencies(builder.Configuration);
 
 
             builder.Services.AddControllers();

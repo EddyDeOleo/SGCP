@@ -1,5 +1,5 @@
 
-using SGCP.Infraestructure.Dependencies.ModuloProducto;
+using SGCP.Ioc.Dependencies.ModuloProducto;
 
 namespace SGCP.ModuloProducto.Api
 {
