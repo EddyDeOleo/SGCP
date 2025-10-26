@@ -16,6 +16,7 @@ namespace SGCP.Domain.Entities.ModuloDeUsuarios
         public string Password { get; set; }
 
 
+        protected Usuario() { }
         protected Usuario(int idUsuario, string nombre, string apellido, string username, string password)
         {
             IdUsuario = idUsuario;

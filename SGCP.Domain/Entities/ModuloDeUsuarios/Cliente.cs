@@ -15,7 +15,7 @@ namespace SGCP.Domain.Entities.ModuloDeUsuarios
         public List<Pedido> HistorialPedidos { get; set; }
         */
 
-
+        public Cliente() { }
         public Cliente(int idUsuario, string nombre, string apellido, string username, string password)
             : base(idUsuario, nombre, apellido, username, password)
         {

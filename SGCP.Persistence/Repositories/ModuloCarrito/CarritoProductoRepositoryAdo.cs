@@ -1,4 +1,5 @@
 ﻿using Microsoft.Extensions.Logging;
+using SGCP.Application.Dtos.ModuloCarrito.CarritoProducto;
 using SGCP.Application.Repositories.ModuloCarrito;
 using SGCP.Application.Repositories.ModuloProducto;
 using SGCP.Domain.Base;
@@ -58,6 +59,33 @@ namespace SGCP.Persistence.Repositories.ModuloCarrito
             {
                 _logger.LogError(ex, "Error al agregar producto al carrito");
                 return OperationResult.FailureResult("Error al agregar producto");
+            }
+
+
+        }
+
+        public async Task<OperationResult> GetProductosByCarritoId(int carritoId)
+        {
+            try
+            {
+                var productos = await _spExecutor.QueryAsync(
+                    "sp_GetProductosByCarritoId",
+                    reader => new CarritoProductoGetDTO
+                    {
+                        ProductoId = reader.GetInt32(reader.GetOrdinal("producto_id")),
+                        Cantidad = reader.GetInt32(reader.GetOrdinal("cantidad")),
+                        Nombre = reader["nombre"].ToString() ?? string.Empty,
+                        Precio = reader.GetDecimal(reader.GetOrdinal("precio"))
+                    },
+                    new Dictionary<string, object> { { "@CarritoId", carritoId } }
+                );
+
+                return OperationResult.SuccessResult("Productos obtenidos", productos.ToList());
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error al obtener productos del carrito");
+                return OperationResult.FailureResult("Error al obtener productos del carrito");
             }
         }
     }

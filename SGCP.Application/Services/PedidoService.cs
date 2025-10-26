@@ -1,9 +1,11 @@
 ﻿using Microsoft.Extensions.Logging;
 using SGCP.Application.Base;
+using SGCP.Application.Dtos.ModuloCarrito.CarritoProducto;
 using SGCP.Application.Dtos.ModuloPedido.Pedido;
 using SGCP.Application.Interfaces;
 using SGCP.Application.Repositories.ModuloCarrito;
 using SGCP.Application.Repositories.ModuloPedido;
+using SGCP.Application.Repositories.ModuloUsuarios;
 using SGCP.Domain.Entities.ModuloDeCarrito;
 using SGCP.Domain.Entities.ModuloDePedido;
 using SGCP.Domain.Entities.ModuloDeUsuarios;
@@ -15,17 +17,26 @@ namespace SGCP.Application.Services
     {
         private readonly IPedido _pedidoRepository;
         private readonly ICarrito _carritoRepository;
+        private readonly ICarritoProducto _carritoProductoRepo;
+        private readonly IPedidoProducto _pedidoProductoRepo;
+        private readonly ICliente _clienteRepository;
         private readonly ILogger<PedidoService> _logger;
-        private readonly ISessionService _sessionService; 
+        private readonly ISessionService _sessionService;
 
         public PedidoService(
             IPedido pedidoRepository,
             ICarrito carritoRepository,
+            ICarritoProducto carritoProductoRepo,
+            IPedidoProducto pedidoProductoRepo,
+            ICliente clienteRepository,
             ILogger<PedidoService> logger,
             ISessionService sessionService)
         {
             _pedidoRepository = pedidoRepository;
             _carritoRepository = carritoRepository;
+            _carritoProductoRepo = carritoProductoRepo;
+            _pedidoProductoRepo = pedidoProductoRepo;
+            _clienteRepository = clienteRepository;
             _logger = logger;
             _sessionService = sessionService;
         }
@@ -37,45 +48,71 @@ namespace SGCP.Application.Services
 
             try
             {
-                // CU-09: Validar cliente logueado
-                /*
-                if (!_sessionService.ClienteIdLogueado.HasValue)
+                // ✅ Validar que el cliente existe
+                var clienteResult = await _clienteRepository.GetEntityBy(createPedidoDto.ClienteId);
+                if (!clienteResult.Success)
                 {
                     result.Success = false;
-                    result.Message = "Debe iniciar sesión para realizar un pedido";
-                    return result;
-                }
-                */
-
-                int clienteId = _sessionService.ClienteIdLogueado.Value;
-
-                // CU-09: Validar que el carrito tiene productos
-                var carritoResult = await _carritoRepository.GetEntityBy(createPedidoDto.CarritoId ?? 0);
-                if (!carritoResult.Success || carritoResult.Data == null)
-                {
-                    result.Success = false;
-                    result.Message = "El carrito no existe";
+                    result.Message = "Cliente no encontrado";
                     return result;
                 }
 
-                var carrito = (Carrito)carritoResult.Data;
-                if (carrito.Productos.Count == 0)
+                // ✅ Validar que el carrito existe
+                var carritoResult = await _carritoRepository.GetEntityBy(createPedidoDto.CarritoId);
+                if (!carritoResult.Success)
                 {
                     result.Success = false;
-                    result.Message = "El carrito está vacío, agregue productos antes de realizar un pedido";
+                    result.Message = "Carrito no encontrado";
                     return result;
                 }
 
-                var pedido = new Pedido(carrito, new Cliente(clienteId, "", "", "", ""))
+                // ✅ Obtener productos del carrito con ADO.NET
+                var productosResult = await _carritoProductoRepo.GetProductosByCarritoId(createPedidoDto.CarritoId);
+                if (!productosResult.Success || productosResult.Data == null)
                 {
-                    Total = carrito.CalcularTotal(),
-                    FechaCreacion = createPedidoDto.FechaCreacion,
+                    result.Success = false;
+                    result.Message = "Error al obtener productos del carrito";
+                    return result;
+                }
+
+                var productosCarrito = (List<CarritoProductoGetDTO>)productosResult.Data;
+
+                if (!productosCarrito.Any())
+                {
+                    result.Success = false;
+                    result.Message = "El carrito está vacío";
+                    return result;
+                }
+
+                // ✅ Calcular el total automáticamente
+                decimal total = 0;
+                foreach (var item in productosCarrito)
+                {
+                    total += item.Precio * item.Cantidad;
+                }
+
+                 var pedido = new Pedido
+                {
+                    ClienteId = createPedidoDto.ClienteId,
+                    CarritoId = createPedidoDto.CarritoId,
+                    FechaCreacion = DateTime.Now,
+                    Estado = "Pendiente",
+                    Total = total,
+
+                    Cliente = new Cliente
+                    {
+                        IdUsuario = createPedidoDto.ClienteId
+                    },
+
+                    Carrito = new Carrito
+                    {
+                        IdCarrito = createPedidoDto.CarritoId
+                    }
                 };
 
-                pedido.ActualizarEstado(createPedidoDto.Estado);
-
-                var opResult = await _pedidoRepository.Save(pedido);
-                if (!opResult.Success)
+                // ✅ Guardar el pedido
+                var savePedidoResult = await _pedidoRepository.Save(pedido);
+                if (!savePedidoResult.Success)
                 {
                     result.Success = false;
                     result.Message = "No se pudo crear el pedido";
@@ -83,19 +120,29 @@ namespace SGCP.Application.Services
                     return result;
                 }
 
+                // ✅ Copiar productos del carrito a PedidoProducto
+                foreach (var item in productosCarrito)
+                {
+                    await _pedidoProductoRepo.AgregarProducto(
+                        pedido.IdPedido,
+                        item.ProductoId,
+                        item.Cantidad
+                    );
+                }
+
                 result.Success = true;
                 result.Message = "Pedido creado exitosamente";
                 result.Data = new PedidoGetDTO
                 {
                     IdPedido = pedido.IdPedido,
-                    ClienteId = pedido.Cliente.IdUsuario,
-                    CarritoId = pedido.Carrito.IdCarrito,
+                    ClienteId = pedido.ClienteId,
+                    CarritoId = pedido.CarritoId,
                     Total = pedido.Total,
                     Estado = pedido.Estado,
                     FechaCreacion = pedido.FechaCreacion
                 };
 
-                _logger.LogInformation("Pedido creado correctamente");
+                _logger.LogInformation($"Pedido {pedido.IdPedido} creado correctamente");
             }
             catch (Exception ex)
             {
@@ -106,7 +153,6 @@ namespace SGCP.Application.Services
 
             return result;
         }
-
         public async Task<ServiceResult> GetPedido()
         {
             var result = new ServiceResult();
@@ -114,15 +160,6 @@ namespace SGCP.Application.Services
 
             try
             {
-                /*
-                if (!_sessionService.ClienteIdLogueado.HasValue)
-                {
-                    result.Success = false;
-                    result.Message = "Debe iniciar sesión para consultar pedidos";
-                    return result;
-                }
-                */
-
                 var opResult = await _pedidoRepository.GetAll();
                 if (!opResult.Success || opResult.Data == null)
                 {
@@ -132,15 +169,12 @@ namespace SGCP.Application.Services
                     return result;
                 }
 
-                int clienteId = _sessionService.ClienteIdLogueado.Value;
-
                 var pedidos = ((List<Pedido>)opResult.Data)
-                    .Where(p => p.Cliente.IdUsuario == clienteId) 
                     .Select(p => new PedidoGetDTO
                     {
                         IdPedido = p.IdPedido,
-                        ClienteId = p.Cliente.IdUsuario,
-                        CarritoId = p.Carrito.IdCarrito,
+                        ClienteId = p.ClienteId,
+                        CarritoId = p.CarritoId,
                         Total = p.Total,
                         Estado = p.Estado,
                         FechaCreacion = p.FechaCreacion
@@ -168,15 +202,6 @@ namespace SGCP.Application.Services
 
             try
             {
-                /*
-                if (!_sessionService.ClienteIdLogueado.HasValue)
-                {
-                    result.Success = false;
-                    result.Message = "Debe iniciar sesión para consultar pedidos";
-                    return result;
-                }
-                */
-
                 var opResult = await _pedidoRepository.GetEntityBy(id);
                 if (!opResult.Success || opResult.Data == null)
                 {
@@ -188,18 +213,11 @@ namespace SGCP.Application.Services
 
                 var p = (Pedido)opResult.Data;
 
-                if (p.Cliente.IdUsuario != _sessionService.ClienteIdLogueado.Value)
-                {
-                    result.Success = false;
-                    result.Message = "No tiene permiso para ver este pedido";
-                    return result;
-                }
-
                 var dto = new PedidoGetDTO
                 {
                     IdPedido = p.IdPedido,
-                    ClienteId = p.Cliente.IdUsuario,
-                    CarritoId = p.Carrito.IdCarrito,
+                    ClienteId = p.ClienteId,
+                    CarritoId = p.CarritoId,
                     Total = p.Total,
                     Estado = p.Estado,
                     FechaCreacion = p.FechaCreacion
@@ -227,15 +245,6 @@ namespace SGCP.Application.Services
 
             try
             {
-                /*
-                if (!_sessionService.ClienteIdLogueado.HasValue)
-                {
-                    result.Success = false;
-                    result.Message = "Debe iniciar sesión para actualizar pedidos";
-                    return result;
-                }
-                */
-
                 var opResult = await _pedidoRepository.GetEntityBy(updatePedidoDto.IdPedido);
                 if (!opResult.Success || opResult.Data == null)
                 {
@@ -245,16 +254,9 @@ namespace SGCP.Application.Services
                 }
 
                 var existingPedido = (Pedido)opResult.Data;
-                if (existingPedido.Cliente.IdUsuario != _sessionService.ClienteIdLogueado.Value)
-                {
-                    result.Success = false;
-                    result.Message = "No tiene permiso para actualizar este pedido";
-                    return result;
-                }
 
-                existingPedido.Total = updatePedidoDto.Total;
-                existingPedido.FechaCreacion = updatePedidoDto.FechaCreacion;
-                existingPedido.ActualizarEstado(updatePedidoDto.Estado);
+                // Solo actualizar el estado (el total no debería cambiar)
+                existingPedido.Estado = updatePedidoDto.Estado;
 
                 var updateResult = await _pedidoRepository.Update(existingPedido);
                 if (!updateResult.Success)
@@ -284,15 +286,6 @@ namespace SGCP.Application.Services
 
             try
             {
-                /*
-                if (!_sessionService.ClienteIdLogueado.HasValue)
-                {
-                    result.Success = false;
-                    result.Message = "Debe iniciar sesión para eliminar pedidos";
-                    return result;
-                }
-                */
-
                 var opResult = await _pedidoRepository.GetEntityBy(deletePedidoDto.IdPedido);
                 if (!opResult.Success || opResult.Data == null)
                 {
@@ -302,12 +295,6 @@ namespace SGCP.Application.Services
                 }
 
                 var existingPedido = (Pedido)opResult.Data;
-                if (existingPedido.Cliente.IdUsuario != _sessionService.ClienteIdLogueado.Value)
-                {
-                    result.Success = false;
-                    result.Message = "No tiene permiso para eliminar este pedido";
-                    return result;
-                }
 
                 var removeResult = await _pedidoRepository.Remove(existingPedido);
                 if (!removeResult.Success)

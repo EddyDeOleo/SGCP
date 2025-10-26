@@ -1,16 +1,5 @@
+using SGCP.Ioc.Dependencies.ModuloPedido;
 
-using SGCP.Application.Interfaces;
-using SGCP.Application.Repositories.ModuloCarrito;
-using SGCP.Application.Repositories.ModuloPedido;
-using SGCP.Application.Repositories.ModuloProducto;
-using SGCP.Application.Services;
-using SGCP.Persistence.Base;
-using SGCP.Persistence.Base.EntityValidator.ModuloCarrito;
-using SGCP.Persistence.Base.EntityValidator.ModuloPedido;
-using SGCP.Persistence.Base.EntityValidator.ModuloProducto;
-using SGCP.Persistence.Repositories.ModuloCarrito;
-using SGCP.Persistence.Repositories.ModuloPedido;
-using SGCP.Persistence.Repositories.ModuloProducto;
 
 namespace SGCP.ModuloPedido.Api
 {
@@ -20,21 +9,7 @@ namespace SGCP.ModuloPedido.Api
         {
             var builder = WebApplication.CreateBuilder(args);
 
-            // Add services to the container.
-            builder.Services.AddScoped<IStoredProcedureExecutor, StoredProcedureExecutor>();
-            builder.Services.AddScoped<PedidoValidator>();
-            builder.Services.AddScoped<IPedido, PedidoRepositoryAdo>();
-            builder.Services.AddScoped<ISessionService, SessionService>();
-            builder.Services.AddTransient<IPedidoService, PedidoService>();
-            builder.Services.AddScoped<CarritoValidator>();
-            builder.Services.AddScoped<ICarrito, CarritoRepositoryAdo>();
-            builder.Services.AddTransient<ICarritoService, CarritoService>();
-
-            builder.Services.AddScoped<ICarritoProducto, CarritoProductoRepositoryAdo>();
-            builder.Services.AddScoped<IProducto, ProductoRepositoryAdo>();
-            builder.Services.AddScoped<ProductoValidator>();
-
-
+            builder.Services.AddPedidoDependencies(builder.Configuration);
 
 
             builder.Services.AddControllers();
