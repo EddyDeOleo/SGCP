@@ -23,7 +23,6 @@ namespace SGCP.Ioc.Dependencies.ModuloReporte
             services.AddScoped<IStoredProcedureExecutor, StoredProcedureExecutor>();
             services.AddScoped<ReporteValidator>();
             services.AddScoped<IReporte, ReporteRepositoryAdo>();
-            services.AddScoped<ISessionService, SessionService>();
             services.AddTransient<IReporteService, ReporteService>();
             services.AddScoped<IAdministrador, AdministradorRepositoryEF>();
 

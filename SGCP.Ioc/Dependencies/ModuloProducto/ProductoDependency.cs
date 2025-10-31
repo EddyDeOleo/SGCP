@@ -17,7 +17,6 @@ namespace SGCP.Ioc.Dependencies.ModuloProducto
             services.AddScoped<IStoredProcedureExecutor, StoredProcedureExecutor>();
             services.AddScoped<ProductoValidator>();
             services.AddScoped<IProducto, ProductoRepositoryAdo>();
-            services.AddScoped<ISessionService, SessionService>();
             services.AddTransient<IProductoService, ProductoService>();
         }
     }

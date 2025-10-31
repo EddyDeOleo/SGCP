@@ -23,7 +23,6 @@ namespace SGCP.Ioc.Dependencies.ModuloUsuarios
             services.AddScoped<IAdministrador, AdministradorRepositoryEF>();
             services.AddTransient<IAdminService, AdminService>();
 
-            services.AddScoped<ISessionService, SessionService>();
 
         }
     }

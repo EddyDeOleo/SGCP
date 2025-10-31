@@ -17,7 +17,6 @@ namespace SGCP.Application.Services
         private readonly ICarrito _carritoRepository;
         private readonly ICarritoProducto _carritoProductoRepo; 
         private readonly ILogger<CarritoService> _logger;
-        private readonly ISessionService _sessionService;
         private readonly IProducto _productoRepository;
 
 
@@ -25,14 +24,12 @@ namespace SGCP.Application.Services
             ICarrito carritoRepository,
             ICarritoProducto carritoProductoRepo, 
             ILogger<CarritoService> logger,
-            ISessionService sessionService,
             IProducto productoRepository
             )
         {
             _carritoRepository = carritoRepository;
             _carritoProductoRepo = carritoProductoRepo; 
             _logger = logger;
-            _sessionService = sessionService;
             _productoRepository = productoRepository;
         }
 
@@ -78,7 +75,6 @@ namespace SGCP.Application.Services
                     return result;
                 }
 
-                // Agregar producto
                 var addResult = await _carritoProductoRepo.AgregarProducto(carritoId, dto.ProductoId, dto.Cantidad);
 
                 result.Success = addResult.Success;

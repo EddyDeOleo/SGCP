@@ -1,162 +1,56 @@
-﻿using Microsoft.Extensions.Logging;
+﻿using Microsoft.Data.SqlClient;
+using Microsoft.Extensions.Logging;
 using SGCP.Application.Repositories.ModuloPedido;
 using SGCP.Domain.Base;
 using SGCP.Domain.Entities.ModuloDePedido;
 using SGCP.Persistence.Base;
 using SGCP.Persistence.Base.EntityHelper.ModuloPedido;
 using SGCP.Persistence.Base.EntityValidator.ModuloPedido;
-using System.Data;
-using System.Linq.Expressions;
+
 
 namespace SGCP.Persistence.Repositories.ModuloPedido
 {
-    public class PedidoRepositoryAdo : IPedido
+    public class PedidoRepositoryAdo : BaseRepositoryAdo<Pedido>, IPedido
     {
+        protected override string SpGetAll => "sp_GetAllPedidos";
+        protected override string SpGetById => "sp_GetPedidoById";
+        protected override string SpInsert => "sp_InsertPedido";
+        protected override string SpUpdate => "sp_UpdatePedido";
+        protected override string SpDelete => "sp_DeletePedido";
 
-        private readonly IStoredProcedureExecutor _spExecutor;
-        private readonly ILogger<PedidoRepositoryAdo> _logger;
-        private readonly PedidoValidator _pedidoValidator;
-
-
-        public PedidoRepositoryAdo(IStoredProcedureExecutor spExecutor, ILogger<PedidoRepositoryAdo> logger, PedidoValidator pedidoValidator)
+        public PedidoRepositoryAdo(
+            IStoredProcedureExecutor spExecutor,
+            ILogger<PedidoRepositoryAdo> logger,
+            PedidoValidator pedidoValidator)
+            : base(spExecutor, logger, pedidoValidator)
         {
-            _spExecutor = spExecutor;
-            _logger = logger;
-            _pedidoValidator = pedidoValidator;
-        }
-        public async Task<bool> Exists(Expression<Func<Pedido, bool>> filter)
-        {
-            var result = await RepositoryLoggerHelper.ExecuteLoggedAsync<Pedido>(
-                _logger,
-                nameof(Exists),
-                async () =>
-                {
-                    var allResult = await GetAll();
-
-                    if (!allResult.Success || allResult.Data == null)
-                        return OperationResult.FailureResult("No se pudo obtener pedidos para verificar existencia");
-
-                    var pedidos = ((List<Pedido>)allResult.Data).AsQueryable();
-
-                    bool exists = pedidos.Any(filter.Compile());
-
-                    return OperationResult.SuccessResult("Existencia verificada", exists);
-                },
-                filter
-            );
-
-            return result.Success && result.Data is bool b && b;
         }
 
-
-        public Task<OperationResult> GetAll() =>
-    RepositoryLoggerHelper.ExecuteLoggedAsync<Pedido>(
-        _logger,
-        nameof(GetAll),
-        async () =>
+        protected override Pedido MapToEntity(SqlDataReader reader)
         {
-            var pedidosGet = await _spExecutor.QueryAsync(
-                "sp_GetAllPedidos",
-                PedidoRepositoryHelper.MapToPedidoGetModel
-            );
-
-            var pedidos = pedidosGet.Select(PedidoRepositoryHelper.MapToPedido).ToList();
-            return OperationResult.SuccessResult("Pedidos obtenidos correctamente", pedidos);
+            var model = PedidoRepositoryHelper.MapToPedidoGetModel(reader);
+            return PedidoRepositoryHelper.MapToPedido(model);
         }
-    );
 
-
-        public Task<OperationResult> GetEntityBy(int id) =>
-    RepositoryLoggerHelper.ExecuteLoggedAsync<Pedido>(
-        _logger,
-        nameof(GetEntityBy),
-        async () =>
+        protected override (Dictionary<string, object>, SqlParameter) GetInsertParameters(Pedido entity)
         {
-            var pedidosGet = await _spExecutor.QueryAsync(
-                "sp_GetPedidoById",
-                PedidoRepositoryHelper.MapToPedidoGetModel,
-                new Dictionary<string, object> { { "@IdPedido", id } }
-            );
+            return PedidoRepositoryHelper.GetInsertParameters(entity);
+        }
 
-            if (!pedidosGet.Any())
-                return OperationResult.FailureResult("Pedido no encontrado");
-
-            var pedido = PedidoRepositoryHelper.MapToPedido(pedidosGet.First());
-            return OperationResult.SuccessResult("Pedido obtenido correctamente", pedido);
-        },
-        id
-    );
-
-
-        public Task<OperationResult> Save(Pedido entity) =>
-     RepositoryLoggerHelper.ExecuteLoggedAsync<Pedido>(
-         _logger,
-         nameof(Save),
-         async () =>
-         {
-             var validation = _pedidoValidator.ValidateForSave(entity);
-             if (!validation.Success) return validation;
-
-             var (parameters, outputParam) = PedidoRepositoryHelper.GetInsertParameters(entity);
-             await _spExecutor.ExecuteAsync("sp_InsertPedido", parameters, outputParam);
-             entity.IdPedido = (int)outputParam.Value;
-
-             return OperationResult.SuccessResult("Pedido creado correctamente", entity);
-         },
-         entity.Cliente.IdUsuario
-     );
-
-        public Task<OperationResult> Update(Pedido entity) =>
-            RepositoryLoggerHelper.ExecuteLoggedAsync<Pedido>(
-                _logger,
-                nameof(Update),
-                async () =>
-                {
-                    var validation = _pedidoValidator.ValidateForUpdate(entity);
-                    if (!validation.Success) return validation;
-
-                    var parameters = PedidoRepositoryHelper.GetUpdateParameters(entity);
-                    await _spExecutor.ExecuteAsync("sp_UpdatePedido", parameters);
-
-                    return OperationResult.SuccessResult("Pedido actualizado correctamente", entity);
-                },
-                entity.IdPedido
-            );
-
-        public Task<OperationResult> Remove(Pedido entity) =>
-    RepositoryLoggerHelper.ExecuteLoggedAsync<Pedido>(
-        _logger,
-        nameof(Remove),
-        async () =>
+        protected override Dictionary<string, object> GetUpdateParameters(Pedido entity)
         {
-            var validation = _pedidoValidator.ValidateForRemove(entity);
-            if (!validation.Success) return validation;
+            return PedidoRepositoryHelper.GetUpdateParameters(entity);
+        }
 
-            var parameters = PedidoRepositoryHelper.GetDeleteParameters(entity);
-            await _spExecutor.ExecuteAsync("sp_DeletePedido", parameters);
-
-            return OperationResult.SuccessResult("Pedido eliminado correctamente");
-        },
-        entity.IdPedido
-    );
-
-
-        public Task<OperationResult> GetAll(Expression<Func<Pedido, bool>> filter) =>
-    RepositoryLoggerHelper.ExecuteLoggedAsync<Pedido>(
-        _logger,
-        nameof(GetAll),
-        async () =>
+        protected override Dictionary<string, object> GetDeleteParameters(Pedido entity)
         {
-            var result = await GetAll();
-            if (!result.Success || result.Data == null)
-                return OperationResult.FailureResult("No se pudieron obtener pedidos");
+            return PedidoRepositoryHelper.GetDeleteParameters(entity);
+        }
 
-            var pedidos = ((List<Pedido>)result.Data).AsQueryable().Where(filter.Compile()).ToList();
-            return OperationResult.SuccessResult("Pedidos filtrados correctamente", pedidos);
-        },
-        filter
-    );
-
+        protected override Dictionary<string, object> GetIdParameter(int id)
+        {
+            return new Dictionary<string, object> { { "@IdPedido", id } };
+        }
 
         public async Task<List<Pedido>> GetPedidosByClienteId(int clienteId)
         {
@@ -169,11 +63,11 @@ namespace SGCP.Persistence.Repositories.ModuloPedido
 
                     var pedidosGet = await _spExecutor.QueryAsync(
                         "sp_GetPedidosByClienteId",
-                        PedidoRepositoryHelper.MapToPedidoGetModel,
+                        MapToEntity,
                         parameters
                     );
 
-                    var pedidos = pedidosGet.Select(PedidoRepositoryHelper.MapToPedido).ToList();
+                    var pedidos = pedidosGet.ToList();
                     return OperationResult.SuccessResult("Pedidos obtenidos", pedidos);
                 },
                 clienteId
@@ -181,7 +75,5 @@ namespace SGCP.Persistence.Repositories.ModuloPedido
 
             return result.Data as List<Pedido> ?? new List<Pedido>();
         }
-
-
     }
 }

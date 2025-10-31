@@ -12,13 +12,11 @@ namespace SGCP.Application.Services
         {
             private readonly IProducto _productoRepository;
             private readonly ILogger<ProductoService> _logger;
-            private readonly ISessionService _sessionService;
 
-            public ProductoService(IProducto productoRepository, ILogger<ProductoService> logger, ISessionService sessionService)
+            public ProductoService(IProducto productoRepository, ILogger<ProductoService> logger)
             {
                 _productoRepository = productoRepository;
                 _logger = logger;
-                _sessionService = sessionService;
             }
 
             public async Task<ServiceResult> CreateProducto(CreateProductoDTO createProductoDto)
@@ -26,15 +24,6 @@ namespace SGCP.Application.Services
                 var result = new ServiceResult();
                 _logger.LogInformation("Iniciando la creación de un nuevo producto");
 
-                // Validación de precondición: admin logueado
-                /*
-                if (_sessionService.AdminIdLogueado == null)
-                {
-                    result.Success = false;
-                    result.Message = "El administrador debe iniciar sesión para crear productos.";
-                    return result;
-                }
-                */
 
                 try
                 {
@@ -120,7 +109,7 @@ namespace SGCP.Application.Services
                 return result;
             }
 
-            public async Task<ServiceResult> GetProductoById(int id)
+            public async  Task<ServiceResult> GetProductoById(int id)
             {
                 var result = new ServiceResult();
                 _logger.LogInformation("Obteniendo producto con ID {ProductoId}", id);
@@ -168,14 +157,6 @@ namespace SGCP.Application.Services
                 _logger.LogInformation($"Iniciando actualización del producto con ID: {updateProductoDto.IdProducto}");
 
 
-                /*
-                if (_sessionService.AdminIdLogueado == null)
-                {
-                    result.Success = false;
-                    result.Message = "El administrador debe iniciar sesión para actualizar productos.";
-                    return result;
-                }
-                */
 
                 try
                 {
@@ -224,14 +205,7 @@ namespace SGCP.Application.Services
                 var result = new ServiceResult();
                 _logger.LogInformation($"Iniciando eliminación del producto con ID: {deleteProductoDto.IdProducto}");
 
-                /*
-                if (_sessionService.AdminIdLogueado == null)
-                {
-                    result.Success = false;
-                    result.Message = "El administrador debe iniciar sesión para eliminar productos.";
-                    return result;
-                }\*/
-
+          
                 try
                 {
                     var existingResult = await _productoRepository.GetEntityBy(deleteProductoDto.IdProducto);

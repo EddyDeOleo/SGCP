@@ -11,13 +11,11 @@ namespace SGCP.Application.Services
     {
         private readonly IAdministrador _repository;
         private readonly ILogger<AdminService> _logger;
-        private readonly ISessionService _sessionService;
 
-        public AdminService(IAdministrador repository, ILogger<AdminService> logger, ISessionService sessionService)
+        public AdminService(IAdministrador repository, ILogger<AdminService> logger)
         {
             _repository = repository;
             _logger = logger;
-            _sessionService = sessionService;
         }
 
         public async Task<ServiceResult> CreateAdmin(CreateAdminDTO createAdminDto)
@@ -76,15 +74,7 @@ namespace SGCP.Application.Services
 
             try
             {
-                /*
-                // CU-04: Debe haber un admin logueado
-                if (!_sessionService.AdminIdLogueado.HasValue)
-                {
-                    result.Success = false;
-                    result.Message = "Debe iniciar sesión como administrador para consultar los administradores";
-                    return result;
-                }
-                */
+               
 
                 var opResult = await _repository.GetAll();
                 if (!opResult.Success || opResult.Data == null)
@@ -124,16 +114,7 @@ namespace SGCP.Application.Services
 
             try
             {
-                /*
-                // CU-04: Debe haber un admin logueado
-                if (!_sessionService.AdminIdLogueado.HasValue)
-                {
-                    result.Success = false;
-                    result.Message = "Debe iniciar sesión como administrador para consultar el administrador";
-                    return result;
-                }
-                */
-
+               
                 var opResult = await _repository.GetEntityBy(id);
                 if (!opResult.Success || opResult.Data == null)
                 {
@@ -174,15 +155,7 @@ namespace SGCP.Application.Services
 
             try
             {
-               /*
-                // CU-04: Debe haber un admin logueado
-                if (!_sessionService.AdminIdLogueado.HasValue)
-                {
-                    result.Success = false;
-                    result.Message = "Debe iniciar sesión como administrador para actualizar";
-                    return result;
-                }
-               */
+             
 
                 var existingResult = await _repository.GetEntityBy(updateAdminDto.AdminId);
                 if (!existingResult.Success || existingResult.Data == null)
@@ -228,16 +201,7 @@ namespace SGCP.Application.Services
 
             try
             {
-               /*
-                // CU-04: Debe haber un admin logueado
-                if (!_sessionService.AdminIdLogueado.HasValue)
-                {
-                    result.Success = false;
-                    result.Message = "Debe iniciar sesión como administrador para eliminar";
-                    return result;
-                }
-               */
-
+              
                 var existingResult = await _repository.GetEntityBy(deleteAdminDto.AdminId);
                 if (!existingResult.Success || existingResult.Data == null)
                 {

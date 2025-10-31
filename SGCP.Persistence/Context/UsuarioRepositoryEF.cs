@@ -9,7 +9,6 @@ public class SGCPDbContext : DbContext
 {
     public SGCPDbContext(DbContextOptions<SGCPDbContext> options) : base(options) { }
 
-    // ✅ AGREGAR ESTO TEMPORALMENTE
     protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
     {
         optionsBuilder.LogTo(Console.WriteLine, new[] { DbLoggerCategory.Database.Command.Name }, LogLevel.Information);
@@ -49,7 +48,6 @@ public class SGCPDbContext : DbContext
         modelBuilder.Entity<Cliente>(entity =>
         {
             entity.ToTable("Cliente");
-            // ❌ NO mapear IdUsuario aquí
         });
 
         // ===============================
@@ -58,7 +56,6 @@ public class SGCPDbContext : DbContext
         modelBuilder.Entity<Administrador>(entity =>
         {
             entity.ToTable("Administrador");
-            // ❌ NO mapear IdUsuario aquí
         });
         // ===============================
         // Carrito

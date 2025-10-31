@@ -18,7 +18,6 @@ namespace SGCP.Ioc.Dependencies.ModuloCarrito
             services.AddScoped<IStoredProcedureExecutor, StoredProcedureExecutor>();
             services.AddScoped<CarritoValidator>();
             services.AddScoped<ICarrito, CarritoRepositoryAdo>();
-            services.AddScoped<ISessionService, SessionService>();
             services.AddTransient<ICarritoService, CarritoService>();
             services.AddScoped<ICarritoProducto, CarritoProductoRepositoryAdo>();
             services.AddScoped<IProducto, ProductoRepositoryAdo>();

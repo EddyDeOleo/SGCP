@@ -30,7 +30,6 @@ namespace SGCP.Ioc.Dependencies.ModuloPedido
             services.AddScoped<IStoredProcedureExecutor, StoredProcedureExecutor>();
             services.AddScoped<PedidoValidator>();
             services.AddScoped<IPedido, PedidoRepositoryAdo>();
-            services.AddScoped<ISessionService, SessionService>();
             services.AddTransient<IPedidoService, PedidoService>();
             services.AddScoped<CarritoValidator>();
             services.AddScoped<ICarrito, CarritoRepositoryAdo>();

@@ -21,7 +21,6 @@ namespace SGCP.Application.Services
         private readonly IPedidoProducto _pedidoProductoRepo;
         private readonly ICliente _clienteRepository;
         private readonly ILogger<PedidoService> _logger;
-        private readonly ISessionService _sessionService;
 
         public PedidoService(
             IPedido pedidoRepository,
@@ -29,8 +28,8 @@ namespace SGCP.Application.Services
             ICarritoProducto carritoProductoRepo,
             IPedidoProducto pedidoProductoRepo,
             ICliente clienteRepository,
-            ILogger<PedidoService> logger,
-            ISessionService sessionService)
+            ILogger<PedidoService> logger
+           )
         {
             _pedidoRepository = pedidoRepository;
             _carritoRepository = carritoRepository;
@@ -38,7 +37,6 @@ namespace SGCP.Application.Services
             _pedidoProductoRepo = pedidoProductoRepo;
             _clienteRepository = clienteRepository;
             _logger = logger;
-            _sessionService = sessionService;
         }
 
         public async Task<ServiceResult> CreatePedido(CreatePedidoDTO createPedidoDto)
@@ -66,7 +64,7 @@ namespace SGCP.Application.Services
                     return result;
                 }
 
-                // ✅ Obtener productos del carrito con ADO.NET
+                // ✅ Obtener productos del carrito
                 var productosResult = await _carritoProductoRepo.GetProductosByCarritoId(createPedidoDto.CarritoId);
                 if (!productosResult.Success || productosResult.Data == null)
                 {
@@ -84,7 +82,6 @@ namespace SGCP.Application.Services
                     return result;
                 }
 
-                // ✅ Calcular el total automáticamente
                 decimal total = 0;
                 foreach (var item in productosCarrito)
                 {
@@ -110,7 +107,6 @@ namespace SGCP.Application.Services
                     }
                 };
 
-                // ✅ Guardar el pedido
                 var savePedidoResult = await _pedidoRepository.Save(pedido);
                 if (!savePedidoResult.Success)
                 {
@@ -120,7 +116,6 @@ namespace SGCP.Application.Services
                     return result;
                 }
 
-                // ✅ Copiar productos del carrito a PedidoProducto
                 foreach (var item in productosCarrito)
                 {
                     await _pedidoProductoRepo.AgregarProducto(
@@ -255,7 +250,6 @@ namespace SGCP.Application.Services
 
                 var existingPedido = (Pedido)opResult.Data;
 
-                // Solo actualizar el estado (el total no debería cambiar)
                 existingPedido.Estado = updatePedidoDto.Estado;
 
                 var updateResult = await _pedidoRepository.Update(existingPedido);

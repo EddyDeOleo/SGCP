@@ -13,13 +13,11 @@ namespace SGCP.Application.Services
     {
         private readonly ICliente _repository;
         private readonly ILogger<ClienteService> _logger;
-        private readonly ISessionService _sessionService;
 
-        public ClienteService(ICliente repository, ILogger<ClienteService> logger, ISessionService sessionService)
+        public ClienteService(ICliente repository, ILogger<ClienteService> logger)
         {
             _repository = repository;
             _logger = logger;
-            _sessionService = sessionService;
         }
 
         public async Task<ServiceResult> CreateCliente(CreateClienteDTO createClienteDto)
@@ -29,7 +27,7 @@ namespace SGCP.Application.Services
 
             try
             {
-                // Validación de username existente...
+                // Validación de username existente
                 var existingResult = await _repository.GetAll();
                 if (existingResult.Success && existingResult.Data != null)
                 {
@@ -50,8 +48,7 @@ namespace SGCP.Application.Services
                     createClienteDto.Password
                 );
 
-                // ✅ NO crear el Carrito aquí, dejarlo null
-                cliente.Carrito = null;  // Asegurar que sea null
+                cliente.Carrito = null; 
 
                 var opResult = await _repository.Save(cliente);
                 if (!opResult.Success)
@@ -81,16 +78,7 @@ namespace SGCP.Application.Services
 
             try
             {
-                /*
-                // Precondición CU-08: Usuario debe haber iniciado sesión
-                if (!_sessionService.ClienteIdLogueado.HasValue)
-                {
-                    result.Success = false;
-                    result.Message = "Debe iniciar sesión para consultar los clientes";
-                    return result;
-                }
-                */
-
+            
                 var opResult = await _repository.GetAll();
                 if (!opResult.Success || opResult.Data == null)
                 {
@@ -129,15 +117,7 @@ namespace SGCP.Application.Services
 
             try
             {
-                /*
-                // Precondición CU-08: Usuario debe haber iniciado sesión
-                if (!_sessionService.ClienteIdLogueado.HasValue)
-                {
-                    result.Success = false;
-                    result.Message = "Debe iniciar sesión para consultar el cliente";
-                    return result;
-                }
-                */
+       
 
                 var opResult = await _repository.GetEntityBy(id);
                 if (!opResult.Success || opResult.Data == null)
@@ -179,15 +159,7 @@ namespace SGCP.Application.Services
 
             try
             {
-                /*
-                // Precondición CU-08: Usuario debe haber iniciado sesión
-                if (!_sessionService.ClienteIdLogueado.HasValue)
-                {
-                    result.Success = false;
-                    result.Message = "Debe iniciar sesión para actualizar el cliente";
-                    return result;
-                }
-                */
+        
 
                 var existingResult = await _repository.GetEntityBy(updateClienteDto.ClienteId);
                 if (!existingResult.Success || existingResult.Data == null)
@@ -233,16 +205,7 @@ namespace SGCP.Application.Services
 
             try
             {
-                /*
-                // Precondición CU-08: Usuario debe haber iniciado sesión
-                if (!_sessionService.ClienteIdLogueado.HasValue)
-                {
-                    result.Success = false;
-                    result.Message = "Debe iniciar sesión para eliminar el cliente";
-                    return result;
-                }
-                */
-
+             
                 var existingResult = await _repository.GetEntityBy(deleteClienteDto.ClienteId);
                 if (!existingResult.Success || existingResult.Data == null)
                 {

@@ -14,14 +14,12 @@ namespace SGCP.Application.Services
         {
             private readonly IReporte _reporteRepository;
             private readonly ILogger<ReporteService> _logger;
-            private readonly ISessionService _sessionService;
             private readonly IAdministrador _adminRepository;
 
-        public ReporteService(IReporte reporteRepository, ILogger<ReporteService> logger, ISessionService sessionService, IAdministrador adminRepository)
+        public ReporteService(IReporte reporteRepository, ILogger<ReporteService> logger, IAdministrador adminRepository)
             {
                 _reporteRepository = reporteRepository;
                 _logger = logger;
-                _sessionService = sessionService;
                 _adminRepository = adminRepository;
         }
 
@@ -30,7 +28,6 @@ namespace SGCP.Application.Services
             var result = new ServiceResult();
             _logger.LogInformation("Iniciando la creación de un nuevo reporte");
 
-            // Validación: admin existe
             var adminResult = await _adminRepository.GetEntityBy(createReporteDto.AdminId);
             if (!adminResult.Success)
             {
@@ -41,7 +38,6 @@ namespace SGCP.Application.Services
 
             var adminExiste = (Administrador)adminResult.Data;
 
-            // Validación: fecha obligatoria
             if (createReporteDto.FechaCreacion == default)
             {
                 result.Success = false;
@@ -53,7 +49,7 @@ namespace SGCP.Application.Services
             {
                 var reporte = new Reporte
                 {
-                    AdminId = adminExiste.IdUsuario, // se asegura que sea un admin real
+                    AdminId = adminExiste.IdUsuario, 
                     FechaCreacion = createReporteDto.FechaCreacion,
                     TotalVentas = createReporteDto.TotalVentas,
                     TotalPedidos = createReporteDto.TotalPedidos
@@ -171,14 +167,7 @@ namespace SGCP.Application.Services
                 var result = new ServiceResult();
                 _logger.LogInformation($"Iniciando actualización del reporte con ID: {updateReporteDto.IdReporte}");
 
-            /*
-                if (_sessionService.AdminIdLogueado == null)
-                {
-                    result.Success = false;
-                    result.Message = "El administrador debe iniciar sesión para actualizar reportes.";
-                    return result;
-                }
-            */
+         
                 try
                 {
                     var existingResult = await _reporteRepository.GetEntityBy(updateReporteDto.IdReporte);
@@ -226,14 +215,7 @@ namespace SGCP.Application.Services
                 var result = new ServiceResult();
                 _logger.LogInformation($"Iniciando eliminación del reporte con ID: {deleteReporteDto.IdReporte}");
 
-            /*
-                if (_sessionService.AdminIdLogueado == null)
-                {
-                    result.Success = false;
-                    result.Message = "El administrador debe iniciar sesión para eliminar reportes.";
-                    return result;
-                }
-            */
+          
                 try
                 {
                     var existingResult = await _reporteRepository.GetEntityBy(deleteReporteDto.IdReporte);

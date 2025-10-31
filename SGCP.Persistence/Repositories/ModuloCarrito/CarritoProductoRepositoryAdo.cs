@@ -13,8 +13,8 @@ namespace SGCP.Persistence.Repositories.ModuloCarrito
 
         private readonly IStoredProcedureExecutor _spExecutor;
         private readonly ILogger<CarritoProductoRepositoryAdo> _logger;
-        private readonly ICarrito _carritoRepository; // ✅ Inyectar repositorio de Carrito
-        private readonly IProducto _productoRepository; // ✅ Inyectar repositorio de Producto
+        private readonly ICarrito _carritoRepository; 
+        private readonly IProducto _productoRepository; 
 
         public CarritoProductoRepositoryAdo(
             IStoredProcedureExecutor spExecutor,
