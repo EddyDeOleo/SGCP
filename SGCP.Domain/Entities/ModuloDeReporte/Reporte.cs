@@ -1,5 +1,4 @@
 ﻿
-using SGCP.Domain.Entities.ModuloDePedido;
 
 namespace SGCP.Domain.Entities.ModuloDeReporte
 {
@@ -10,11 +9,7 @@ namespace SGCP.Domain.Entities.ModuloDeReporte
         public decimal TotalVentas { get; set; }
         public int TotalPedidos { get; set; }
 
-        public void GenerarReporte(List<Pedido> pedidos)
-        {
-            TotalVentas = pedidos.Sum(p => p.Total);
-            TotalPedidos = pedidos.Count;
-        }
+ 
 
 
 

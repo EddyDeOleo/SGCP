@@ -16,7 +16,6 @@ namespace SGCP.Domain.Entities.ModuloDeCarrito
         [Column("cantidad")]
         public int Cantidad { get; set; }
 
-        // Propiedades de navegación (opcionales para ADO.NET)
         public Carrito Carrito { get; set; }
         public Producto Producto { get; set; }
     }

@@ -6,9 +6,7 @@ using SGCP.Application.Interfaces;
 using SGCP.Application.Repositories.ModuloCarrito;
 using SGCP.Application.Repositories.ModuloPedido;
 using SGCP.Application.Repositories.ModuloUsuarios;
-using SGCP.Domain.Entities.ModuloDeCarrito;
 using SGCP.Domain.Entities.ModuloDePedido;
-using SGCP.Domain.Entities.ModuloDeUsuarios;
 
 
 namespace SGCP.Application.Services
@@ -46,7 +44,7 @@ namespace SGCP.Application.Services
 
             try
             {
-                // ✅ Validar que el cliente existe
+                // Validar que el cliente existe
                 var clienteResult = await _clienteRepository.GetEntityBy(createPedidoDto.ClienteId);
                 if (!clienteResult.Success)
                 {
@@ -55,7 +53,7 @@ namespace SGCP.Application.Services
                     return result;
                 }
 
-                // ✅ Validar que el carrito existe
+                // Validar que el carrito existe
                 var carritoResult = await _carritoRepository.GetEntityBy(createPedidoDto.CarritoId);
                 if (!carritoResult.Success)
                 {
@@ -64,7 +62,7 @@ namespace SGCP.Application.Services
                     return result;
                 }
 
-                // ✅ Obtener productos del carrito
+                // Obtener productos del carrito
                 var productosResult = await _carritoProductoRepo.GetProductosByCarritoId(createPedidoDto.CarritoId);
                 if (!productosResult.Success || productosResult.Data == null)
                 {
@@ -88,23 +86,12 @@ namespace SGCP.Application.Services
                     total += item.Precio * item.Cantidad;
                 }
 
-                 var pedido = new Pedido
+                var pedido = new Pedido
                 {
                     ClienteId = createPedidoDto.ClienteId,
                     CarritoId = createPedidoDto.CarritoId,
-                    FechaCreacion = DateTime.Now,
                     Estado = "Pendiente",
-                    Total = total,
-
-                    Cliente = new Cliente
-                    {
-                        IdUsuario = createPedidoDto.ClienteId
-                    },
-
-                    Carrito = new Carrito
-                    {
-                        IdCarrito = createPedidoDto.CarritoId
-                    }
+                    Total = total
                 };
 
                 var savePedidoResult = await _pedidoRepository.Save(pedido);
@@ -134,7 +121,9 @@ namespace SGCP.Application.Services
                     CarritoId = pedido.CarritoId,
                     Total = pedido.Total,
                     Estado = pedido.Estado,
-                    FechaCreacion = pedido.FechaCreacion
+                    FechaCreacion = pedido.FechaCreacion,
+                    FechaModificacion = pedido.FechaModificacion,
+                    UsuarioModificacion = pedido.UsuarioModificacion
                 };
 
                 _logger.LogInformation($"Pedido {pedido.IdPedido} creado correctamente");
@@ -148,6 +137,7 @@ namespace SGCP.Application.Services
 
             return result;
         }
+
         public async Task<ServiceResult> GetPedido()
         {
             var result = new ServiceResult();
@@ -172,7 +162,9 @@ namespace SGCP.Application.Services
                         CarritoId = p.CarritoId,
                         Total = p.Total,
                         Estado = p.Estado,
-                        FechaCreacion = p.FechaCreacion
+                        FechaCreacion = p.FechaCreacion,
+                        FechaModificacion = p.FechaModificacion,
+                        UsuarioModificacion = p.UsuarioModificacion
                     }).ToList();
 
                 result.Success = true;
@@ -215,7 +207,9 @@ namespace SGCP.Application.Services
                     CarritoId = p.CarritoId,
                     Total = p.Total,
                     Estado = p.Estado,
-                    FechaCreacion = p.FechaCreacion
+                    FechaCreacion = p.FechaCreacion,
+                    FechaModificacion = p.FechaModificacion,
+                    UsuarioModificacion = p.UsuarioModificacion
                 };
 
                 result.Success = true;
@@ -251,6 +245,7 @@ namespace SGCP.Application.Services
                 var existingPedido = (Pedido)opResult.Data;
 
                 existingPedido.Estado = updatePedidoDto.Estado;
+                //existingPedido.UsuarioModificacion = updatePedidoDto.UsuarioModificacion;
 
                 var updateResult = await _pedidoRepository.Update(existingPedido);
                 if (!updateResult.Success)
@@ -312,4 +307,5 @@ namespace SGCP.Application.Services
         }
     }
 }
+
 

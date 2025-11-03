@@ -27,6 +27,7 @@ namespace SGCP.Application.Services
 
             try
             {
+
                 // Validación de username existente
                 var existingResult = await _repository.GetAll();
                 if (existingResult.Success && existingResult.Data != null)
@@ -41,14 +42,13 @@ namespace SGCP.Application.Services
                 }
 
                 var cliente = new Cliente(
-                
                     createClienteDto.Nombre,
                     createClienteDto.Apellido,
                     createClienteDto.Username,
                     createClienteDto.Password
                 );
 
-                cliente.Carrito = null; 
+                cliente.Carrito = null;
 
                 var opResult = await _repository.Save(cliente);
                 if (!opResult.Success)
@@ -71,6 +71,7 @@ namespace SGCP.Application.Services
 
             return result;
         }
+
         public async Task<ServiceResult> GetCliente()
         {
             var result = new ServiceResult();
@@ -78,7 +79,6 @@ namespace SGCP.Application.Services
 
             try
             {
-            
                 var opResult = await _repository.GetAll();
                 if (!opResult.Success || opResult.Data == null)
                 {
@@ -93,7 +93,10 @@ namespace SGCP.Application.Services
                     Nombre = c.Nombre,
                     Apellido = c.Apellido,
                     Username = c.Username,
-                    Password = c.Password
+                    FechaCreacion = c.FechaCreacion,
+                    FechaModificacion = c.FechaModificacion,
+                    UsuarioModificacion = c.UsuarioModificacion,
+                    Estatus = c.Estatus
                 }).ToList();
 
                 result.Success = true;
@@ -117,8 +120,6 @@ namespace SGCP.Application.Services
 
             try
             {
-       
-
                 var opResult = await _repository.GetEntityBy(id);
                 if (!opResult.Success || opResult.Data == null)
                 {
@@ -135,7 +136,10 @@ namespace SGCP.Application.Services
                     Nombre = cliente.Nombre,
                     Apellido = cliente.Apellido,
                     Username = cliente.Username,
-                    Password = cliente.Password
+                    FechaCreacion = cliente.FechaCreacion,
+                    FechaModificacion = cliente.FechaModificacion,
+                    UsuarioModificacion = cliente.UsuarioModificacion,
+                    Estatus = cliente.Estatus
                 };
 
                 result.Success = true;
@@ -159,8 +163,6 @@ namespace SGCP.Application.Services
 
             try
             {
-        
-
                 var existingResult = await _repository.GetEntityBy(updateClienteDto.ClienteId);
                 if (!existingResult.Success || existingResult.Data == null)
                 {
@@ -175,6 +177,7 @@ namespace SGCP.Application.Services
                 cliente.Apellido = updateClienteDto.Apellido;
                 cliente.Username = updateClienteDto.Username;
                 cliente.Password = updateClienteDto.Password;
+       
 
                 var opResult = await _repository.Update(cliente);
                 if (!opResult.Success)
@@ -205,7 +208,6 @@ namespace SGCP.Application.Services
 
             try
             {
-             
                 var existingResult = await _repository.GetEntityBy(deleteClienteDto.ClienteId);
                 if (!existingResult.Success || existingResult.Data == null)
                 {

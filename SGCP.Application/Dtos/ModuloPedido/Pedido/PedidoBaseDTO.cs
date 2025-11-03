@@ -17,7 +17,6 @@ namespace SGCP.Application.Dtos.ModuloPedido.Pedido
 
         public int? CarritoId { get; set; }
 
-        [Required(ErrorMessage = "La fecha del pedido es obligatoria.")]
-        public DateTime FechaCreacion { get; set; }
+  
     }
 }

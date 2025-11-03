@@ -1,18 +1,12 @@
 ﻿
-using System.ComponentModel.DataAnnotations;
-using System.ComponentModel.DataAnnotations.Schema;
 
-namespace SGCP.Domain.Base
+namespace SGCP.Application.Dtos
 {
-    public abstract class BaseEntity
+    public abstract record BaseDTO
     {
-        [Required]
         public DateTime FechaCreacion { get; set; }
-
         public DateTime? FechaModificacion { get; set; }
-
         public int? UsuarioModificacion { get; set; }
-
         public bool Estatus { get; set; }
     }
 }

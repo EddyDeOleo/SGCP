@@ -33,6 +33,7 @@ namespace SGCP.Application.Services
             _productoRepository = productoRepository;
         }
 
+
         public async Task<ServiceResult> AgregarProductoAlCarrito(int carritoId, AgregarProductoDTO dto)
         {
             var result = new ServiceResult();
@@ -49,7 +50,7 @@ namespace SGCP.Application.Services
                     return result;
                 }
 
-                // ✅ Validar que el producto existe y obtener stock
+                // Validar que el producto existe y obtener stock
                 var productoResult = await _productoRepository.GetEntityBy(dto.ProductoId);
                 if (!productoResult.Success)
                 {
@@ -60,7 +61,7 @@ namespace SGCP.Application.Services
 
                 var producto = (Producto)productoResult.Data;
 
-                // ✅ Validar stock disponible
+                // Validar stock disponible
                 if (producto.Stock < dto.Cantidad)
                 {
                     result.Success = false;
@@ -102,6 +103,7 @@ namespace SGCP.Application.Services
                 var carrito = new Carrito
                 {
                     ClienteId = createCarritoDto.ClienteId
+                   
                 };
 
                 var opResult = await _carritoRepository.Save(carrito);
@@ -118,7 +120,11 @@ namespace SGCP.Application.Services
                 result.Data = new CarritoGetDTO
                 {
                     CarritoId = carrito.IdCarrito,
-                    ClienteId = carrito.ClienteId
+                    ClienteId = carrito.ClienteId,
+                    FechaCreacion = carrito.FechaCreacion,
+                    FechaModificacion = carrito.FechaModificacion,
+                    UsuarioModificacion = carrito.UsuarioModificacion,
+                    Estatus = carrito.Estatus
                 };
 
                 _logger.LogInformation("Carrito creado correctamente");
@@ -154,7 +160,11 @@ namespace SGCP.Application.Services
                     .Select(c => new CarritoGetDTO
                     {
                         CarritoId = c.IdCarrito,
-                        ClienteId = c.ClienteId
+                        ClienteId = c.ClienteId,
+                        FechaCreacion = c.FechaCreacion,
+                        FechaModificacion = c.FechaModificacion,
+                        UsuarioModificacion = c.UsuarioModificacion,
+                        Estatus = c.Estatus
                     }).ToList();
 
                 result.Success = true;
@@ -190,12 +200,14 @@ namespace SGCP.Application.Services
 
                 var c = (Carrito)opResult.Data;
 
-       
-
                 var dto = new CarritoGetDTO
                 {
                     CarritoId = c.IdCarrito,
-                    ClienteId = c.ClienteId
+                    ClienteId = c.ClienteId,
+                    FechaCreacion = c.FechaCreacion,
+                    FechaModificacion = c.FechaModificacion,
+                    UsuarioModificacion = c.UsuarioModificacion,
+                    Estatus = c.Estatus
                 };
 
                 result.Success = true;
@@ -229,7 +241,6 @@ namespace SGCP.Application.Services
                 }
 
                 var c = (Carrito)existingResult.Data;
-
 
                 c.ClienteId = updateCarritoDto.ClienteId;
 
@@ -272,7 +283,6 @@ namespace SGCP.Application.Services
                 }
 
                 var c = (Carrito)existingResult.Data;
-
 
                 var opResult = await _carritoRepository.Remove(c);
                 if (!opResult.Success)

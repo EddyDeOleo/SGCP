@@ -3,7 +3,7 @@ using System.ComponentModel.DataAnnotations;
 
 namespace SGCP.Application.Dtos.ModuloReporte.Reporte
 {
-    public abstract record ReporteBaseDTO
+    public abstract record ReporteBaseDTO : BaseDTO
     {
         [Required(ErrorMessage = "El Id del administrador es obligatorio.")]
         public int AdminId { get; set; }

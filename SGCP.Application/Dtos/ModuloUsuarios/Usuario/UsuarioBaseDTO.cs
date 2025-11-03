@@ -3,7 +3,7 @@ using System.ComponentModel.DataAnnotations;
 
 namespace SGCP.Application.Dtos.ModuloUsuarios.Usuario
 {
-    public abstract record UsuarioBaseDTO
+    public abstract record UsuarioBaseDTO : BaseDTO
     {
         [Required(ErrorMessage = "El nombre es obligatorio.")]
         [MaxLength(50)]
@@ -17,8 +17,8 @@ namespace SGCP.Application.Dtos.ModuloUsuarios.Usuario
         [MaxLength(50)]
         public string Username { get; set; }
 
-        [Required(ErrorMessage = "La contraseña es obligatoria.")]
-        [MaxLength(255)]
-        public string Password { get; set; }
+        
+
+
     }
 }

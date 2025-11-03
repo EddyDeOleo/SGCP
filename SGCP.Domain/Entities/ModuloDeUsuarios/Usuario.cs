@@ -4,7 +4,7 @@ using System.ComponentModel.DataAnnotations.Schema;
 
 namespace SGCP.Domain.Entities.ModuloDeUsuarios
 {
-    public abstract class Usuario 
+    public abstract class Usuario : Base.BaseEntity
     {
         [Key]
         [Column("usuario_id")]
@@ -16,7 +16,11 @@ namespace SGCP.Domain.Entities.ModuloDeUsuarios
         public string Password { get; set; }
 
 
+    
+
+
         protected Usuario() { }
+
         protected Usuario(int idUsuario, string nombre, string apellido, string username, string password)
         {
             IdUsuario = idUsuario;
@@ -34,20 +38,6 @@ namespace SGCP.Domain.Entities.ModuloDeUsuarios
             Password = password;
         }
 
-        public virtual bool IniciarSesion(string username, string password)
-        {
-            if (Username == username && Password == password)
-            {
-                Console.WriteLine($"Usuario {username} ha iniciado sesión.");
-                return true;
-            }
-            Console.WriteLine("Credenciales incorrectas.");
-            return false;
-        }
-
-        public virtual void CerrarSesion()
-        {
-            Console.WriteLine($"Usuario {Username} ha cerrado sesión.");
-        }
+  
     }
 }

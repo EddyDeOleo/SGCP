@@ -32,7 +32,6 @@ namespace SGCP.Persistence.Repositories.ModuloReporte
             return ReporteRepositoryHelper.MapToReporte(model);
         }
 
-
         protected override (Dictionary<string, object>, SqlParameter) GetInsertParameters(Reporte entity)
         {
             return ReporteRepositoryHelper.GetInsertParameters(entity);

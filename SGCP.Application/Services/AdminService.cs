@@ -25,12 +25,14 @@ namespace SGCP.Application.Services
 
             try
             {
-                // CU-07: No debe existir un admin con el mismo username
+                // Validación de username existente
+
                 var existingResult = await _repository.GetAll();
                 if (existingResult.Success && existingResult.Data != null)
                 {
-                    if (((List<Administrador>)existingResult.Data)
-                        .Any(a => a.Username.Equals(createAdminDto.Username, StringComparison.OrdinalIgnoreCase)))
+                    var admins = (List<Administrador>)existingResult.Data;
+
+                    if (admins.Any(a => a.Username.Equals(createAdminDto.Username, StringComparison.OrdinalIgnoreCase)))
                     {
                         result.Success = false;
                         result.Message = "El username ya está registrado";
@@ -74,8 +76,6 @@ namespace SGCP.Application.Services
 
             try
             {
-               
-
                 var opResult = await _repository.GetAll();
                 if (!opResult.Success || opResult.Data == null)
                 {
@@ -90,7 +90,11 @@ namespace SGCP.Application.Services
                     Nombre = a.Nombre,
                     Apellido = a.Apellido,
                     Username = a.Username,
-                    Password = a.Password
+       
+                    FechaCreacion = a.FechaCreacion,
+                    FechaModificacion = a.FechaModificacion,
+                    UsuarioModificacion = a.UsuarioModificacion,
+                    Estatus = a.Estatus
                 }).ToList();
 
                 result.Success = true;
@@ -114,7 +118,6 @@ namespace SGCP.Application.Services
 
             try
             {
-               
                 var opResult = await _repository.GetEntityBy(id);
                 if (!opResult.Success || opResult.Data == null)
                 {
@@ -131,7 +134,10 @@ namespace SGCP.Application.Services
                     Nombre = admin.Nombre,
                     Apellido = admin.Apellido,
                     Username = admin.Username,
-                    Password = admin.Password
+                    FechaCreacion = admin.FechaCreacion,
+                    FechaModificacion = admin.FechaModificacion,
+                    UsuarioModificacion = admin.UsuarioModificacion,
+                    Estatus = admin.Estatus
                 };
 
                 result.Success = true;
@@ -155,8 +161,6 @@ namespace SGCP.Application.Services
 
             try
             {
-             
-
                 var existingResult = await _repository.GetEntityBy(updateAdminDto.AdminId);
                 if (!existingResult.Success || existingResult.Data == null)
                 {
@@ -201,7 +205,6 @@ namespace SGCP.Application.Services
 
             try
             {
-              
                 var existingResult = await _repository.GetEntityBy(deleteAdminDto.AdminId);
                 if (!existingResult.Success || existingResult.Data == null)
                 {

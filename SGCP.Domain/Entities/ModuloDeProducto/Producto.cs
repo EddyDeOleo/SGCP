@@ -26,26 +26,5 @@ namespace SGCP.Domain.Entities.ModuloDeProducto
             Categoria = categoria;
         }
 
-        public bool VerificarDisponibilidad(int cantidad)
-        {
-            return Stock >= cantidad;
-        }
-
-        public void ActualizarStock(int cantidad)
-        {
-            if (cantidad <= Stock)
-                Stock -= cantidad;
-            else
-                Console.WriteLine($"No hay suficiente stock de {Nombre}");
-        }
-
-        public void ActualizarProducto(string nombre, string descripcion, decimal precio, int stock, string categoria)
-        {
-            Nombre = nombre;
-            Descripcion = descripcion;
-            Precio = precio;
-            Stock = stock;
-            Categoria = categoria;
-        }
     }
 }

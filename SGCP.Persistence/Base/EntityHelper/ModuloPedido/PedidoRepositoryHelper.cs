@@ -13,31 +13,40 @@ namespace SGCP.Persistence.Base.EntityHelper.ModuloPedido
             new PedidoGetModel
             {
                 IdPedido = reader.GetInt32(reader.GetOrdinal("pedido_id")),
-                Cliente = new Cliente(reader.GetInt32(reader.GetOrdinal("cliente_id")), "", "", "", ""),
-                Carrito = new Carrito { IdCarrito = reader.GetInt32(reader.GetOrdinal("carrito_id")) },
+                ClienteId = reader.GetInt32(reader.GetOrdinal("cliente_id")),
+                CarritoId = reader.GetInt32(reader.GetOrdinal("carrito_id")),
                 Total = reader.GetDecimal(reader.GetOrdinal("total")),
                 Estado = reader.GetString(reader.GetOrdinal("estado")),
-                FechaCreacion = reader.GetDateTime(reader.GetOrdinal("fecha_creacion"))
+                FechaCreacion = reader.GetDateTime(reader.GetOrdinal("fecha_creacion")),
+                FechaModificacion = reader.IsDBNull(reader.GetOrdinal("fecha_modificacion"))
+                    ? null
+                    : reader.GetDateTime(reader.GetOrdinal("fecha_modificacion")),
+                UsuarioModificacion = reader.IsDBNull(reader.GetOrdinal("usuario_modificacion"))
+                    ? null
+                    : reader.GetInt32(reader.GetOrdinal("usuario_modificacion"))
             };
 
         public static Pedido MapToPedido(PedidoGetModel model) =>
-            new Pedido(model.Carrito, model.Cliente)
+            new Pedido
             {
                 IdPedido = model.IdPedido,
+                ClienteId = model.ClienteId,
+                CarritoId = model.CarritoId,
                 Total = model.Total,
                 Estado = model.Estado,
-                FechaCreacion = model.FechaCreacion
+                FechaCreacion = model.FechaCreacion,
+                FechaModificacion = model.FechaModificacion,
+                UsuarioModificacion = model.UsuarioModificacion
             };
 
         public static (Dictionary<string, object> parameters, SqlParameter outputParam) GetInsertParameters(Pedido entity)
         {
             var parameters = new Dictionary<string, object>
             {
-                { "@ClienteId", entity.Cliente.IdUsuario },
-                { "@CarritoId", entity.Carrito.IdCarrito },
+                { "@ClienteId", entity.ClienteId },
+                { "@CarritoId", entity.CarritoId },
                 { "@Total", entity.Total },
-                { "@Estado", entity.Estado },
-                { "@FechaCreacion", entity.FechaCreacion }
+                { "@Estado", entity.Estado }
             };
 
             var outputParam = new SqlParameter("@IdPedido", SqlDbType.Int) { Direction = ParameterDirection.Output };
@@ -48,11 +57,11 @@ namespace SGCP.Persistence.Base.EntityHelper.ModuloPedido
             new Dictionary<string, object>
             {
                 { "@IdPedido", entity.IdPedido },
-                { "@ClienteId", entity.Cliente.IdUsuario },
-                { "@CarritoId", entity.Carrito.IdCarrito },
+                { "@ClienteId", entity.ClienteId },
+                { "@CarritoId", entity.CarritoId },
                 { "@Total", entity.Total },
                 { "@Estado", entity.Estado },
-                { "@FechaCreacion", entity.FechaCreacion }
+                { "@UsuarioModificacion", entity.UsuarioModificacion ?? (object)DBNull.Value }
             };
 
         public static Dictionary<string, object> GetDeleteParameters(Pedido entity) =>

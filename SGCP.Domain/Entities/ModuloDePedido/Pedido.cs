@@ -23,8 +23,7 @@ namespace SGCP.Domain.Entities.ModuloDePedido
         [Column("estado")]
         public string Estado { get; set; }
 
-        [Column("FechaCreacion")]
-        public DateTime FechaCreacion { get; set; } 
+     
         public Pedido(Carrito carrito, Cliente cliente)
         {
             Carrito = carrito;
@@ -36,14 +35,5 @@ namespace SGCP.Domain.Entities.ModuloDePedido
 
         
 
-        public void CancelarPedido()
-        {
-            Estado = "Cancelado";
-        }
-
-        public void ActualizarEstado(string nuevoEstado)
-        {
-            Estado = nuevoEstado;
-        }
     }
 }

@@ -19,7 +19,6 @@ namespace SGCP.Domain.Entities.ModuloDeCarrito
         [NotMapped]
         public List<CarritoProducto> CarritoProductos { get; set; } = new List<CarritoProducto>();
 
-        //
 
         public Cliente Cliente { get; set; }
 
@@ -28,38 +27,6 @@ namespace SGCP.Domain.Entities.ModuloDeCarrito
 
         public Carrito() { }
 
-        public void AgregarProducto(Producto producto, int cantidad)
-        {
-            if (Cantidades.ContainsKey(producto))
-                Cantidades[producto] += cantidad;
-            else
-                Cantidades[producto] = cantidad;
-
-            if (!Productos.Contains(producto))
-                Productos.Add(producto);
-        }
-
-        public void QuitarProducto(Producto producto)
-        {
-            if (Cantidades.ContainsKey(producto))
-            {
-                Cantidades.Remove(producto);
-                Productos.Remove(producto);
-            }
-        }
-
-        public decimal CalcularTotal()
-        {
-            decimal total = 0;
-            foreach (var producto in Productos)
-                total += producto.Precio * Cantidades[producto];
-            return total;
-        }
-
-        public void VaciarCarrito()
-        {
-            Productos.Clear();
-            Cantidades.Clear();
-        }
+       
     }
 }
