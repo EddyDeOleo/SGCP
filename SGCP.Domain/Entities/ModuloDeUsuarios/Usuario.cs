@@ -10,9 +10,19 @@ namespace SGCP.Domain.Entities.ModuloDeUsuarios
         [Column("usuario_id")]
         [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
         public int IdUsuario { get; set; }
+        [Required(ErrorMessage = "El nombre es obligatorio.")]
+        [MaxLength(50)]
         public string Nombre { get; set; }
+        [Required(ErrorMessage = "El apellido es obligatorio.")]
+        [MaxLength(50)]
         public string Apellido { get;  set; }
+
+        [Required(ErrorMessage = "El username es obligatorio.")]
+        [MaxLength(50, ErrorMessage = "El username no puede exceder los 50 caracteres.")]
         public string Username { get; set; }
+
+        [Required(ErrorMessage = "La contraseña es obligatoria.")]
+        [MaxLength(255, ErrorMessage = "La contraseña no puede exceder los 255 caracteres.")]
         public string Password { get; set; }
 
 

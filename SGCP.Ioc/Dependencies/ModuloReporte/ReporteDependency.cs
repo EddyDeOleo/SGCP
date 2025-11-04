@@ -6,6 +6,8 @@ using SGCP.Application.Repositories.ModuloReporte;
 using SGCP.Application.Repositories.ModuloUsuarios;
 using SGCP.Application.Services;
 using SGCP.Infraestructure.Dependencies.DB_Context;
+using SGCP.Infraestructure.Interfaces;
+using SGCP.Infraestructure.Security;
 using SGCP.Persistence.Base;
 using SGCP.Persistence.Base.EntityValidator.ModuloReporte;
 using SGCP.Persistence.Repositories.ModuloReporte;
@@ -25,6 +27,16 @@ namespace SGCP.Ioc.Dependencies.ModuloReporte
             services.AddScoped<IReporte, ReporteRepositoryAdo>();
             services.AddTransient<IReporteService, ReporteService>();
             services.AddScoped<IAdministrador, AdministradorRepositoryEF>();
+
+            services.AddScoped<ICliente, ClienteRepositoryEF>();
+
+            services.AddScoped<ICurrentUserService, CurrentUserService>();
+            services.AddScoped<IAuthService, AuthService>();
+            services.AddScoped<IJwtTokenService, JwtTokenService>();
+
+
+
+
 
         }
     }

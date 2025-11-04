@@ -1,5 +1,4 @@
 ﻿using SGCP.Domain.Entities.ModuloDeProducto;
-using System.ComponentModel.DataAnnotations.Schema;
 
 namespace SGCP.Persistence.Models.ModuloCarrito.Carrito
 {

@@ -20,10 +20,34 @@ namespace SGCP.Persistence.Repositories.ModuloUsuarios
 
         public async Task<List<Pedido>> GetPedidosByClienteId(int clienteId)
         {
-            _logger.LogInformation("Obteniendo pedidos del cliente {ClienteId}", clienteId);
-            var cliente = await _dbSet.Include(c => c.HistorialPedidos)
-                                      .FirstOrDefaultAsync(c => c.IdUsuario == clienteId);
-            return cliente?.HistorialPedidos ?? new List<Pedido>();
+            _logger.LogInformation("Obteniendo pedidos para cliente con ID {ClienteId}", clienteId);
+
+            if (clienteId <= 0)
+            {
+                _logger.LogWarning("ID de cliente inválido: {ClienteId}", clienteId);
+                return new List<Pedido>();
+            }
+
+            try
+            {
+                var cliente = await _context.Cliente.FindAsync(clienteId);
+                if (cliente == null)
+                {
+                    _logger.LogWarning("No se encontró cliente con ID {ClienteId}", clienteId);
+                    return new List<Pedido>();
+                }
+
+                var pedidos = await _context.Pedido
+                    .Where(p => p.ClienteId == clienteId)
+                    .ToListAsync();
+
+                return pedidos;
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error al obtener pedidos del cliente {ClienteId}", clienteId);
+                return new List<Pedido>();
+            }
         }
     }
 }

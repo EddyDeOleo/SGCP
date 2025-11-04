@@ -1,6 +1,4 @@
-﻿using SGCP.Domain.Entities.ModuloDePedido;
-using SGCP.Domain.Entities.ModuloDeProducto;
-using SGCP.Domain.Entities.ModuloDeReporte;
+﻿
 
 namespace SGCP.Domain.Entities.ModuloDeUsuarios
 {
@@ -15,6 +13,8 @@ namespace SGCP.Domain.Entities.ModuloDeUsuarios
         {
         }
 
-    
+        public Administrador() { }  
+
+
     }
 }

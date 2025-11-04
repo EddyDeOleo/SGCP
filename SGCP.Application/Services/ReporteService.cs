@@ -12,15 +12,21 @@ namespace SGCP.Application.Services
     {
         public sealed class ReporteService : IReporteService
         {
-            private readonly IReporte _reporteRepository;
-            private readonly ILogger<ReporteService> _logger;
-            private readonly IAdministrador _adminRepository;
+        private readonly IReporte _reporteRepository;
+        private readonly ILogger<ReporteService> _logger;
+        private readonly IAdministrador _adminRepository;
+        private readonly ICurrentUserService _currentUserService; 
 
-        public ReporteService(IReporte reporteRepository, ILogger<ReporteService> logger, IAdministrador adminRepository)
-            {
-                _reporteRepository = reporteRepository;
-                _logger = logger;
-                _adminRepository = adminRepository;
+        public ReporteService(
+            IReporte reporteRepository,
+            ILogger<ReporteService> logger,
+            IAdministrador adminRepository,
+            ICurrentUserService currentUserService) 
+        {
+            _reporteRepository = reporteRepository;
+            _logger = logger;
+            _adminRepository = adminRepository;
+            _currentUserService = currentUserService; 
         }
 
 
@@ -168,38 +174,49 @@ namespace SGCP.Application.Services
 
             try
             {
+                // Obtener el ID del usuario autenticado
+                var usuarioModificacionId = _currentUserService.GetUserId();
+                if (usuarioModificacionId == null)
+                {
+                    result.Success = false;
+                    result.Message = "Usuario no autenticado";
+                    return result;
+                }
+
                 var existingResult = await _reporteRepository.GetEntityBy(updateReporteDto.IdReporte);
                 if (!existingResult.Success || existingResult.Data == null)
                 {
                     result.Success = false;
                     result.Message = "Reporte no encontrado";
-                    _logger.LogWarning($"Reporte con ID {updateReporteDto.IdReporte} no encontrado");
                     return result;
                 }
 
                 var reporteExistente = (Reporte)existingResult.Data;
 
                 reporteExistente.AdminId = updateReporteDto.AdminId;
+                reporteExistente.FechaCreacion = updateReporteDto.FechaCreacion;
                 reporteExistente.TotalVentas = updateReporteDto.TotalVentas;
                 reporteExistente.TotalPedidos = updateReporteDto.TotalPedidos;
+
+                reporteExistente.FechaModificacion = DateTime.Now;
+                reporteExistente.UsuarioModificacion = usuarioModificacionId.Value; 
 
                 var opResult = await _reporteRepository.Update(reporteExistente);
                 if (!opResult.Success)
                 {
                     result.Success = false;
                     result.Message = opResult.Message;
-                    _logger.LogWarning($"No se pudo actualizar el reporte con ID {updateReporteDto.IdReporte}");
                     return result;
                 }
 
                 result.Success = true;
                 result.Message = "Reporte actualizado correctamente";
                 result.Data = reporteExistente;
-                _logger.LogInformation($"Reporte con ID {updateReporteDto.IdReporte} actualizado exitosamente");
+                _logger.LogInformation($"Reporte actualizado por usuario {usuarioModificacionId}");
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, $"Error al actualizar el reporte con ID {updateReporteDto.IdReporte}");
+                _logger.LogError(ex, "Error al actualizar el reporte");
                 result.Success = false;
                 result.Message = "Ocurrió un error al actualizar el reporte";
             }

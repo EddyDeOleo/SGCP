@@ -19,6 +19,7 @@ public class SGCPDbContext : DbContext
     public DbSet<Usuario> Usuario { get; set; }
     public DbSet<Cliente> Cliente { get; set; }
     public DbSet<Administrador> Administrador { get; set; }
+    public DbSet<Pedido> Pedido { get; set; }
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {

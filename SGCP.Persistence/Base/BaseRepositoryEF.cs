@@ -2,6 +2,7 @@
 using Microsoft.Extensions.Logging;
 using SGCP.Domain.Base;
 using SGCP.Domain.Repository;
+using System.ComponentModel.DataAnnotations;
 using System.Linq.Expressions;
 
 namespace SGCP.Persistence.Repositories.Base
@@ -22,10 +23,26 @@ namespace SGCP.Persistence.Repositories.Base
         public virtual async Task<OperationResult> Save(TEntity entity)
         {
             _logger.LogInformation("Guardando {EntityType}", typeof(TEntity).Name);
+
             try
             {
+                // ✅ 1. Validar atributos de DataAnnotations antes de guardar
+                var validationContext = new ValidationContext(entity);
+                var validationResults = new List<ValidationResult>();
+
+                bool isValid = Validator.TryValidateObject(entity, validationContext, validationResults, true);
+
+                if (!isValid)
+                {
+                    var errors = string.Join("; ", validationResults.Select(r => r.ErrorMessage));
+                    _logger.LogWarning("Validación fallida para {EntityType}: {Errors}", typeof(TEntity).Name, errors);
+                    return OperationResult.FailureResult($"Error: Validación fallida. {errors}");
+                }
+
+                // ✅ 2. Guardar si pasa la validación
                 await _dbSet.AddAsync(entity);
                 await _context.SaveChangesAsync();
+
                 _logger.LogInformation("{EntityType} guardado correctamente", typeof(TEntity).Name);
                 return OperationResult.SuccessResult($"{typeof(TEntity).Name} guardado correctamente", entity);
             }
@@ -39,10 +56,26 @@ namespace SGCP.Persistence.Repositories.Base
         public virtual async Task<OperationResult> Update(TEntity entity)
         {
             _logger.LogInformation("Actualizando {EntityType}", typeof(TEntity).Name);
+
             try
             {
+                // ✅ 1. Validar atributos de DataAnnotations antes de actualizar
+                var validationContext = new ValidationContext(entity);
+                var validationResults = new List<ValidationResult>();
+
+                bool isValid = Validator.TryValidateObject(entity, validationContext, validationResults, true);
+
+                if (!isValid)
+                {
+                    var errors = string.Join("; ", validationResults.Select(r => r.ErrorMessage));
+                    _logger.LogWarning("Validación fallida para {EntityType}: {Errors}", typeof(TEntity).Name, errors);
+                    return OperationResult.FailureResult($"Error: Validación fallida. {errors}");
+                }
+
+                // ✅ 2. Actualizar la entidad si pasa la validación
                 _dbSet.Update(entity);
                 await _context.SaveChangesAsync();
+
                 _logger.LogInformation("{EntityType} actualizado correctamente", typeof(TEntity).Name);
                 return OperationResult.SuccessResult($"{typeof(TEntity).Name} actualizado correctamente", entity);
             }

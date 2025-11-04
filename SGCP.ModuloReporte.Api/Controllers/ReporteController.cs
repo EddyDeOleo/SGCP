@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 using SGCP.Application.Dtos.ModuloReporte.Reporte;
 using SGCP.Application.Interfaces;
 
@@ -55,6 +56,7 @@ namespace SGCP.ModuloReporte.Api.Controllers
 
         // PUT api/<ReporteController>/5
         [HttpPut("update-reporte")]
+        [Authorize]
         public async Task<IActionResult> Put([FromBody] UpdateReporteDTO updateReporteDTO)
         {
             var result = await _reporteService.UpdateReporte(updateReporteDTO);
@@ -75,6 +77,24 @@ namespace SGCP.ModuloReporte.Api.Controllers
                 return BadRequest(result);
             }
             return Ok(result);
+        }
+
+        [HttpGet("test-token")]
+        [Authorize]
+        public IActionResult TestToken()
+        {
+            var userId = User.FindFirst("UserId")?.Value;
+            var username = User.FindFirst("Username")?.Value;
+            var allClaims = User.Claims.Select(c => new { c.Type, c.Value }).ToList();
+
+            return Ok(new
+            {
+                userId,
+                username,
+                isAuthenticated = User.Identity?.IsAuthenticated,
+                authType = User.Identity?.AuthenticationType,
+                claims = allClaims
+            });
         }
     }
 }

@@ -5,6 +5,8 @@ using SGCP.Application.Interfaces;
 using SGCP.Application.Repositories.ModuloUsuarios;
 using SGCP.Application.Services;
 using SGCP.Infraestructure.Dependencies.DB_Context;
+using SGCP.Infraestructure.Interfaces;
+using SGCP.Infraestructure.Security;
 using SGCP.Persistence.Repositories.ModuloUsuarios;
 
 namespace SGCP.Ioc.Dependencies.ModuloUsuarios
@@ -22,6 +24,11 @@ namespace SGCP.Ioc.Dependencies.ModuloUsuarios
 
             services.AddScoped<IAdministrador, AdministradorRepositoryEF>();
             services.AddTransient<IAdminService, AdminService>();
+
+            services.AddHttpContextAccessor();
+            services.AddScoped<ICurrentUserService, CurrentUserService>();
+            services.AddScoped<IAuthService, AuthService>();
+            services.AddScoped<IJwtTokenService, JwtTokenService>();
 
 
         }

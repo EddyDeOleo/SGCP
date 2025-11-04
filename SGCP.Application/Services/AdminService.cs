@@ -11,11 +11,14 @@ namespace SGCP.Application.Services
     {
         private readonly IAdministrador _repository;
         private readonly ILogger<AdminService> _logger;
+        private readonly ICurrentUserService _currentUserService;
 
-        public AdminService(IAdministrador repository, ILogger<AdminService> logger)
+
+        public AdminService(IAdministrador repository, ILogger<AdminService> logger, ICurrentUserService currentUserService)
         {
             _repository = repository;
             _logger = logger;
+            _currentUserService = currentUserService;
         }
 
         public async Task<ServiceResult> CreateAdmin(CreateAdminDTO createAdminDto)
@@ -176,6 +179,9 @@ namespace SGCP.Application.Services
                 admin.Username = updateAdminDto.Username;
                 admin.Password = updateAdminDto.Password;
 
+                admin.UsuarioModificacion = _currentUserService.GetUserId();
+                admin.FechaModificacion = DateTime.UtcNow;
+
                 var opResult = await _repository.Update(admin);
                 if (!opResult.Success)
                 {
@@ -197,7 +203,6 @@ namespace SGCP.Application.Services
 
             return result;
         }
-
         public async Task<ServiceResult> RemoveAdmin(DeleteAdminDTO deleteAdminDto)
         {
             var result = new ServiceResult();

@@ -1,6 +1,5 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using SGCP.Application.Dtos.ModuloUsuarios.Administrador;
-using SGCP.Application.Dtos.ModuloUsuarios.Cliente;
 using SGCP.Application.Interfaces;
 
 // For more information on enabling Web API for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
@@ -77,5 +76,6 @@ namespace SGCP.ModuloUsuarios.Api.Controllers
             }
             return Ok(result);
         }
+    
     }
 }

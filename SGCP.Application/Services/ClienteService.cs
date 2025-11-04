@@ -13,11 +13,14 @@ namespace SGCP.Application.Services
     {
         private readonly ICliente _repository;
         private readonly ILogger<ClienteService> _logger;
+        private readonly ICurrentUserService _currentUserService;
 
-        public ClienteService(ICliente repository, ILogger<ClienteService> logger)
+
+        public ClienteService(ICliente repository, ILogger<ClienteService> logger, ICurrentUserService currentUserService)
         {
             _repository = repository;
             _logger = logger;
+            _currentUserService = currentUserService;
         }
 
         public async Task<ServiceResult> CreateCliente(CreateClienteDTO createClienteDto)
@@ -177,7 +180,10 @@ namespace SGCP.Application.Services
                 cliente.Apellido = updateClienteDto.Apellido;
                 cliente.Username = updateClienteDto.Username;
                 cliente.Password = updateClienteDto.Password;
-       
+
+                var userId = _currentUserService.GetUserId();
+                cliente.UsuarioModificacion = userId;
+                cliente.FechaModificacion = DateTime.Now;
 
                 var opResult = await _repository.Update(cliente);
                 if (!opResult.Success)
