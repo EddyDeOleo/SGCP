@@ -7,7 +7,8 @@ using SGCP.Domain.Base;
 using SGCP.Domain.Entities.ModuloDeUsuarios;
 using SGCP.Infraestructure.Interfaces;
 
-namespace SGCP.Application.Test;
+namespace SGCP.Test.Application.ModuloUsuarios;
+
 
 public class AuthServiceTests
 {

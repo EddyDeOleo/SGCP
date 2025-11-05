@@ -7,7 +7,8 @@ using SGCP.Application.Services;
 using SGCP.Domain.Base;
 using SGCP.Domain.Entities.ModuloDeUsuarios;
 
-namespace SGCP.Application.Test;
+namespace SGCP.Test.Application.ModuloUsuarios;
+
 
 public class AdminServiceTests
 {
