@@ -2,12 +2,13 @@
 
 using Microsoft.Extensions.Logging;
 using SGCP.Application.Dtos.ModuloReporte.Reporte;
+using SGCP.Application.Interfaces.IServiceValidator.ModuloReporte;
 using SGCP.Application.Repositories.ModuloReporte;
 using SGCP.Application.Repositories.ModuloUsuarios;
 
 namespace SGCP.Application.Base.ServiceValidator.ModuloReporte
 {
-    public class ReporteServiceValidator : ServiceValidator<ReporteServiceValidator>
+    public class ReporteServiceValidator : ServiceValidator<ReporteServiceValidator>, IReporteServiceValidator
     {
         private readonly IReporte _reporteRepository;
         private readonly IAdministrador _adminRepository;

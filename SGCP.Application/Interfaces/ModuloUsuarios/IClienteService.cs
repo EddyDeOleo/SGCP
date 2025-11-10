@@ -1,8 +1,7 @@
-﻿
-using SGCP.Application.Base;
+﻿using SGCP.Application.Base;
 using SGCP.Application.Dtos.ModuloUsuarios.Cliente;
 
-namespace SGCP.Application.Interfaces
+namespace SGCP.Application.Interfaces.ModuloUsuarios
 {
     public interface IClienteService
     {

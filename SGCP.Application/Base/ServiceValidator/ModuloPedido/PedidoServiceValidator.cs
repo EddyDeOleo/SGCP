@@ -2,16 +2,15 @@
 using Microsoft.Extensions.Logging;
 using SGCP.Application.Dtos.ModuloCarrito.CarritoProducto;
 using SGCP.Application.Dtos.ModuloPedido.Pedido;
+using SGCP.Application.Interfaces.IServiceValidator.ModuloPedido;
 using SGCP.Application.Repositories.ModuloCarrito;
 using SGCP.Application.Repositories.ModuloPedido;
-using SGCP.Application.Repositories.ModuloProducto;
 using SGCP.Application.Repositories.ModuloUsuarios;
-using SGCP.Domain.Base;
 using SGCP.Domain.Entities.ModuloDePedido;
 
 namespace SGCP.Application.Base.ServiceValidator.ModuloPedido
 {
-    public class PedidoServiceValidator : ServiceValidator<PedidoServiceValidator>
+    public class PedidoServiceValidator : ServiceValidator<PedidoServiceValidator>, IPedidoServiceValidator
     {
         private readonly IPedido _pedidoRepository;
         private readonly ICarrito _carritoRepository;
@@ -49,11 +48,11 @@ namespace SGCP.Application.Base.ServiceValidator.ModuloPedido
             return Success("DTO válido para crear pedido");
         }
 
-        public ServiceResult ValidateForUpdate(CreatePedidoDTO dto)
-            => ValidateForCreate(dto);
+        public ServiceResult ValidateForUpdate(UpdatePedidoDTO dto)
+            => ValidateForUpdate(dto);
 
-        public ServiceResult ValidateForDelete(CreatePedidoDTO dto)
-            => ValidateForCreate(dto);
+        public ServiceResult ValidateForDelete(DeletePedidoDTO dto)
+            => ValidateForDelete(dto);
 
         // -------------------------
         // Validaciones repositorio

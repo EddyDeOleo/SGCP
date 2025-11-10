@@ -1,7 +1,7 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using SGCP.Application.Dtos.ModuloPedido.Pedido;
-using SGCP.Application.Interfaces;
+using SGCP.Application.Interfaces.ModuloPedido;
 
 // For more information on enabling Web API for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
 

@@ -1,7 +1,7 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using SGCP.Application.Dtos.ModuloUsuarios.Cliente;
-using SGCP.Application.Interfaces;
+using SGCP.Application.Interfaces.ModuloUsuarios;
 
 
 namespace SGCP.ModuloUsuarios.Api.Controllers

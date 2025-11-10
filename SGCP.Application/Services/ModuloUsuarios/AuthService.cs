@@ -3,7 +3,7 @@
 using Microsoft.Extensions.Logging;
 using SGCP.Application.Base;
 using SGCP.Application.Dtos.ModuloUsuarios.Authetication;
-using SGCP.Application.Interfaces;
+using SGCP.Application.Interfaces.ModuloUsuarios;
 using SGCP.Application.Repositories.ModuloUsuarios;
 using SGCP.Domain.Entities.ModuloDeUsuarios;
 using SGCP.Infraestructure.Interfaces;

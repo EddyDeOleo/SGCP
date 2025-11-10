@@ -1,8 +1,7 @@
-﻿
-using SGCP.Application.Base;
-using SGCP.Application.Dtos.ModuloPedido.Pedido;  
+﻿using SGCP.Application.Base;
+using SGCP.Application.Dtos.ModuloPedido.Pedido;
 
-namespace SGCP.Application.Interfaces
+namespace SGCP.Application.Interfaces.ModuloPedido
 {
     public interface IPedidoService
     {

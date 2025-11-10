@@ -3,7 +3,9 @@ using Microsoft.Extensions.Logging;
 using SGCP.Application.Base;
 using SGCP.Application.Base.ServiceValidator.ModuloProducto;
 using SGCP.Application.Dtos.ModuloProducto.Producto;
-using SGCP.Application.Interfaces;
+using SGCP.Application.Interfaces.IServiceValidator.ModuloProducto;
+using SGCP.Application.Interfaces.ModuloProducto;
+using SGCP.Application.Interfaces.ModuloUsuarios;
 using SGCP.Application.Mappers;
 using SGCP.Application.Repositories.ModuloProducto;
 using SGCP.Domain.Entities.ModuloDeProducto;
@@ -14,13 +16,13 @@ namespace SGCP.Application.Services.ModuloProducto
     {
         private readonly IProducto _productoRepository;
         private readonly ICurrentUserService _currentUserService;
-        private readonly ProductoServiceValidator _productoServiceValidator;
+        private readonly IProductoServiceValidator _productoServiceValidator;
 
         public ProductoService(
             IProducto productoRepository,
             ILogger<ProductoService> logger,
             ICurrentUserService currentUserService,
-            ProductoServiceValidator productoServiceValidator
+            IProductoServiceValidator productoServiceValidator
         ) : base(logger)
         {
             _productoRepository = productoRepository;

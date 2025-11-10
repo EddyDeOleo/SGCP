@@ -1,6 +1,6 @@
 ﻿
 using Microsoft.AspNetCore.Http;
-using SGCP.Application.Interfaces;
+using SGCP.Application.Interfaces.ModuloUsuarios;
 using SGCP.Infraestructure.Interfaces;
 using System.Security.Claims;
 

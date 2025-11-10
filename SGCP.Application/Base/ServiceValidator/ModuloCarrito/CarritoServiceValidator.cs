@@ -3,12 +3,13 @@
 using Microsoft.Extensions.Logging;
 using SGCP.Application.Dtos.ModuloCarrito.Carrito;
 using SGCP.Application.Dtos.ModuloCarrito.CarritoProducto;
+using SGCP.Application.Interfaces.IServiceValidator.ModuloCarrito;
 using SGCP.Application.Repositories.ModuloCarrito;
 using SGCP.Application.Repositories.ModuloProducto;
 
 namespace SGCP.Application.Base.ServiceValidator.ModuloCarrito
 {
-    public class CarritoServiceValidator : ServiceValidator<CarritoServiceValidator>
+    public class CarritoServiceValidator : ServiceValidator<CarritoServiceValidator>, ICarritoServiceValidator
     {
         private readonly ICarrito _carritoRepository;
         private readonly IProducto _productoRepository;

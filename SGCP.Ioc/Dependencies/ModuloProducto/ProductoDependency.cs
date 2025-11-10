@@ -3,7 +3,9 @@
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using SGCP.Application.Base.ServiceValidator.ModuloProducto;
-using SGCP.Application.Interfaces;
+using SGCP.Application.Interfaces.IServiceValidator.ModuloProducto;
+using SGCP.Application.Interfaces.ModuloProducto;
+using SGCP.Application.Interfaces.ModuloUsuarios;
 using SGCP.Application.Repositories.ModuloProducto;
 using SGCP.Application.Repositories.ModuloUsuarios;
 using SGCP.Application.Services.ModuloProducto;
@@ -27,7 +29,7 @@ namespace SGCP.Ioc.Dependencies.ModuloProducto
 
             services.AddScoped<IStoredProcedureExecutor, StoredProcedureExecutor>();
             services.AddScoped<ProductoValidator>();
-            services.AddScoped<ProductoServiceValidator>();
+            services.AddScoped<IProductoServiceValidator, ProductoServiceValidator>();
 
             services.AddScoped<IProducto, ProductoRepositoryAdo>();
             services.AddTransient<IProductoService, ProductoService>();

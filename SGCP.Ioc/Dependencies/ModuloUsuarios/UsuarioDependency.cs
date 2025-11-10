@@ -1,9 +1,9 @@
 ﻿
-using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using SGCP.Application.Base.ServiceValidator.ModuloUsuarios;
-using SGCP.Application.Interfaces;
+using SGCP.Application.Interfaces.IServiceValidator.ModuloUsuarios;
+using SGCP.Application.Interfaces.ModuloUsuarios;
 using SGCP.Application.Repositories.ModuloUsuarios;
 using SGCP.Application.Services.ModuloUsuarios;
 using SGCP.Infraestructure.Dependencies.DB_Context;
@@ -28,8 +28,8 @@ namespace SGCP.Ioc.Dependencies.ModuloUsuarios
             services.AddTransient<IAdminService, AdminService>();
 
 
-            services.AddScoped<AdminServiceValidator>();
-            services.AddScoped<ClienteServiceValidator>();
+            services.AddScoped<IAdminServiceValidator, AdminServiceValidator>();
+            services.AddScoped<IClienteServiceValidator, ClienteServiceValidator>();
 
             services.AddHttpContextAccessor();
             services.AddScoped<ICurrentUserService, CurrentUserService>();

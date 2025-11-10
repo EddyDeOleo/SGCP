@@ -1,8 +1,7 @@
-﻿
-using SGCP.Application.Base;
+﻿using SGCP.Application.Base;
 using SGCP.Application.Dtos.ModuloProducto.Producto;
 
-namespace SGCP.Application.Interfaces
+namespace SGCP.Application.Interfaces.ModuloProducto
 {
     public interface IProductoService
     {

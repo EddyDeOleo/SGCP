@@ -2,11 +2,12 @@
 
 using Microsoft.Extensions.Logging;
 using SGCP.Application.Dtos.ModuloProducto.Producto;
+using SGCP.Application.Interfaces.IServiceValidator.ModuloProducto;
 using SGCP.Application.Repositories.ModuloProducto;
 
 namespace SGCP.Application.Base.ServiceValidator.ModuloProducto
 {
-    public class ProductoServiceValidator : ServiceValidator<ProductoServiceValidator>
+    public class ProductoServiceValidator : ServiceValidator<ProductoServiceValidator>, IProductoServiceValidator
     {
         private readonly IProducto _productoRepository;
 

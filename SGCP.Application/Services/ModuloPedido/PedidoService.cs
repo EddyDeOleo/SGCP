@@ -1,9 +1,10 @@
 ﻿using Microsoft.Extensions.Logging;
 using SGCP.Application.Base;
-using SGCP.Application.Base.ServiceValidator.ModuloPedido;
 using SGCP.Application.Dtos.ModuloCarrito.CarritoProducto;
 using SGCP.Application.Dtos.ModuloPedido.Pedido;
-using SGCP.Application.Interfaces;
+using SGCP.Application.Interfaces.IServiceValidator.ModuloPedido;
+using SGCP.Application.Interfaces.ModuloPedido;
+using SGCP.Application.Interfaces.ModuloUsuarios;
 using SGCP.Application.Mappers;
 using SGCP.Application.Repositories.ModuloCarrito;
 using SGCP.Application.Repositories.ModuloPedido;
@@ -24,7 +25,7 @@ namespace SGCP.Application.Services.ModuloPedido
         private readonly ICliente _clienteRepository;
         private readonly ICurrentUserService _currentUserService;
         private readonly IProducto _productoRepository;
-        private readonly PedidoServiceValidator _pedidoServiceValidator;
+        private readonly IPedidoServiceValidator _pedidoServiceValidator;
 
         public PedidoService(
             IPedido pedidoRepository,
@@ -35,7 +36,7 @@ namespace SGCP.Application.Services.ModuloPedido
             ICurrentUserService currentUserService,
             ILogger<PedidoService> logger,
             IProducto productoRepository,
-            PedidoServiceValidator pedidoServiceValidator
+            IPedidoServiceValidator pedidoServiceValidator
         ) : base(logger)
         {
             _pedidoRepository = pedidoRepository;

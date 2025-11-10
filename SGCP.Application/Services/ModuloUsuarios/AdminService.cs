@@ -2,7 +2,8 @@
 using SGCP.Application.Base;
 using SGCP.Application.Base.ServiceValidator.ModuloUsuarios;
 using SGCP.Application.Dtos.ModuloUsuarios.Administrador;
-using SGCP.Application.Interfaces;
+using SGCP.Application.Interfaces.IServiceValidator.ModuloUsuarios;
+using SGCP.Application.Interfaces.ModuloUsuarios;
 using SGCP.Application.Mappers;
 using SGCP.Application.Repositories.ModuloUsuarios;
 using SGCP.Domain.Entities.ModuloDeUsuarios;
@@ -13,13 +14,13 @@ namespace SGCP.Application.Services.ModuloUsuarios
     {
         private readonly IAdministrador _repository;
         private readonly ICurrentUserService _currentUserService;
-        private readonly AdminServiceValidator _adminServiceValidator;
+        private readonly IAdminServiceValidator _adminServiceValidator;
 
         public AdminService(
             IAdministrador repository,
             ILogger<AdminService> logger,
             ICurrentUserService currentUserService,
-            AdminServiceValidator adminServiceValidator
+            IAdminServiceValidator adminServiceValidator
         ) : base(logger)
         {
             _repository = repository;

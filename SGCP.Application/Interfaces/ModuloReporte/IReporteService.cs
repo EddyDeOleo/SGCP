@@ -1,7 +1,7 @@
 ﻿using SGCP.Application.Base;
 using SGCP.Application.Dtos.ModuloReporte.Reporte;
 
-namespace SGCP.Application.Interfaces
+namespace SGCP.Application.Interfaces.ModuloReporte
 {
     public interface IReporteService
     {

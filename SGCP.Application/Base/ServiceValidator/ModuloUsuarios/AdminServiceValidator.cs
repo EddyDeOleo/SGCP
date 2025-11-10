@@ -2,11 +2,12 @@
 
 using Microsoft.Extensions.Logging;
 using SGCP.Application.Dtos.ModuloUsuarios.Administrador;
+using SGCP.Application.Interfaces.IServiceValidator.ModuloUsuarios;
 using SGCP.Application.Repositories.ModuloUsuarios;
 
 namespace SGCP.Application.Base.ServiceValidator.ModuloUsuarios
 {
-    public class AdminServiceValidator : ServiceValidator<AdminServiceValidator>
+    public class AdminServiceValidator : ServiceValidator<AdminServiceValidator>, IAdminServiceValidator
     {
         private readonly IAdministrador _adminRepository;
 

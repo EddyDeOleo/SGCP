@@ -1,7 +1,9 @@
 ﻿using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using SGCP.Application.Base.ServiceValidator.ModuloCarrito;
-using SGCP.Application.Interfaces;
+using SGCP.Application.Interfaces.IServiceValidator.ModuloCarrito;
+using SGCP.Application.Interfaces.ModuloCarrito;
+using SGCP.Application.Interfaces.ModuloUsuarios;
 using SGCP.Application.Repositories.ModuloCarrito;
 using SGCP.Application.Repositories.ModuloProducto;
 using SGCP.Application.Repositories.ModuloUsuarios;
@@ -28,7 +30,7 @@ namespace SGCP.Ioc.Dependencies.ModuloCarrito
 
             services.AddScoped<IStoredProcedureExecutor, StoredProcedureExecutor>();
             services.AddScoped<CarritoValidator>();
-            services.AddScoped<CarritoServiceValidator>();
+            services.AddScoped<ICarritoServiceValidator, CarritoServiceValidator>();
             services.AddScoped<ICarrito, CarritoRepositoryAdo>();
             services.AddTransient<ICarritoService, CarritoService>();
             services.AddScoped<ICarritoProducto, CarritoProductoRepositoryAdo>();

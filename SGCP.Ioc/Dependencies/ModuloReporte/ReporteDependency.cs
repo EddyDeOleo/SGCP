@@ -2,7 +2,9 @@
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using SGCP.Application.Base.ServiceValidator.ModuloReporte;
-using SGCP.Application.Interfaces;
+using SGCP.Application.Interfaces.IServiceValidator.ModuloReporte;
+using SGCP.Application.Interfaces.ModuloReporte;
+using SGCP.Application.Interfaces.ModuloUsuarios;
 using SGCP.Application.Repositories.ModuloReporte;
 using SGCP.Application.Repositories.ModuloUsuarios;
 using SGCP.Application.Services.ModuloReporte;
@@ -36,7 +38,7 @@ namespace SGCP.Ioc.Dependencies.ModuloReporte
             services.AddScoped<IAuthService, AuthService>();
             services.AddScoped<IJwtTokenService, JwtTokenService>();
 
-            services.AddScoped<ReporteServiceValidator>();
+            services.AddScoped<IReporteServiceValidator, ReporteServiceValidator>();
 
             services.AddHttpContextAccessor();
 

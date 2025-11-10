@@ -1,5 +1,4 @@
-﻿
-namespace SGCP.Application.Interfaces
+﻿namespace SGCP.Application.Interfaces.ModuloUsuarios
 {
     public interface ICurrentUserService
     {

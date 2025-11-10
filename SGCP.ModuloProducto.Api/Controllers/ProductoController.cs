@@ -2,7 +2,7 @@
 using Microsoft.AspNetCore.Mvc;
 using SGCP.Application.Base;
 using SGCP.Application.Dtos.ModuloProducto.Producto;
-using SGCP.Application.Interfaces;
+using SGCP.Application.Interfaces.ModuloProducto;
 
 // For more information on enabling Web API for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
 

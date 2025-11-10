@@ -5,7 +5,12 @@ using Microsoft.Extensions.DependencyInjection;
 using SGCP.Application.Base.ServiceValidator.ModuloCarrito;
 using SGCP.Application.Base.ServiceValidator.ModuloPedido;
 using SGCP.Application.Base.ServiceValidator.ModuloUsuarios;
-using SGCP.Application.Interfaces;
+using SGCP.Application.Interfaces.IServiceValidator.ModuloCarrito;
+using SGCP.Application.Interfaces.IServiceValidator.ModuloPedido;
+using SGCP.Application.Interfaces.IServiceValidator.ModuloUsuarios;
+using SGCP.Application.Interfaces.ModuloCarrito;
+using SGCP.Application.Interfaces.ModuloPedido;
+using SGCP.Application.Interfaces.ModuloUsuarios;
 using SGCP.Application.Repositories.ModuloCarrito;
 using SGCP.Application.Repositories.ModuloPedido;
 using SGCP.Application.Repositories.ModuloProducto;
@@ -39,7 +44,7 @@ namespace SGCP.Ioc.Dependencies.ModuloPedido
             services.AddScoped<IPedido, PedidoRepositoryAdo>();
             services.AddTransient<IPedidoService, PedidoService>();
             services.AddScoped<CarritoValidator>();
-            services.AddScoped<PedidoServiceValidator>();
+            services.AddScoped<IPedidoServiceValidator,PedidoServiceValidator>();
             services.AddScoped<ICarrito, CarritoRepositoryAdo>();
             services.AddTransient<ICarritoService, CarritoService>();
 
@@ -59,8 +64,10 @@ namespace SGCP.Ioc.Dependencies.ModuloPedido
             services.AddScoped<IJwtTokenService, JwtTokenService>();
             services.AddHttpContextAccessor();
 
-            services.AddScoped<ClienteServiceValidator>();
-            services.AddScoped<CarritoServiceValidator>();
+            services.AddScoped<IClienteServiceValidator, ClienteServiceValidator>();
+
+            services.AddScoped<ICarritoServiceValidator, CarritoServiceValidator>();
+
 
 
 

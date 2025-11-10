@@ -2,15 +2,15 @@
 
 using Microsoft.Extensions.Logging;
 using SGCP.Application.Base;
-using SGCP.Application.Base.ServiceValidator.ModuloCarrito;
 using SGCP.Application.Dtos.ModuloCarrito.Carrito;
 using SGCP.Application.Dtos.ModuloCarrito.CarritoProducto;
-using SGCP.Application.Interfaces;
+using SGCP.Application.Interfaces.IServiceValidator.ModuloCarrito;
+using SGCP.Application.Interfaces.ModuloCarrito;
+using SGCP.Application.Interfaces.ModuloUsuarios;
 using SGCP.Application.Mappers;
 using SGCP.Application.Repositories.ModuloCarrito;
 using SGCP.Application.Repositories.ModuloProducto;
 using SGCP.Domain.Entities.ModuloDeCarrito;
-using SGCP.Domain.Entities.ModuloDeProducto;
 
 namespace SGCP.Application.Services.ModuloCarrito
     {
@@ -20,7 +20,7 @@ namespace SGCP.Application.Services.ModuloCarrito
         private readonly ICarritoProducto _carritoProductoRepo;
         private readonly IProducto _productoRepository;
         private readonly ICurrentUserService _currentUserService;
-        private readonly CarritoServiceValidator _carritoServiceValidator; 
+        private readonly ICarritoServiceValidator _carritoServiceValidator; 
 
         public CarritoService(
             ICarrito carritoRepository,
@@ -28,7 +28,7 @@ namespace SGCP.Application.Services.ModuloCarrito
             ILogger<CarritoService> logger,
             IProducto productoRepository,
             ICurrentUserService currentUserService,
-            CarritoServiceValidator carritoServiceValidator 
+            ICarritoServiceValidator carritoServiceValidator 
         ) : base(logger)
         {
             _carritoRepository = carritoRepository;

@@ -1,7 +1,7 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using SGCP.Application.Dtos.ModuloReporte.Reporte;
-using SGCP.Application.Interfaces;
+using SGCP.Application.Interfaces.ModuloReporte;
 
 // For more information on enabling Web API for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
 

@@ -31,5 +31,22 @@ namespace SGCP.Application.Mappers
                 Estatus = c.Estatus
             };
         }
+        public static Cliente ToEntity(CreateClienteDTO dto)
+        {
+            if (dto == null)
+                throw new ArgumentNullException(nameof(dto));
+
+            return new Cliente(
+                dto.Nombre,
+                dto.Apellido,
+                dto.Username,
+                dto.Password
+            )
+            {
+                Carrito = null,
+                FechaCreacion = DateTime.Now,
+                Estatus = true
+            };
+        }
     }
 }

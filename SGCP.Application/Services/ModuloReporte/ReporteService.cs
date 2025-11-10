@@ -1,9 +1,10 @@
 ﻿
 using Microsoft.Extensions.Logging;
 using SGCP.Application.Base;
-using SGCP.Application.Base.ServiceValidator.ModuloReporte;
 using SGCP.Application.Dtos.ModuloReporte.Reporte;
-using SGCP.Application.Interfaces;
+using SGCP.Application.Interfaces.IServiceValidator.ModuloReporte;
+using SGCP.Application.Interfaces.ModuloReporte;
+using SGCP.Application.Interfaces.ModuloUsuarios;
 using SGCP.Application.Mappers;
 using SGCP.Application.Repositories.ModuloReporte;
 using SGCP.Application.Repositories.ModuloUsuarios;
@@ -17,14 +18,14 @@ namespace SGCP.Application.Services.ModuloReporte
         private readonly IReporte _reporteRepository;
         private readonly IAdministrador _adminRepository;
         private readonly ICurrentUserService _currentUserService;
-        private readonly ReporteServiceValidator _reporteServiceValidator;
+        private readonly IReporteServiceValidator _reporteServiceValidator;
 
         public ReporteService(
             IReporte reporteRepository,
             ILogger<ReporteService> logger,
             IAdministrador adminRepository,
             ICurrentUserService currentUserService,
-            ReporteServiceValidator reporteServiceValidator
+            IReporteServiceValidator reporteServiceValidator
         ) : base(logger)
         {
             _reporteRepository = reporteRepository;

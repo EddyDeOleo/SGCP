@@ -2,7 +2,7 @@
 using Microsoft.AspNetCore.Mvc;
 using SGCP.Application.Dtos.ModuloCarrito.Carrito;
 using SGCP.Application.Dtos.ModuloCarrito.CarritoProducto;
-using SGCP.Application.Interfaces;
+using SGCP.Application.Interfaces.ModuloCarrito;
 
 // For more information on enabling Web API for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
 

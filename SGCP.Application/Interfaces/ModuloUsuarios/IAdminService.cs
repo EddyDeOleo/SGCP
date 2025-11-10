@@ -1,8 +1,7 @@
-﻿
-using SGCP.Application.Base;
+﻿using SGCP.Application.Base;
 using SGCP.Application.Dtos.ModuloUsuarios.Administrador;
 
-namespace SGCP.Application.Interfaces
+namespace SGCP.Application.Interfaces.ModuloUsuarios
 {
     public interface IAdminService
     {

@@ -2,13 +2,14 @@
 
 using Microsoft.Extensions.Logging;
 using SGCP.Application.Dtos.ModuloUsuarios.Cliente;
+using SGCP.Application.Interfaces.IServiceValidator.ModuloUsuarios;
 using SGCP.Application.Repositories.ModuloUsuarios;
 using SGCP.Domain.Entities.ModuloDeUsuarios;
 
 namespace SGCP.Application.Base.ServiceValidator.ModuloUsuarios
 {
 
-    public class ClienteServiceValidator : ServiceValidator<ClienteServiceValidator>
+    public class ClienteServiceValidator : ServiceValidator<ClienteServiceValidator>, IClienteServiceValidator
     {
         private readonly ICliente _clienteRepository;
 
@@ -79,6 +80,22 @@ namespace SGCP.Application.Base.ServiceValidator.ModuloUsuarios
                 return Failure("Cliente no existe");
 
             return Success("Cliente existente", result.Data);
+        }
+
+        public async Task<ServiceResult> ValidateUsernameUnico(string username)
+        {
+            if (string.IsNullOrWhiteSpace(username))
+                return Failure("Username no puede estar vacío");
+
+            var allClientes = await _clienteRepository.GetAll();
+
+            if (allClientes.Success && allClientes.Data is List<Domain.Entities.ModuloDeUsuarios.Cliente> clientes)
+            {
+                if (clientes.Any(c => c.Username.Equals(username, StringComparison.OrdinalIgnoreCase)))
+                    return Failure("El username ya está registrado");
+            }
+
+            return Success("Username válido y único");
         }
     }
 

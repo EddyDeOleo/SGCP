@@ -2,9 +2,9 @@
 
 using Microsoft.Extensions.Logging;
 using SGCP.Application.Base;
-using SGCP.Application.Base.ServiceValidator.ModuloUsuarios;
 using SGCP.Application.Dtos.ModuloUsuarios.Cliente;
-using SGCP.Application.Interfaces;
+using SGCP.Application.Interfaces.IServiceValidator.ModuloUsuarios;
+using SGCP.Application.Interfaces.ModuloUsuarios;
 using SGCP.Application.Mappers;
 using SGCP.Application.Repositories.ModuloUsuarios;
 using SGCP.Domain.Entities.ModuloDeUsuarios;
@@ -15,13 +15,13 @@ namespace SGCP.Application.Services.ModuloUsuarios
     {
         private readonly ICliente _repository;
         private readonly ICurrentUserService _currentUserService;
-        private readonly ClienteServiceValidator _clienteServiceValidator;
+        private readonly IClienteServiceValidator _clienteServiceValidator;
 
         public ClienteService(
             ICliente repository,
             ILogger<ClienteService> logger,
             ICurrentUserService currentUserService,
-            ClienteServiceValidator clienteServiceValidator
+            IClienteServiceValidator clienteServiceValidator
         ) : base(logger)
         {
             _repository = repository;
@@ -33,24 +33,21 @@ namespace SGCP.Application.Services.ModuloUsuarios
         {
             return await ExecuteSafeAsync("crear cliente", async () =>
             {
-                var valResult = _clienteServiceValidator.ValidateForCreate(dto);
-                if (!valResult.Success) return valResult;
+                // 1) Validación DTO vía validator
+                var dtoValidation = _clienteServiceValidator.ValidateForCreate(dto);
+                if (!dtoValidation.Success) return dtoValidation;
 
-                var existingResult = await _repository.GetAll();
-                if (existingResult.Success && existingResult.Data is List<Cliente> clientes)
-                {
-                    if (clientes.Any(c => c.Username.Equals(dto.Username, StringComparison.OrdinalIgnoreCase)))
-                        return new ServiceResult(false, "El username ya está registrado");
-                }
+                // 2) Validar username único vía validator (await)
+                var usernameVal = await _clienteServiceValidator.ValidateUsernameUnico(dto.Username);
+                if (!usernameVal.Success) return usernameVal;
 
-                var cliente = new Cliente(dto.Nombre, dto.Apellido, dto.Username, dto.Password)
-                {
-                    Carrito = null
-                };
+                // 3) Mapear y guardar
+                var cliente = ClienteMapper.ToEntity(dto);
+                cliente.UsuarioModificacion = _currentUserService.GetUserId();
 
-                var opResult = await _repository.Save(cliente);
-                if (!opResult.Success)
-                    return new ServiceResult(false, opResult.Message);
+                var saveResult = await _repository.Save(cliente);
+                if (!saveResult.Success)
+                    return new ServiceResult(false, saveResult.Message);
 
                 return new ServiceResult(true, "Cliente creado correctamente", cliente);
             });
