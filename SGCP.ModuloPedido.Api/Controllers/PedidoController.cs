@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 using SGCP.Application.Dtos.ModuloPedido.Pedido;
 using SGCP.Application.Interfaces;
 
@@ -18,6 +19,7 @@ namespace SGCP.ModuloPedido.Api.Controllers
         }
         // GET: api/<PedidoController>
         [HttpGet("get-pedido")]
+        [Authorize]
         public async Task<IActionResult> Get()
         {
             var result = await _pedidoService.GetPedido();
@@ -30,6 +32,7 @@ namespace SGCP.ModuloPedido.Api.Controllers
 
         // GET api/<PedidoController>/5
         [HttpGet("getbyid-pedido")]
+        [Authorize]
         public async Task<IActionResult> Get(int id)
         {
             var result = await _pedidoService.GetPedidoById(id);
@@ -41,6 +44,7 @@ namespace SGCP.ModuloPedido.Api.Controllers
         }
         // POST api/<PedidoController>
         [HttpPost("create-pedido")]
+        [Authorize]
         public async Task<IActionResult> Post([FromBody] CreatePedidoDTO createPedidoDTO)
         {
             var result = await _pedidoService.CreatePedido(createPedidoDTO);
@@ -52,6 +56,7 @@ namespace SGCP.ModuloPedido.Api.Controllers
         }
         // PUT api/<PedidoController>/5
         [HttpPut("update-pedido")]
+        [Authorize]
         public async Task<IActionResult> Put([FromBody] UpdatePedidoDTO updatePedidoDTO)
         {
             var result = await _pedidoService.UpdatePedido(updatePedidoDTO);
@@ -64,6 +69,7 @@ namespace SGCP.ModuloPedido.Api.Controllers
 
         // DELETE api/<PedidoController>/5
         [HttpDelete("remove-pedido")]
+        [Authorize]
         public async Task<IActionResult> Delete([FromBody] DeletePedidoDTO deletePedidoDTO)
         {
             var result = await _pedidoService.RemovePedido(deletePedidoDTO);
@@ -73,5 +79,31 @@ namespace SGCP.ModuloPedido.Api.Controllers
             }
             return Ok(result);
         }
+
+        [HttpPut("finalizar-pedido")]
+        [Authorize]
+        public async Task<IActionResult> FinalizarPedido(int idPedido)
+        {
+            var result = await _pedidoService.FinalizarPedido(idPedido);
+            if (!result.Success)
+            {
+                return BadRequest(result);
+            }
+            return Ok(result);
+        }
+
+        [HttpPut("cancelar-pedido")]
+        [Authorize]
+        public async Task<IActionResult> CancelarPedido(int idPedido)
+        {
+            var result = await _pedidoService.CancelarPedido(idPedido);
+            if (!result.Success)
+            {
+                return BadRequest(result);
+            }
+            return Ok(result);
+        }
+
+
     }
 }

@@ -2,13 +2,20 @@
 
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using SGCP.Application.Base.ServiceValidator.ModuloCarrito;
+using SGCP.Application.Base.ServiceValidator.ModuloPedido;
+using SGCP.Application.Base.ServiceValidator.ModuloUsuarios;
 using SGCP.Application.Interfaces;
 using SGCP.Application.Repositories.ModuloCarrito;
 using SGCP.Application.Repositories.ModuloPedido;
 using SGCP.Application.Repositories.ModuloProducto;
 using SGCP.Application.Repositories.ModuloUsuarios;
-using SGCP.Application.Services;
+using SGCP.Application.Services.ModuloCarrito;
+using SGCP.Application.Services.ModuloPedido;
+using SGCP.Application.Services.ModuloUsuarios;
 using SGCP.Infraestructure.Dependencies.DB_Context;
+using SGCP.Infraestructure.Interfaces;
+using SGCP.Infraestructure.Security;
 using SGCP.Persistence.Base;
 using SGCP.Persistence.Base.EntityValidator.ModuloCarrito;
 using SGCP.Persistence.Base.EntityValidator.ModuloPedido;
@@ -32,6 +39,7 @@ namespace SGCP.Ioc.Dependencies.ModuloPedido
             services.AddScoped<IPedido, PedidoRepositoryAdo>();
             services.AddTransient<IPedidoService, PedidoService>();
             services.AddScoped<CarritoValidator>();
+            services.AddScoped<PedidoServiceValidator>();
             services.AddScoped<ICarrito, CarritoRepositoryAdo>();
             services.AddTransient<ICarritoService, CarritoService>();
 
@@ -42,6 +50,17 @@ namespace SGCP.Ioc.Dependencies.ModuloPedido
 
             services.AddScoped<ICliente, ClienteRepositoryEF>();
             services.AddTransient<IClienteService, ClienteService>();
+
+
+            services.AddScoped<IAdministrador, AdministradorRepositoryEF>();
+
+            services.AddScoped<ICurrentUserService, CurrentUserService>();
+            services.AddScoped<IAuthService, AuthService>();
+            services.AddScoped<IJwtTokenService, JwtTokenService>();
+            services.AddHttpContextAccessor();
+
+            services.AddScoped<ClienteServiceValidator>();
+            services.AddScoped<CarritoServiceValidator>();
 
 
 

@@ -2,7 +2,7 @@
 using Moq;
 using SGCP.Application.Dtos.ModuloUsuarios.Authetication;
 using SGCP.Application.Repositories.ModuloUsuarios;
-using SGCP.Application.Services;
+using SGCP.Application.Services.ModuloUsuarios;
 using SGCP.Domain.Base;
 using SGCP.Domain.Entities.ModuloDeUsuarios;
 using SGCP.Infraestructure.Interfaces;

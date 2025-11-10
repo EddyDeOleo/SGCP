@@ -15,7 +15,7 @@ namespace SGCP.Persistence.Base.EntityValidator.ModuloPedido
             if (!baseResult.Success)
                 return baseResult;
 
-            if (entity.Cliente == null)
+            if (entity.ClienteId <= 0)
                 return OperationResult.FailureResult("El cliente es obligatorio.");
 
             if (string.IsNullOrWhiteSpace(entity.Estado) || entity.Estado.Length > 30)

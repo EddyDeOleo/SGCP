@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 using SGCP.Application.Dtos.ModuloCarrito.Carrito;
 using SGCP.Application.Dtos.ModuloCarrito.CarritoProducto;
 using SGCP.Application.Interfaces;
@@ -20,6 +21,7 @@ namespace SGCP.ModuloCarrito.Api.Controllers
 
         // GET: api/<CarritoController>
         [HttpGet("get-carrito")]
+        [Authorize]
         public async Task<IActionResult> Get()
         {
             var result = await _carritoService.GetCarrito();
@@ -32,6 +34,7 @@ namespace SGCP.ModuloCarrito.Api.Controllers
 
         // GET api/<CarritoController>/5
         [HttpGet("getbyid-carrito")]
+        [Authorize]
         public async Task<IActionResult> Get(int id)
         {
             var result = await _carritoService.GetCarritoById(id);
@@ -44,6 +47,7 @@ namespace SGCP.ModuloCarrito.Api.Controllers
 
         // POST api/<CarritoController>
         [HttpPost("create-carrito")]
+        [Authorize]
         public async Task<IActionResult> Post([FromBody] CreateCarritoDTO createCarritoDTO)
         {
             var result = await _carritoService.CreateCarrito(createCarritoDTO);
@@ -56,6 +60,7 @@ namespace SGCP.ModuloCarrito.Api.Controllers
 
         // PUT api/<CarritoController>/5
         [HttpPut("update-carrito")]
+        [Authorize]
         public async Task<IActionResult> Put([FromBody] UpdateCarritoDTO updateCarritoDTO)
         {
             var result = await _carritoService.UpdateCarrito(updateCarritoDTO);
@@ -68,6 +73,7 @@ namespace SGCP.ModuloCarrito.Api.Controllers
 
         // DELETE api/<CarritoController>/5
         [HttpDelete("remove-carrito")]
+        [Authorize]
         public async Task<IActionResult> Delete([FromBody] DeleteCarritoDTO deleteCarritoDTO)
         {
             var result = await _carritoService.RemoveCarrito(deleteCarritoDTO);
@@ -78,6 +84,7 @@ namespace SGCP.ModuloCarrito.Api.Controllers
             return Ok(result);
         }
         [HttpPost("agregar-productos-al-carrito")]
+        [Authorize]
         public async Task<IActionResult> AgregarProducto(int carritoId, [FromBody] AgregarProductoDTO agregarProductoDTO)
         {
 

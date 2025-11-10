@@ -3,7 +3,7 @@ using Moq;
 using SGCP.Application.Dtos.ModuloUsuarios.Administrador;
 using SGCP.Application.Interfaces;
 using SGCP.Application.Repositories.ModuloUsuarios;
-using SGCP.Application.Services;
+using SGCP.Application.Services.ModuloUsuarios;
 using SGCP.Domain.Base;
 using SGCP.Domain.Entities.ModuloDeUsuarios;
 

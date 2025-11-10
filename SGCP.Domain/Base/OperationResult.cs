@@ -22,6 +22,8 @@ namespace SGCP.Domain.Base
             };
         }
 
+        
+
         public static OperationResult FailureResult(string message, dynamic? data = null)
         {
             return new OperationResult

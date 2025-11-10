@@ -1,7 +1,5 @@
 ﻿using Microsoft.Data.SqlClient;
-using SGCP.Domain.Entities.ModuloDeCarrito;
 using SGCP.Domain.Entities.ModuloDePedido;
-using SGCP.Domain.Entities.ModuloDeUsuarios;
 using SGCP.Persistence.Models.ModuloPedido.Pedido;
 using System.Data;
 

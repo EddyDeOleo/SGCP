@@ -5,5 +5,7 @@ namespace SGCP.Application.Dtos.ModuloProducto.Producto
     {
         public DateTime FechaCreacion { get; set; }
         public DateTime? FechaModificacion { get; set; }
+
+        public int? UsuarioModificacion { get; set; }
     }
 }

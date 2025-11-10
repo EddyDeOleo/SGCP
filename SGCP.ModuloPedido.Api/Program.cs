@@ -1,4 +1,6 @@
+
 using SGCP.Ioc.Dependencies.ModuloPedido;
+using SGCP.Ioc.Dependencies.ServiceCollectionExtensions;
 
 
 namespace SGCP.ModuloPedido.Api
@@ -12,26 +14,33 @@ namespace SGCP.ModuloPedido.Api
             builder.Services.AddPedidoDependencies(builder.Configuration);
 
 
+            builder.Logging.ClearProviders();
+            builder.Logging.AddConsole();
+            builder.Logging.SetMinimumLevel(LogLevel.Debug);
+
+            builder.Services.AddJwtAuthentication(builder.Configuration);
+            builder.Services.AddSwaggerWithJwt("SGCP Pedido API");
+
             builder.Services.AddControllers();
-            // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
             builder.Services.AddEndpointsApiExplorer();
-            builder.Services.AddSwaggerGen();
 
             var app = builder.Build();
 
-            // Configure the HTTP request pipeline.
             if (app.Environment.IsDevelopment())
             {
                 app.UseSwagger();
                 app.UseSwaggerUI();
             }
 
+            app.UseHttpsRedirection();
+            app.UseAuthentication();
             app.UseAuthorization();
 
-
             app.MapControllers();
+
 
             app.Run();
         }
     }
 }
+

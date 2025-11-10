@@ -3,7 +3,7 @@ using Moq;
 using SGCP.Application.Dtos.ModuloUsuarios.Cliente;
 using SGCP.Application.Interfaces;
 using SGCP.Application.Repositories.ModuloUsuarios;
-using SGCP.Application.Services;
+using SGCP.Application.Services.ModuloUsuarios;
 using SGCP.Domain.Base;
 using SGCP.Domain.Entities.ModuloDeUsuarios;
 
@@ -79,7 +79,8 @@ public class ClienteServiceTest
         var result = await _service.CreateCliente(dto);
 
         Assert.False(result.Success);
-        Assert.Equal("Ocurrió un error al crear el cliente", result.Message);
+        Assert.Equal("Ocurrió un error al crear cliente", result.Message);
+
     }
 
     #endregion
@@ -120,7 +121,7 @@ public class ClienteServiceTest
         var result = await _service.GetCliente();
 
         Assert.False(result.Success);
-        Assert.Equal("Ocurrió un error al obtener los clientes", result.Message);
+        Assert.Equal("Ocurrió un error al obtener todos los clientes", result.Message);
     }
 
     #endregion
@@ -158,7 +159,7 @@ public class ClienteServiceTest
         var result = await _service.GetClienteById(1);
 
         Assert.False(result.Success);
-        Assert.Equal("Ocurrió un error al obtener el cliente", result.Message);
+        Assert.Equal("Ocurrió un error al obtener cliente", result.Message);
     }
 
     #endregion
@@ -214,7 +215,7 @@ public class ClienteServiceTest
         var result = await _service.UpdateCliente(dto);
 
         Assert.False(result.Success);
-        Assert.Equal("Ocurrió un error al actualizar el cliente", result.Message);
+        Assert.Equal($"Ocurrió un error al actualizar cliente", result.Message);
     }
 
     #endregion
@@ -270,7 +271,7 @@ public class ClienteServiceTest
         var result = await _service.RemoveCliente(dto);
 
         Assert.False(result.Success);
-        Assert.Equal("Ocurrió un error al eliminar el cliente", result.Message);
+        Assert.Equal("Ocurrió un error al eliminar cliente", result.Message);
     }
 
     #endregion

@@ -10,7 +10,7 @@ using SGCP.Infraestructure.Interfaces;
 using SGCP.Infraestructure.Security;
 
 
-namespace SGCP.Application.Services
+namespace SGCP.Application.Services.ModuloUsuarios
 {
     public sealed class AuthService : IAuthService
     {
@@ -44,7 +44,6 @@ namespace SGCP.Application.Services
 
             try
             {
-                // 🔹 Buscar administrador
                 var admin = await BuscarAdministrador(loginDto.Username, loginDto.Password);
                 if (admin != null)
                 {
@@ -52,7 +51,6 @@ namespace SGCP.Application.Services
                     return CrearResultadoExitoso(admin.IdUsuario, admin.Username, admin.Nombre, admin.Apellido, token);
                 }
 
-                // 🔹 Buscar cliente
                 var cliente = await BuscarCliente(loginDto.Username, loginDto.Password);
                 if (cliente != null)
                 {
@@ -104,7 +102,7 @@ namespace SGCP.Application.Services
             var admin = ((List<Administrador>)usuarios.Data)
                 .FirstOrDefault(a => a.Username == username && a.Estatus);
 
-            return (admin != null && VerifyPassword(password, admin.Password)) ? admin : null;
+            return admin != null && VerifyPassword(password, admin.Password) ? admin : null;
         }
 
         private async Task<Cliente?> BuscarCliente(string username, string password)
@@ -115,7 +113,7 @@ namespace SGCP.Application.Services
             var cliente = ((List<Cliente>)clientes.Data)
                 .FirstOrDefault(c => c.Username == username && c.Estatus);
 
-            return (cliente != null && VerifyPassword(password, cliente.Password)) ? cliente : null;
+            return cliente != null && VerifyPassword(password, cliente.Password) ? cliente : null;
         }
 
         private bool VerifyPassword(string inputPassword, string storedPassword)

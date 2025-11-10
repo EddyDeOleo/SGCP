@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 using SGCP.Application.Base;
 using SGCP.Application.Dtos.ModuloProducto.Producto;
 using SGCP.Application.Interfaces;
@@ -19,6 +20,7 @@ namespace SGCP.ModuloProducto.Api.Controllers
 
         // GET: api/<ProductoController>
         [HttpGet("get-productos")]
+        [Authorize]
         public async Task<IActionResult>  Get()
         {
             ServiceResult result = await _productoService.GetProducto();    
@@ -33,6 +35,7 @@ namespace SGCP.ModuloProducto.Api.Controllers
 
         // GET api/<ProductoController>/5
         [HttpGet("getbyid-productos")]
+        [Authorize]
         public async Task<IActionResult> Get(int id)
         {
             ServiceResult result = await _productoService.GetProductoById(id);
@@ -45,6 +48,7 @@ namespace SGCP.ModuloProducto.Api.Controllers
 
         // POST api/<ProductoController>
         [HttpPost("create-productos")]
+        [Authorize]
         public async Task<IActionResult> Post([FromBody] CreateProductoDTO createProductoDTO)
         {
             ServiceResult result = await _productoService.CreateProducto(createProductoDTO);
@@ -57,6 +61,7 @@ namespace SGCP.ModuloProducto.Api.Controllers
 
         // PUT api/<ProductoController>/5
         [HttpPut("update-productos")]
+        [Authorize]
         public async Task<IActionResult> Put([FromBody] UpdateProductoDTO updateProductoDTO)
         {
             ServiceResult result = await _productoService.UpdateProducto(updateProductoDTO);
@@ -69,6 +74,7 @@ namespace SGCP.ModuloProducto.Api.Controllers
 
         // DELETE api/<ProductoController>/5
         [HttpDelete("remove-producto")]
+        [Authorize]
         public async Task<IActionResult> Delete([FromBody] DeleteProductoDTO deleteProductoDTO)
         {
             ServiceResult result = await _productoService.RemoveProducto(deleteProductoDTO);

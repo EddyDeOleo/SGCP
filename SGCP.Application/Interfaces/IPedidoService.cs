@@ -15,5 +15,8 @@ namespace SGCP.Application.Interfaces
         Task<ServiceResult> UpdatePedido(UpdatePedidoDTO updatePedidoDto);
 
         Task<ServiceResult> RemovePedido(DeletePedidoDTO deletePedidoDto);
+
+        Task<ServiceResult> FinalizarPedido(int idPedido);
+        Task<ServiceResult> CancelarPedido(int idPedido);
     }
 }

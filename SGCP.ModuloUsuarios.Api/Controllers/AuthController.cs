@@ -48,6 +48,8 @@ namespace SGCP.ModuloUsuarios.Api.Controllers
 
     
         [HttpGet("test-user")]
+        [Authorize]
+
         public IActionResult TestUser([FromServices] ICurrentUserService currentUser)
         {
             return Ok(new

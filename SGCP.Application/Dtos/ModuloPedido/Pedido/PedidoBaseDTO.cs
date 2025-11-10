@@ -5,7 +5,7 @@ namespace SGCP.Application.Dtos.ModuloPedido.Pedido
 {
     public abstract record PedidoBaseDTO
     {
-         [Required(ErrorMessage = "El cliente es obligatorio.")]
+        [Range(1, int.MaxValue, ErrorMessage = "El cliente es obligatorio.")]
         public int ClienteId { get; set; }
 
         [Range(0, double.MaxValue, ErrorMessage = "El total del pedido no puede ser negativo.")]

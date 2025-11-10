@@ -20,6 +20,7 @@ namespace SGCP.ModuloReporte.Api.Controllers
 
         // GET: api/<ReporteController>
         [HttpGet("get-reporte")]
+        [Authorize]
         public async Task<IActionResult> Get()
         {
             var result = await _reporteService.GetReporte();
@@ -32,6 +33,7 @@ namespace SGCP.ModuloReporte.Api.Controllers
 
         // GET api/<ReporteController>/5
         [HttpGet("getbyid-reporte")]
+        [Authorize]
         public async Task<IActionResult> Get(int id)
         {
             var result = await _reporteService.GetReporteById(id);
@@ -44,6 +46,7 @@ namespace SGCP.ModuloReporte.Api.Controllers
 
         // POST api/<ReporteController>
         [HttpPost("create-reporte")]
+        [Authorize]
         public async Task<IActionResult> Post([FromBody] CreateReporteDTO createReporteDTO)
         {
             var result = await _reporteService.CreateReporte(createReporteDTO);
@@ -69,6 +72,7 @@ namespace SGCP.ModuloReporte.Api.Controllers
 
         // DELETE api/<ReporteController>/5
         [HttpDelete("remove-reporte")]
+        [Authorize]
         public async Task<IActionResult> Delete([FromBody] DeleteReporteDTO deleteReporteDTO)
         {
             var result = await _reporteService.RemoveReporte(deleteReporteDTO);

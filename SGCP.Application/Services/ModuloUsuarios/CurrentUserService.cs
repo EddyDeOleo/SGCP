@@ -1,17 +1,17 @@
 ﻿
 using Microsoft.AspNetCore.Http;
 using SGCP.Application.Interfaces;
-using SGCP.Infraestructure.Security;
+using SGCP.Infraestructure.Interfaces;
 using System.Security.Claims;
 
-namespace SGCP.Application.Services
+namespace SGCP.Application.Services.ModuloUsuarios
 {
     public sealed class CurrentUserService : ICurrentUserService
     {
         private readonly IHttpContextAccessor _httpContextAccessor;
-        private readonly JwtTokenService _jwtTokenService;
+        private readonly IJwtTokenService _jwtTokenService;
 
-        public CurrentUserService(IHttpContextAccessor httpContextAccessor, JwtTokenService jwtTokenService)
+        public CurrentUserService(IHttpContextAccessor httpContextAccessor, IJwtTokenService jwtTokenService)
         {
             _httpContextAccessor = httpContextAccessor;
             _jwtTokenService = jwtTokenService;
@@ -32,16 +32,13 @@ namespace SGCP.Application.Services
             return GetClaimValue(ClaimTypes.Name) ?? GetClaimValue("Username") ?? string.Empty;
         }
 
-        /// <summary>
-        /// Obtiene un claim específico desde el contexto HTTP o, si no existe, lo extrae validando el token directamente.
-        /// </summary>
+      
         private string? GetClaimValue(string claimType)
         {
             var claim = _httpContextAccessor.HttpContext?.User?.FindFirst(claimType);
             if (claim != null)
                 return claim.Value;
 
-            // Si no existe en el contexto, intenta leer manualmente el token
             var token = _httpContextAccessor.HttpContext?.Request.Headers["Authorization"]
                 .FirstOrDefault()?.Replace("Bearer ", "");
 

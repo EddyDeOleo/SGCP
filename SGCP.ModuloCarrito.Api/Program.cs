@@ -1,5 +1,10 @@
 
+using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.IdentityModel.Tokens;
+using Microsoft.OpenApi.Models;
 using SGCP.Ioc.Dependencies.ModuloCarrito;
+using SGCP.Ioc.Dependencies.ServiceCollectionExtensions;
+using System.Text;
 
 namespace SGCP.ModuloCarrito.Api
 {
@@ -9,27 +14,30 @@ namespace SGCP.ModuloCarrito.Api
         {
             var builder = WebApplication.CreateBuilder(args);
 
-    
+            builder.Services.AddCarritoDependencies(builder.Configuration);
 
-            builder.Services.AddCarritoDependencies();
-          
+            builder.Logging.ClearProviders();
+            builder.Logging.AddConsole();
+            builder.Logging.SetMinimumLevel(LogLevel.Debug);
+
+           
+
+            builder.Services.AddJwtAuthentication(builder.Configuration);
+            builder.Services.AddSwaggerWithJwt("SGCP Carrito API");
 
             builder.Services.AddControllers();
-            // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
             builder.Services.AddEndpointsApiExplorer();
-            builder.Services.AddSwaggerGen();
 
             var app = builder.Build();
 
-            // Configure the HTTP request pipeline.
+            app.UseHttpsRedirection();
+            app.UseAuthentication();
+            app.UseAuthorization();
             if (app.Environment.IsDevelopment())
             {
                 app.UseSwagger();
                 app.UseSwaggerUI();
             }
-
-            app.UseAuthorization();
-
 
             app.MapControllers();
 

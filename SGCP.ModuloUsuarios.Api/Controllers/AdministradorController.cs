@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 using SGCP.Application.Dtos.ModuloUsuarios.Administrador;
 using SGCP.Application.Interfaces;
 
@@ -19,6 +20,7 @@ namespace SGCP.ModuloUsuarios.Api.Controllers
 
         // GET: api/<AdministradorController>
         [HttpGet("get-admin")]
+        [Authorize]
         public async Task<IActionResult> Get()
         {
             var result = await _service.GetAdmin();
@@ -31,6 +33,7 @@ namespace SGCP.ModuloUsuarios.Api.Controllers
 
         // GET api/<AdministradorController>/5
         [HttpGet("getbyid-admin")]
+        [Authorize]
         public async Task<IActionResult> Get(int id)
         {
             var result = await _service.GetAdminById(id);
@@ -43,6 +46,7 @@ namespace SGCP.ModuloUsuarios.Api.Controllers
 
         // POST api/<AdministradorController>
         [HttpPost("create-admin")]
+        [Authorize]
         public async Task<IActionResult> Post([FromBody] CreateAdminDTO createAdminDTO)
         {
             var result = await _service.CreateAdmin(createAdminDTO);
@@ -55,6 +59,7 @@ namespace SGCP.ModuloUsuarios.Api.Controllers
 
         // PUT api/<AdministradorController>/5
         [HttpPut("update-admin")]
+        [Authorize]
         public async Task<IActionResult> Put([FromBody] UpdateAdminDTO updateAdminDTO)
         {
             var result = await _service.UpdateAdmin(updateAdminDTO);

@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 using SGCP.Application.Dtos.ModuloUsuarios.Cliente;
 using SGCP.Application.Interfaces;
 
@@ -15,7 +16,7 @@ namespace SGCP.ModuloUsuarios.Api.Controllers
             _service = service;
         }
         [HttpGet("get-cliente")]
-
+        [Authorize]
         public async Task<IActionResult> Get()
         {
             var result = await _service.GetCliente();
@@ -30,6 +31,7 @@ namespace SGCP.ModuloUsuarios.Api.Controllers
 
         // GET api/<ReporteController>/5
         [HttpGet("getbyid-cliente")]
+        [Authorize]
         public async Task<IActionResult> Get(int id)
         {
             var result = await _service.GetClienteById(id);
@@ -42,6 +44,7 @@ namespace SGCP.ModuloUsuarios.Api.Controllers
 
         // POST api/<ReporteController>
         [HttpPost("create-cliente")]
+        [Authorize]
         public async Task<IActionResult> Post([FromBody] CreateClienteDTO createClienteDTO)
         {
             var result = await _service.CreateCliente(createClienteDTO);
@@ -54,6 +57,7 @@ namespace SGCP.ModuloUsuarios.Api.Controllers
 
         // PUT api/<ReporteController>/5
         [HttpPut("update-cliente")]
+        [Authorize]
         public async Task<IActionResult> Put([FromBody] UpdateClienteDTO updateClienteDTO)
         {
             var result = await _service.UpdateCliente(updateClienteDTO);
@@ -66,6 +70,7 @@ namespace SGCP.ModuloUsuarios.Api.Controllers
 
         // DELETE api/<ReporteController>/5
         [HttpDelete("remove-cliente")]
+        [Authorize]
         public async Task<IActionResult> Delete([FromBody] DeleteClienteDTO deleteClienteDTO)
         {
             var result = await _service.RemoveCliente(deleteClienteDTO);
