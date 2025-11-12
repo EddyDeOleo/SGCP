@@ -1,6 +1,7 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using SGCP.Application.Repositories.ModuloUsuarios;
+using SGCP.Domain.Base;
 using SGCP.Domain.Entities.ModuloDePedido;
 using SGCP.Domain.Entities.ModuloDeUsuarios;
 using SGCP.Persistence.Repositories.Base;
@@ -47,6 +48,24 @@ namespace SGCP.Persistence.Repositories.ModuloUsuarios
             {
                 _logger.LogError(ex, "Error al obtener pedidos del cliente {ClienteId}", clienteId);
                 return new List<Pedido>();
+            }
+        }
+
+        public override async Task<OperationResult> GetAll()
+        {
+            _logger.LogInformation("Obteniendo clientes en orden descendente");
+            try
+            {
+                var list = await _dbSet
+                    .OrderByDescending(a => a.FechaCreacion)
+                    .ToListAsync();
+
+                return OperationResult.SuccessResult("Clientes obtenidos correctamente", list);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error al obtener clientes");
+                return OperationResult.FailureResult($"Error al obtener clientes: {ex.Message}");
             }
         }
     }

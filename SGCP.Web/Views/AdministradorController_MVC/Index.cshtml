@@ -1,0 +1,76 @@
+﻿@model IEnumerable<SGCP.Application.Dtos.ModuloUsuarios.Administrador.AdminGetDTO>
+
+@{
+    ViewData["Title"] = "Index";
+}
+
+<h1>Administradores</h1>
+
+<p>
+    <a asp-action="Create">Create New</a>
+</p>
+<table class="table">
+    <thead>
+        <tr>
+            <th>
+                AdminId
+            </th>
+            <th>
+                Nombre
+            </th>
+            <th>
+                Apellido
+            </th>
+            <th>
+                Username
+            </th>
+            <th>
+                FechaCreacion
+            </th>
+            <th>
+                FechaModificacion
+            </th>
+            <th>
+                UsuarioModificacion
+            </th>
+            <th>
+                Estatus
+            </th>
+            <th></th>
+        </tr>
+    </thead>
+    <tbody>
+@foreach (var item in Model) {
+        <tr>
+            <td>
+                @item.AdminId
+            </td>
+            <td>
+                @item.Nombre
+            </td>
+            <td>
+                @item.Apellido
+            </td>
+            <td>
+                @item.Username
+            </td>
+            <td>
+                @item.FechaCreacion
+            </td>
+            <td>
+                @item.FechaModificacion
+            </td>
+            <td>
+                @item.UsuarioModificacion
+            </td>
+            <td>
+                @item.Estatus
+            </td>
+            <td>
+                @Html.ActionLink("Edit", "Edit", new {  id=item.AdminId }) |
+                @Html.ActionLink("Details", "Details", new {  id=item.AdminId }) |
+            </td>
+        </tr>
+}
+    </tbody>
+</table>

@@ -1,0 +1,66 @@
+﻿@model SGCP.Application.Dtos.ModuloReporte.Reporte.ReporteGetDTO
+
+@{
+    ViewData["Title"] = "Details";
+}
+
+<h1>Details</h1>
+
+<div>
+    <h4>ReporteGetDTO</h4>
+    <hr />
+    <dl class="row">
+        <dt class = "col-sm-2">
+            IdReporte
+        </dt>
+        <dd class = "col-sm-10">
+            @Model.IdReporte
+        </dd>
+        <dt class = "col-sm-2">
+            AdminId
+        </dt>
+        <dd class = "col-sm-10">
+            @Model.AdminId
+        </dd>
+        <dt class = "col-sm-2">
+            FechaCreacion
+        </dt>
+        <dd class = "col-sm-10">
+            @Model.FechaCreacion
+        </dd>
+        <dt class = "col-sm-2">
+            TotalVentas
+        </dt>
+        <dd class = "col-sm-10">
+            @Model.TotalVentas
+        </dd>
+        <dt class = "col-sm-2">
+            TotalPedidos
+        </dt>
+        <dd class = "col-sm-10">
+            @Model.TotalPedidos
+        </dd>
+        <dt class = "col-sm-2">
+            FechaModificacion
+        </dt>
+        <dd class = "col-sm-10">
+            @Model.FechaModificacion
+        </dd>
+        <dt class = "col-sm-2">
+            UsuarioModificacion
+        </dt>
+        <dd class = "col-sm-10">
+            @Model.UsuarioModificacion
+        </dd>
+        <dt class = "col-sm-2">
+            Estatus
+        </dt>
+        <dd class = "col-sm-10">
+            @Model.Estatus
+        </dd>
+    </dl>
+</div>
+<div>
+    @Html.ActionLink("Edit", "Edit", new { id = Model.IdReporte }) |
+    <a asp-action="Index">Back to List</a>
+</div>

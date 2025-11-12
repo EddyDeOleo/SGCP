@@ -1,0 +1,76 @@
+﻿@model IEnumerable<SGCP.Application.Dtos.ModuloReporte.Reporte.ReporteGetDTO>
+
+@{
+    ViewData["Title"] = "Index";
+}
+
+<h1>Reportes</h1>
+
+<p>
+    <a asp-action="Create">Create New</a>
+</p>
+<table class="table">
+    <thead>
+        <tr>
+            <th>
+                IdReporte
+            </th>
+            <th>
+                AdminId
+            </th>
+            <th>
+                FechaCreacion
+            </th>
+            <th>
+                TotalVentas
+            </th>
+            <th>
+                TotalPedidos
+            </th>
+            <th>
+                FechaModificacion
+            </th>
+            <th>
+                UsuarioModificacion
+            </th>
+            <th>
+                Estatus
+            </th>
+            <th></th>
+        </tr>
+    </thead>
+    <tbody>
+@foreach (var item in Model) {
+        <tr>
+            <td>
+                @item.IdReporte
+            </td>
+            <td>
+                @item.AdminId
+            </td>
+            <td>
+                @item.FechaCreacion
+            </td>
+            <td>
+                @item.TotalVentas
+            </td>
+            <td>
+                @item.TotalPedidos
+            </td>
+            <td>
+                @item.FechaModificacion
+            </td>
+            <td>
+                @item.UsuarioModificacion
+            </td>
+            <td>
+                @item.Estatus
+            </td>
+            <td>
+                    @Html.ActionLink("Edit", "Edit", new {  id=item.IdReporte }) |
+                    @Html.ActionLink("Details", "Details", new { id = item.IdReporte }) |
+            </td>
+        </tr>
+}
+    </tbody>
+</table>

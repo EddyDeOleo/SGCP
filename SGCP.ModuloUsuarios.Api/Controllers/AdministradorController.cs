@@ -20,7 +20,7 @@ namespace SGCP.ModuloUsuarios.Api.Controllers
 
         // GET: api/<AdministradorController>
         [HttpGet("get-admin")]
-        [Authorize]
+     
         public async Task<IActionResult> Get()
         {
             var result = await _service.GetAdmin();

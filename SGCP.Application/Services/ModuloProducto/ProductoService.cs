@@ -1,7 +1,6 @@
 ﻿
 using Microsoft.Extensions.Logging;
 using SGCP.Application.Base;
-using SGCP.Application.Base.ServiceValidator.ModuloProducto;
 using SGCP.Application.Dtos.ModuloProducto.Producto;
 using SGCP.Application.Interfaces.IServiceValidator.ModuloProducto;
 using SGCP.Application.Interfaces.ModuloProducto;

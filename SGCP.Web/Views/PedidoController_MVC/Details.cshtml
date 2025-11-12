@@ -1,0 +1,68 @@
+﻿@model SGCP.Application.Dtos.ModuloPedido.Pedido.PedidoGetDTO
+
+@{
+    ViewData["Title"] = "Details";
+}
+
+<h1>Details</h1>
+
+<div>
+    <h4>PedidoGetDTO</h4>
+    <hr />
+    <dl class="row">
+     
+        <dt class = "col-sm-2">
+            IdPedido
+        </dt>
+        <dd class = "col-sm-10">
+            @Model.IdPedido
+        </dd>
+        <dt class = "col-sm-2">
+            ClienteId
+        </dt>
+        <dd class = "col-sm-10">
+            @Model.ClienteId
+        </dd>
+        <dt class = "col-sm-2">
+            Total
+        </dt>
+        <dd class = "col-sm-10">
+            @Model.Total
+      
+        <dt class = "col-sm-2">
+            CarritoId
+        </dt>
+        <dd class = "col-sm-10">
+            @Model.CarritoId
+        </dd>
+        <dt class="col-sm-2">
+            FechaCreacion
+        </dt>
+        <dd class="col-sm-10">
+            @Model.FechaCreacion
+        </dd>
+        <dt class="col-sm-2">
+            FechaModificacion
+        </dt>
+        <dd class="col-sm-10">
+            @Model.FechaModificacion
+        </dd>
+        <dt class="col-sm-2">
+            UsuarioModificacion
+        </dt>
+        <dd class="col-sm-10">
+            @Model.UsuarioModificacion
+        </dd>
+        </dd>
+        <dt class="col-sm-2">
+            Estado
+        </dt>
+        <dd class="col-sm-10">
+            @Model.Estado
+        </dd>
+    </dl>
+</div>
+<div>
+    @Html.ActionLink("Edit", "Edit", new { id = Model.IdPedido }) |
+    <a asp-action="Index">Back to List</a>
+</div>

@@ -20,19 +20,37 @@ namespace SGCP.Application.Services.ModuloUsuarios
         public int? GetUserId()
         {
             var userIdClaim = GetClaimValue("UserId") ?? GetClaimValue(ClaimTypes.NameIdentifier);
-
             if (userIdClaim != null && int.TryParse(userIdClaim, out int userId))
                 return userId;
+
+            var session = _httpContextAccessor.HttpContext?.Session;
+            if (session != null)
+            {
+                var userIdString = session.GetString("UserId");
+                if (!string.IsNullOrEmpty(userIdString) && int.TryParse(userIdString, out int sessionUserId))
+                    return sessionUserId;
+            }
 
             return null;
         }
 
         public string GetUserName()
         {
-            return GetClaimValue(ClaimTypes.Name) ?? GetClaimValue("Username") ?? string.Empty;
+            var username = GetClaimValue(ClaimTypes.Name) ?? GetClaimValue("Username");
+            if (!string.IsNullOrEmpty(username))
+                return username;
+
+            var session = _httpContextAccessor.HttpContext?.Session;
+            if (session != null)
+            {
+                var sessionUsername = session.GetString("Username");
+                if (!string.IsNullOrEmpty(sessionUsername))
+                    return sessionUsername;
+            }
+
+            return string.Empty;
         }
 
-      
         private string? GetClaimValue(string claimType)
         {
             var claim = _httpContextAccessor.HttpContext?.User?.FindFirst(claimType);

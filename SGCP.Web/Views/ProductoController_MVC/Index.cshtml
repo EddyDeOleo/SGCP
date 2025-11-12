@@ -1,0 +1,85 @@
+﻿@model IEnumerable<SGCP.Application.Dtos.ModuloProducto.Producto.ProductoGetDTO>
+
+@{
+    ViewData["Title"] = "Index";
+}
+
+<h1>Productos</h1>
+
+<p>
+    <a asp-action="Create">Create New</a>
+</p>
+<table class="table">
+    <thead>
+        <tr>
+
+            <th>
+                IdProducto
+            </th>
+            <th>
+                Nombre
+            </th>
+            <th>
+                Descripcion
+            </th>
+            <th>
+                Categoria
+            </th>
+            <th>
+                Precio
+            </th>
+            <th>
+                Stock
+            </th>
+            <th>
+                FechaCreacion
+            </th>
+            <th>
+                FechaModificacion
+            </th>
+            <th>
+                UsuarioModificacion
+            </th>
+            <th></th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var item in Model)
+        {
+            <tr>
+
+                <td>
+                    @item.IdProducto
+                </td>
+                <td>
+                    @item.Nombre
+                </td>
+                <td>
+                    @item.Descripcion
+                </td>
+                <td>
+                    @item.Categoria
+                </td>
+                <td>
+                    @item.Precio
+                </td>
+                <td>
+                    @item.Stock
+                </td>
+                <td>
+                    @item.FechaCreacion
+                </td>
+                <td>
+                    @item.FechaModificacion
+                </td>
+                <td>
+                    @item.UsuarioModificacion
+                </td>
+                <td>
+                    @Html.ActionLink("Edit", "Edit", new { id = item.IdProducto }) |
+                    @Html.ActionLink("Details", "Details", new { id = item.IdProducto }) |
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>

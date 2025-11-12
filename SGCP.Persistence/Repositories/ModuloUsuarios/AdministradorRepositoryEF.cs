@@ -1,6 +1,7 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using SGCP.Application.Repositories.ModuloUsuarios;
+using SGCP.Domain.Base;
 using SGCP.Domain.Entities.ModuloDeReporte;
 using SGCP.Domain.Entities.ModuloDeUsuarios;
 using SGCP.Persistence.Repositories.Base;
@@ -51,6 +52,24 @@ namespace SGCP.Persistence.Repositories.ModuloUsuarios
             {
                 _logger.LogError(ex, "Error al obtener reportes del administrador {AdminId}", adminId);
                 throw;
+            }
+        }
+
+        public override async Task<OperationResult> GetAll()
+        {
+            _logger.LogInformation("Obteniendo administradores en orden descendente");
+            try
+            {
+                var list = await _dbSet
+                    .OrderByDescending(a => a.FechaCreacion)
+                    .ToListAsync();
+
+                return OperationResult.SuccessResult("Administradores obtenidos correctamente", list);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error al obtener administradores");
+                return OperationResult.FailureResult($"Error al obtener administradores: {ex.Message}");
             }
         }
     }

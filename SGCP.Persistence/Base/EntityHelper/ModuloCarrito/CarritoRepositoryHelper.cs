@@ -45,7 +45,6 @@ namespace SGCP.Persistence.Base.EntityHelper.ModuloCarrito
             var parameters = new Dictionary<string, object>
             {
                 { "@ClienteId", entity.ClienteId }
-                // FechaCreacion y Estatus son manejados por la DB
             };
 
             var outputParam = new SqlParameter("@IdCarrito", SqlDbType.Int)
@@ -63,7 +62,6 @@ namespace SGCP.Persistence.Base.EntityHelper.ModuloCarrito
                 { "@IdCarrito", entity.IdCarrito },
                 { "@ClienteId", entity.ClienteId },
                 { "@UsuarioModificacion", entity.UsuarioModificacion ?? (object)DBNull.Value }
-                // FechaModificacion es manejada por la DB
             };
         }
 
