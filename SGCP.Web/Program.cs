@@ -1,3 +1,4 @@
+using SGCP.Ioc.Dependencies.ModuloCarrito;
 using SGCP.Ioc.Dependencies.ModuloPedido;
 using SGCP.Ioc.Dependencies.ModuloProducto;
 using SGCP.Ioc.Dependencies.ModuloReporte;
@@ -32,6 +33,8 @@ namespace SGCP.Web
             builder.Services.AddJwtAuthentication(builder.Configuration);
             builder.Services.AddReporteDependencies(builder.Configuration);
             builder.Services.AddPedidoDependencies(builder.Configuration);
+            builder.Services.AddCarritoDependencies(builder.Configuration);
+
 
 
             // PONER LAS DEPENDENCIAS DE LOS MODULOS AQUI Y MODIFICAR EL APPSETTINGS.JSON

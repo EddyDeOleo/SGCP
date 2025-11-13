@@ -1,0 +1,67 @@
+﻿@model IEnumerable<SGCP.Application.Dtos.ModuloCarrito.Carrito.CarritoGetDTO>
+
+@{
+    ViewData["Title"] = "Index";
+}
+
+<h1>Carritos</h1>
+
+<p>
+    <a asp-action="Create">Create New</a>
+</p>
+<table class="table">
+    <thead>
+        <tr>
+
+            <th>
+                CarritoId
+            </th>
+            <th>
+                ClienteId
+            </th>
+            <th>
+                FechaCreacion
+            </th>
+            <th>
+                FechaModificacion
+            </th>
+            <th>
+                UsuarioModificacion
+            </th>
+            <th>
+                Estatus
+            </th>
+            <th></th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var item in Model)
+        {
+            <tr>
+                <td>
+                    @item.CarritoId
+                </td>
+                <td>
+                    @item.ClienteId
+                </td>
+                <td>
+                    @item.FechaCreacion
+                </td>
+                <td>
+                    @item.FechaModificacion
+                </td>
+                <td>
+                    @item.UsuarioModificacion
+                </td>
+                <td>
+                    @item.Estatus
+                </td>
+
+                <td>
+                    @Html.ActionLink("Edit", "Edit", new { id = item.CarritoId }) |
+                    @Html.ActionLink("Details", "Details", new { id = item.CarritoId }) |
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>

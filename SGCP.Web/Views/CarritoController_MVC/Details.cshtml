@@ -1,0 +1,55 @@
+﻿@model SGCP.Application.Dtos.ModuloCarrito.Carrito.CarritoGetDTO
+
+@{
+    ViewData["Title"] = "Details";
+}
+
+<h1>Details</h1>
+
+<div>
+    <h4>CarritoGetDTO</h4>
+    <hr />
+    <dl class="row">
+
+        <dt class="col-sm-2">
+            CarritoId
+        </dt>
+        <dd class="col-sm-10">
+            @Model.CarritoId
+        </dd>
+        <dt class = "col-sm-2">
+            ClienteId
+        </dt>
+        <dd class = "col-sm-10">
+            @Model.ClienteId
+        </dd>
+        <dt class="col-sm-2">
+            FechaCreacion
+        </dt>
+        <dd class="col-sm-10">
+            @Model.FechaCreacion
+        </dd>
+        <dt class="col-sm-2">
+            FechaModificacion
+        </dt>
+        <dd class="col-sm-10">
+            @Model.FechaModificacion
+        </dd>
+        <dt class="col-sm-2">
+            UsuarioModificacion
+        </dt>
+        <dd class="col-sm-10">
+            @Model.UsuarioModificacion
+        </dd>
+        <dt class="col-sm-2">
+            Estatus
+        </dt>
+        <dd class="col-sm-10">
+            @Model.Estatus
+        </dd>
+    </dl>
+</div>
+<div>
+    @Html.ActionLink("Edit", "Edit", new {  id = Model.CarritoId }) |
+    <a asp-action="Index">Back to List</a>
+</div>

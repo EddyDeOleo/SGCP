@@ -3,7 +3,7 @@ using SGCP.Application.Base;
 using SGCP.Application.Dtos.ModuloPedido.Pedido;
 using SGCP.Application.Interfaces.ModuloPedido;
 
-namespace SGCP.Web.Controllers
+namespace SGCP.Web.Controllers.ModuloPedido
 {
     public class PedidoController_MVC : Controller
     {
