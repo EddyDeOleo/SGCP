@@ -1,11 +1,12 @@
 ﻿using Microsoft.Extensions.Logging;
 using SGCP.Domain.Base;
+using SGCP.Persistence.Base.IEntityValidator;
 
 
 namespace SGCP.Persistence.Base.EntityValidator
 {
 
-    public abstract class EntityValidator<TEntity> where TEntity : class
+    public abstract class EntityValidator<TEntity> : IEntityValidator<TEntity> where TEntity : class
     {
         protected readonly ILogger _logger;
 

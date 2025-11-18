@@ -5,7 +5,7 @@ using SGCP.Domain.Base;
 using SGCP.Domain.Entities.ModuloDeReporte;
 using SGCP.Persistence.Base;
 using SGCP.Persistence.Base.EntityHelper.ModuloReporte;
-using SGCP.Persistence.Base.EntityValidator.ModuloReporte;
+using SGCP.Persistence.Base.IEntityValidator;
 
 
 namespace SGCP.Persistence.Repositories.ModuloReporte
@@ -21,9 +21,46 @@ namespace SGCP.Persistence.Repositories.ModuloReporte
         public ReporteRepositoryAdo(
             IStoredProcedureExecutor spExecutor,
             ILogger<ReporteRepositoryAdo> logger,
-            ReporteValidator reporteValidator)
+            IEntityValidator<Reporte> reporteValidator)
             : base(spExecutor, logger, reporteValidator)
         {
+        }
+
+
+        public override async Task<OperationResult> Save(Reporte entity)
+        {
+            if (_validator != null)
+            {
+                var validation = _validator.ValidateForSave(entity);
+                if (!validation.Success)
+                    return validation;
+            }
+
+            return await base.Save(entity);
+        }
+
+        public override async Task<OperationResult> Update(Reporte entity)
+        {
+            if (_validator != null)
+            {
+                var validation = _validator.ValidateForUpdate(entity);
+                if (!validation.Success)
+                    return validation;
+            }
+
+            return await base.Update(entity);
+        }
+
+        public override async Task<OperationResult> Remove(Reporte entity)
+        {
+            if (_validator != null)
+            {
+                var validation = _validator.ValidateForRemove(entity);
+                if (!validation.Success)
+                    return validation;
+            }
+
+            return await base.Remove(entity);
         }
 
         protected override Reporte MapToEntity(SqlDataReader reader)
@@ -51,6 +88,9 @@ namespace SGCP.Persistence.Repositories.ModuloReporte
         {
             return new Dictionary<string, object> { { "@IdReporte", id } };
         }
+
+
+
 
         public async Task<List<Reporte>> GetByAdministradorId(int adminId)
         {

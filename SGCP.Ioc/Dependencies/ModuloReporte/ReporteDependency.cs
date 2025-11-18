@@ -9,11 +9,15 @@ using SGCP.Application.Repositories.ModuloReporte;
 using SGCP.Application.Repositories.ModuloUsuarios;
 using SGCP.Application.Services.ModuloReporte;
 using SGCP.Application.Services.ModuloUsuarios;
+using SGCP.Domain.Entities.ModuloDeReporte;
+using SGCP.Domain.Entities.ModuloDeUsuarios;
 using SGCP.Infraestructure.Dependencies.DB_Context;
 using SGCP.Infraestructure.Interfaces;
 using SGCP.Infraestructure.Security;
 using SGCP.Persistence.Base;
 using SGCP.Persistence.Base.EntityValidator.ModuloReporte;
+using SGCP.Persistence.Base.EntityValidator.ModuloUsuarios;
+using SGCP.Persistence.Base.IEntityValidator;
 using SGCP.Persistence.Repositories.ModuloReporte;
 using SGCP.Persistence.Repositories.ModuloUsuarios;
 
@@ -27,12 +31,18 @@ namespace SGCP.Ioc.Dependencies.ModuloReporte
             services.AddDBContextDependencies(configuration);
 
             services.AddScoped<IStoredProcedureExecutor, StoredProcedureExecutor>();
-            services.AddScoped<ReporteValidator>();
+            services.AddScoped<IEntityValidator<Reporte>, ReporteValidator>();
             services.AddScoped<IReporte, ReporteRepositoryAdo>();
             services.AddTransient<IReporteService, ReporteService>();
             services.AddScoped<IAdministrador, AdministradorRepositoryEF>();
 
             services.AddScoped<ICliente, ClienteRepositoryEF>();
+
+
+            services.AddScoped<IEntityValidator<Administrador>, AdministradorValidator>();
+
+            services.AddScoped<IEntityValidator<Cliente>, ClienteValidator>();
+
 
             services.AddScoped<ICurrentUserService, CurrentUserService>();
             services.AddScoped<IAuthService, AuthService>();

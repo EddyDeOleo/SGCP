@@ -3,7 +3,7 @@ using Microsoft.Data.SqlClient;
 using Microsoft.Extensions.Logging;
 using SGCP.Domain.Base;
 using SGCP.Domain.Repository;
-using SGCP.Persistence.Base.EntityValidator;
+using SGCP.Persistence.Base.IEntityValidator;
 using System.Data;
 using System.Linq.Expressions;
 
@@ -13,7 +13,7 @@ namespace SGCP.Persistence.Base
     {
         protected readonly IStoredProcedureExecutor _spExecutor;
         protected readonly ILogger _logger;
-        protected readonly EntityValidator<TEntity>? _validator;
+        protected readonly IEntityValidator<TEntity> _validator;
 
         protected abstract string SpGetAll { get; }
         protected abstract string SpGetById { get; }
@@ -26,7 +26,7 @@ namespace SGCP.Persistence.Base
         protected abstract Dictionary<string, object> GetUpdateParameters(TEntity entity);
         protected abstract Dictionary<string, object> GetDeleteParameters(TEntity entity);
 
-        public BaseRepositoryAdo(IStoredProcedureExecutor spExecutor, ILogger logger, EntityValidator<TEntity>? validator = null)
+        public BaseRepositoryAdo(IStoredProcedureExecutor spExecutor, ILogger logger, IEntityValidator<TEntity> validator)
         {
             _spExecutor = spExecutor;
             _logger = logger;

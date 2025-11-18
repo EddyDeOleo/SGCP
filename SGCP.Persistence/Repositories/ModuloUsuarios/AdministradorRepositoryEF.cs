@@ -4,6 +4,7 @@ using SGCP.Application.Repositories.ModuloUsuarios;
 using SGCP.Domain.Base;
 using SGCP.Domain.Entities.ModuloDeReporte;
 using SGCP.Domain.Entities.ModuloDeUsuarios;
+using SGCP.Persistence.Base.IEntityValidator;
 using SGCP.Persistence.Repositories.Base;
 
 
@@ -11,8 +12,8 @@ namespace SGCP.Persistence.Repositories.ModuloUsuarios
 {
     public class AdministradorRepositoryEF : BaseRepositoryEF<Administrador>, IAdministrador
     {
-        public AdministradorRepositoryEF(SGCPDbContext context, ILogger<AdministradorRepositoryEF> logger)
-            : base(context, logger) { }
+        public AdministradorRepositoryEF(SGCPDbContext context, ILogger<AdministradorRepositoryEF> logger, IEntityValidator<Administrador> validator)
+            : base(context, logger, validator) { }
 
         public async Task<Administrador> GetByUsername(string username)
         {

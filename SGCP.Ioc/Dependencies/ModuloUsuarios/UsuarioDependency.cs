@@ -6,9 +6,14 @@ using SGCP.Application.Interfaces.IServiceValidator.ModuloUsuarios;
 using SGCP.Application.Interfaces.ModuloUsuarios;
 using SGCP.Application.Repositories.ModuloUsuarios;
 using SGCP.Application.Services.ModuloUsuarios;
+using SGCP.Domain.Entities.ModuloDeProducto;
+using SGCP.Domain.Entities.ModuloDeUsuarios;
 using SGCP.Infraestructure.Dependencies.DB_Context;
 using SGCP.Infraestructure.Interfaces;
 using SGCP.Infraestructure.Security;
+using SGCP.Persistence.Base.EntityValidator.ModuloProducto;
+using SGCP.Persistence.Base.EntityValidator.ModuloUsuarios;
+using SGCP.Persistence.Base.IEntityValidator;
 using SGCP.Persistence.Repositories.ModuloUsuarios;
 
 namespace SGCP.Ioc.Dependencies.ModuloUsuarios
@@ -23,6 +28,12 @@ namespace SGCP.Ioc.Dependencies.ModuloUsuarios
 
             services.AddScoped<ICliente, ClienteRepositoryEF>();
             services.AddTransient<IClienteService, ClienteService>();
+
+            services.AddScoped<IEntityValidator<Administrador>, AdministradorValidator>();
+
+            services.AddScoped<IEntityValidator<Cliente>, ClienteValidator>();
+
+
 
             services.AddScoped<IAdministrador, AdministradorRepositoryEF>();
             services.AddTransient<IAdminService, AdminService>();

@@ -3,9 +3,12 @@ using Microsoft.Extensions.Logging;
 using SGCP.Application.Repositories.ModuloCarrito;
 using SGCP.Domain.Base;
 using SGCP.Domain.Entities.ModuloDeCarrito;
+using SGCP.Domain.Entities.ModuloDePedido;
+using SGCP.Domain.Entities.ModuloDeProducto;
 using SGCP.Persistence.Base;
 using SGCP.Persistence.Base.EntityHelper.ModuloCarrito;
 using SGCP.Persistence.Base.EntityValidator.ModuloCarrito;
+using SGCP.Persistence.Base.IEntityValidator;
 
 
 
@@ -22,11 +25,47 @@ namespace SGCP.Persistence.Repositories.ModuloCarrito
         public CarritoRepositoryAdo(
             IStoredProcedureExecutor spExecutor,
             ILogger<CarritoRepositoryAdo> logger,
-            CarritoValidator carritoValidator)
+            IEntityValidator<Carrito> carritoValidator)
             : base(spExecutor, logger, carritoValidator)
         {
         }
 
+
+        public override async Task<OperationResult> Save(Carrito entity)
+        {
+            if (_validator != null)
+            {
+                var validation = _validator.ValidateForSave(entity);
+                if (!validation.Success)
+                    return validation;
+            }
+
+            return await base.Save(entity);
+        }
+
+        public override async Task<OperationResult> Update(Carrito entity)
+        {
+            if (_validator != null)
+            {
+                var validation = _validator.ValidateForUpdate(entity);
+                if (!validation.Success)
+                    return validation;
+            }
+
+            return await base.Update(entity);
+        }
+
+        public override async Task<OperationResult> Remove(Carrito entity)
+        {
+            if (_validator != null)
+            {
+                var validation = _validator.ValidateForRemove(entity);
+                if (!validation.Success)
+                    return validation;
+            }
+
+            return await base.Remove(entity);
+        }
         protected override Carrito MapToEntity(SqlDataReader reader)
         {
             var model = CarritoRepositoryHelper.MapToCarritoGetModel(reader);
@@ -52,6 +91,9 @@ namespace SGCP.Persistence.Repositories.ModuloCarrito
         {
             return new Dictionary<string, object> { { "@IdCarrito", id } };
         }
+
+
+
 
         public async Task<Carrito?> GetByClienteId(int clienteId)
         {

@@ -5,7 +5,7 @@ using SGCP.Domain.Base;
 using SGCP.Domain.Entities.ModuloDePedido;
 using SGCP.Persistence.Base;
 using SGCP.Persistence.Base.EntityHelper.ModuloPedido;
-using SGCP.Persistence.Base.EntityValidator.ModuloPedido;
+using SGCP.Persistence.Base.IEntityValidator;
 
 
 namespace SGCP.Persistence.Repositories.ModuloPedido
@@ -21,9 +21,46 @@ namespace SGCP.Persistence.Repositories.ModuloPedido
         public PedidoRepositoryAdo(
             IStoredProcedureExecutor spExecutor,
             ILogger<PedidoRepositoryAdo> logger,
-            PedidoValidator pedidoValidator)
+            IEntityValidator<Pedido> pedidoValidator)
             : base(spExecutor, logger, pedidoValidator)
         {
+        }
+
+
+        public override async Task<OperationResult> Save(Pedido entity)
+        {
+            if (_validator != null)
+            {
+                var validation = _validator.ValidateForSave(entity);
+                if (!validation.Success)
+                    return validation;
+            }
+
+            return await base.Save(entity);
+        }
+
+        public override async Task<OperationResult> Update(Pedido entity)
+        {
+            if (_validator != null)
+            {
+                var validation = _validator.ValidateForUpdate(entity);
+                if (!validation.Success)
+                    return validation;
+            }
+
+            return await base.Update(entity);
+        }
+
+        public override async Task<OperationResult> Remove(Pedido entity)
+        {
+            if (_validator != null)
+            {
+                var validation = _validator.ValidateForRemove(entity);
+                if (!validation.Success)
+                    return validation;
+            }
+
+            return await base.Remove(entity);
         }
 
         protected override Pedido MapToEntity(SqlDataReader reader)
@@ -51,6 +88,7 @@ namespace SGCP.Persistence.Repositories.ModuloPedido
         {
             return new Dictionary<string, object> { { "@IdPedido", id } };
         }
+
 
         public async Task<List<Pedido>> GetPedidosByClienteId(int clienteId)
         {

@@ -4,14 +4,15 @@ using SGCP.Application.Repositories.ModuloUsuarios;
 using SGCP.Domain.Base;
 using SGCP.Domain.Entities.ModuloDePedido;
 using SGCP.Domain.Entities.ModuloDeUsuarios;
+using SGCP.Persistence.Base.IEntityValidator;
 using SGCP.Persistence.Repositories.Base;
 
 namespace SGCP.Persistence.Repositories.ModuloUsuarios
 {
     public class ClienteRepositoryEF : BaseRepositoryEF<Cliente>, ICliente
     {
-        public ClienteRepositoryEF(SGCPDbContext context, ILogger<ClienteRepositoryEF> logger)
-            : base(context, logger) { }
+        public ClienteRepositoryEF(SGCPDbContext context, ILogger<ClienteRepositoryEF> logger, IEntityValidator<Cliente> validator)
+            : base(context, logger, validator) { }
 
         public async Task<Cliente> GetByUsername(string username)
         {

@@ -10,11 +10,15 @@ using SGCP.Application.Repositories.ModuloProducto;
 using SGCP.Application.Repositories.ModuloUsuarios;
 using SGCP.Application.Services.ModuloProducto;
 using SGCP.Application.Services.ModuloUsuarios;
+using SGCP.Domain.Entities.ModuloDeProducto;
+using SGCP.Domain.Entities.ModuloDeUsuarios;
 using SGCP.Infraestructure.Dependencies.DB_Context;
 using SGCP.Infraestructure.Interfaces;
 using SGCP.Infraestructure.Security;
 using SGCP.Persistence.Base;
 using SGCP.Persistence.Base.EntityValidator.ModuloProducto;
+using SGCP.Persistence.Base.EntityValidator.ModuloUsuarios;
+using SGCP.Persistence.Base.IEntityValidator;
 using SGCP.Persistence.Repositories.ModuloProducto;
 using SGCP.Persistence.Repositories.ModuloUsuarios;
 
@@ -28,7 +32,7 @@ namespace SGCP.Ioc.Dependencies.ModuloProducto
 
 
             services.AddScoped<IStoredProcedureExecutor, StoredProcedureExecutor>();
-            services.AddScoped<ProductoValidator>();
+            services.AddScoped<IEntityValidator<Producto>, ProductoValidator>();
             services.AddScoped<IProductoServiceValidator, ProductoServiceValidator>();
 
             services.AddScoped<IProducto, ProductoRepositoryAdo>();
@@ -39,6 +43,11 @@ namespace SGCP.Ioc.Dependencies.ModuloProducto
             services.AddScoped<IJwtTokenService, JwtTokenService>();
             services.AddScoped<IAdministrador, AdministradorRepositoryEF>();
             services.AddScoped<ICliente, ClienteRepositoryEF>();
+
+
+            services.AddScoped<IEntityValidator<Administrador>, AdministradorValidator>();
+
+            services.AddScoped<IEntityValidator<Cliente>, ClienteValidator>();
 
             services.AddHttpContextAccessor();
 

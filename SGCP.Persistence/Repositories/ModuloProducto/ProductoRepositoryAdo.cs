@@ -5,7 +5,7 @@ using SGCP.Domain.Base;
 using SGCP.Domain.Entities.ModuloDeProducto;
 using SGCP.Persistence.Base;
 using SGCP.Persistence.Base.EntityHelper.ModuloProducto;
-using SGCP.Persistence.Base.EntityValidator.ModuloProducto;
+using SGCP.Persistence.Base.IEntityValidator;
 
 
 namespace SGCP.Persistence.Repositories.ModuloProducto
@@ -21,10 +21,47 @@ namespace SGCP.Persistence.Repositories.ModuloProducto
         public ProductoRepositoryAdo(
             IStoredProcedureExecutor spExecutor,
             ILogger<ProductoRepositoryAdo> logger,
-            ProductoValidator productoValidator)
+            IEntityValidator<Producto> productoValidator)
             : base(spExecutor, logger, productoValidator)
         {
         }
+
+        public override async Task<OperationResult> Save(Producto entity)
+        {
+            if (_validator != null)
+            {
+                var validation = _validator.ValidateForSave(entity);
+                if (!validation.Success)
+                    return validation;
+            }
+
+            return await base.Save(entity);
+        }
+
+        public override async Task<OperationResult> Update(Producto entity)
+        {
+            if (_validator != null)
+            {
+                var validation = _validator.ValidateForUpdate(entity);
+                if (!validation.Success)
+                    return validation;
+            }
+
+            return await base.Update(entity);
+        }
+
+        public override async Task<OperationResult> Remove(Producto entity)
+        {
+            if (_validator != null)
+            {
+                var validation = _validator.ValidateForRemove(entity);
+                if (!validation.Success)
+                    return validation;
+            }
+
+            return await base.Remove(entity);
+        }
+
 
         protected override Producto MapToEntity(SqlDataReader reader)
         {
@@ -34,6 +71,7 @@ namespace SGCP.Persistence.Repositories.ModuloProducto
 
         protected override (Dictionary<string, object>, SqlParameter) GetInsertParameters(Producto entity)
         {
+
             return ProductoRepositoryHelper.GetInsertParameters(entity);
         }
 
@@ -51,6 +89,9 @@ namespace SGCP.Persistence.Repositories.ModuloProducto
         {
             return new Dictionary<string, object> { { "@IdProducto", id } };
         }
+
+
+      
 
         public async Task<List<Producto>> GetProductosByCategoria(string categoria)
         {
