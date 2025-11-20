@@ -1,4 +1,4 @@
-﻿@model SGCP.Application.Dtos.ModuloUsuarios.Authetication.LoginDTO
+﻿@model SGCP.Web.Models.ModuloUsuarios.AuthModels.AuthLoginModel
 
 @{
     ViewData["Title"] = "Iniciar Sesión";
@@ -12,15 +12,15 @@
 
         <form asp-action="Login" method="post" novalidate>
             <div class="mb-3">
-                <label asp-for="Username" class="form-label fw-semibold"></label>
-                <input asp-for="Username" class="form-control" placeholder="Ingresa tu usuario" />
-                <span asp-validation-for="Username" class="text-danger small"></span>
+                <label asp-for="username" class="form-label fw-semibold"></label>
+                <input asp-for="username" class="form-control" placeholder="Ingresa tu usuario" />
+                <span asp-validation-for="username" class="text-danger small"></span>
             </div>
 
             <div class="mb-3">
-                <label asp-for="Password" class="form-label fw-semibold"></label>
-                <input asp-for="Password" type="password" class="form-control" placeholder="Ingresa tu contraseña" />
-                <span asp-validation-for="Password" class="text-danger small"></span>
+                <label asp-for="password" class="form-label fw-semibold"></label>
+                <input asp-for="password" type="password" class="form-control" placeholder="Ingresa tu contraseña" />
+                <span asp-validation-for="password" class="text-danger small"></span>
             </div>
 
             <div class="d-grid">

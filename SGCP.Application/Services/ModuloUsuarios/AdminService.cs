@@ -1,6 +1,5 @@
 ﻿using Microsoft.Extensions.Logging;
 using SGCP.Application.Base;
-using SGCP.Application.Base.ServiceValidator.ModuloUsuarios;
 using SGCP.Application.Dtos.ModuloUsuarios.Administrador;
 using SGCP.Application.Interfaces.IServiceValidator.ModuloUsuarios;
 using SGCP.Application.Interfaces.ModuloUsuarios;

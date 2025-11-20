@@ -28,6 +28,8 @@ namespace SGCP.Web
                 options.Cookie.Name = ".SGCP.Session"; 
             });
 
+            builder.Services.AddHttpClient();
+
             builder.Services.AddUsuarioDependencies(builder.Configuration);
             builder.Services.AddProductoDependencies(builder.Configuration);
             builder.Services.AddJwtAuthentication(builder.Configuration);
@@ -50,10 +52,10 @@ namespace SGCP.Web
             app.UseStaticFiles();
             app.UseRouting();
 
-          
-            app.UseAuthentication();
-            app.UseSession(); 
 
+
+            app.UseSession();          
+            app.UseAuthentication();   
             app.UseAuthorization();
 
             app.MapControllerRoute(

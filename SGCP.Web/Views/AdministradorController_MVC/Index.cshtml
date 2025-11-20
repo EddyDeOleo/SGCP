@@ -1,4 +1,4 @@
-﻿@model IEnumerable<SGCP.Application.Dtos.ModuloUsuarios.Administrador.AdminGetDTO>
+﻿@model IEnumerable<SGCP.Web.Models.ModuloUsuarios.AdministradorModels.AdminGetModel>
 
 @{
     ViewData["Title"] = "Index";
@@ -43,32 +43,32 @@
 @foreach (var item in Model) {
         <tr>
             <td>
-                @item.AdminId
+                @item.adminId
             </td>
             <td>
-                @item.Nombre
+                @item.nombre
             </td>
             <td>
-                @item.Apellido
+                @item.apellido
             </td>
             <td>
-                @item.Username
+                @item.username
             </td>
             <td>
-                @item.FechaCreacion
+                @item.fechaCreacion
             </td>
             <td>
-                @item.FechaModificacion
+                @item.fechaModificacion
             </td>
             <td>
-                @item.UsuarioModificacion
+                @item.usuarioModificacion
             </td>
             <td>
-                @item.Estatus
+                @item.estatus
             </td>
             <td>
-                @Html.ActionLink("Edit", "Edit", new {  id=item.AdminId }) |
-                @Html.ActionLink("Details", "Details", new {  id=item.AdminId }) |
+                @Html.ActionLink("Edit", "Edit", new {  id=item.adminId }) |
+                @Html.ActionLink("Details", "Details", new {  id=item.adminId }) |
             </td>
         </tr>
 }

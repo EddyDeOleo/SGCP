@@ -20,18 +20,11 @@ namespace SGCP.Application.Services.ModuloUsuarios
         public int? GetUserId()
         {
             var userIdClaim = GetClaimValue("UserId") ?? GetClaimValue(ClaimTypes.NameIdentifier);
-            if (userIdClaim != null && int.TryParse(userIdClaim, out int userId))
-                return userId;
 
-            var session = _httpContextAccessor.HttpContext?.Session;
-            if (session != null)
-            {
-                var userIdString = session.GetString("UserId");
-                if (!string.IsNullOrEmpty(userIdString) && int.TryParse(userIdString, out int sessionUserId))
-                    return sessionUserId;
-            }
+            if (string.IsNullOrEmpty(userIdClaim))
+                throw new InvalidOperationException("No se pudo obtener UserId desde el token.");
 
-            return null;
+            return int.Parse(userIdClaim);
         }
 
         public string GetUserName()
@@ -68,5 +61,10 @@ namespace SGCP.Application.Services.ModuloUsuarios
 
             return null;
         }
+
+
+       
+
+      
     }
 }

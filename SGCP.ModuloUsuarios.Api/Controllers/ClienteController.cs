@@ -16,7 +16,6 @@ namespace SGCP.ModuloUsuarios.Api.Controllers
             _service = service;
         }
         [HttpGet("get-cliente")]
-        [Authorize]
         public async Task<IActionResult> Get()
         {
             var result = await _service.GetCliente();
@@ -31,7 +30,6 @@ namespace SGCP.ModuloUsuarios.Api.Controllers
 
         // GET api/<ReporteController>/5
         [HttpGet("getbyid-cliente")]
-        [Authorize]
         public async Task<IActionResult> Get(int id)
         {
             var result = await _service.GetClienteById(id);

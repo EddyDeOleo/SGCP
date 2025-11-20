@@ -3,48 +3,104 @@ using SGCP.Application.Base;
 using SGCP.Application.Dtos.ModuloProducto.Producto;
 using SGCP.Application.Dtos.ModuloUsuarios.Cliente;
 using SGCP.Application.Interfaces.ModuloProducto;
+using SGCP.Web.Models.ModuloProducto;
+using SGCP.Web.Models.ModuloUsuarios.AdministradorModels;
+using SGCP.Web.Models.ModuloUsuarios.ClienteModels;
+using System.Text.Json;
 
 namespace SGCP.Web.Controllers.ModuloProducto
 {
     public class ProductoController_MVC : Controller
     {
         private readonly IProductoService _productoService;
-        private readonly ILogger<ProductoController_MVC> _logger;
 
-        public ProductoController_MVC(IProductoService productoService, ILogger<ProductoController_MVC> logger)
+
+         public async Task<ActionResult> Index()
         {
-            _productoService = productoService;
-            _logger = logger;
-        }
+            Response_GAP_Result getallresponse = null;
 
-        // GET: ProductoController
-        public async Task<ActionResult> Index()
-        {
 
-            ServiceResult result = await _productoService.GetProducto();
-
-            if (!result.Success)
+            try
             {
-                ViewBag.ErrorMessage = result.Message;
-                return View();
+                using (var client = new HttpClient())
+                {
+
+                    client.BaseAddress = new Uri("http://localhost:5287/api/");
+
+                    var response = await client.GetAsync("Producto/get-productos");
+
+                    if (response.IsSuccessStatusCode)
+                    {
+                        string apiResponse = await response.Content.ReadAsStringAsync();
+                        getallresponse = System.Text.Json.JsonSerializer.Deserialize<Response_GAP_Result>(apiResponse);
+                    }
+                    else
+                    {
+                        getallresponse = new Response_GAP_Result
+                        {
+                            success = false,
+                            message = "Error al obtener los productos.",
+                        };
+                    }
+
+                }
+            }
+            catch (Exception ex)
+            {
+
+                getallresponse = new Response_GAP_Result
+                {
+                    success = false,
+                    message = $"Error al obtener los productos. {ex.Message}",
+                };
+                throw;
             }
 
-            return View(result.Data);
+            return View(getallresponse.data);
+
         }
+
 
         // GET: ProductoController/Details/5
         public async Task<ActionResult> Details(int id)
         {
-            ServiceResult result = await _productoService.GetProductoById(id);
+            Response_GP_Result getbyidresponse = null;
 
-            if (!result.Success)
+            try
             {
-                ViewBag.ErrorMessage = result.Message;
-                return View();
+                using (var client = new HttpClient())
+                {
+                    client.BaseAddress = new Uri("http://localhost:5287/api/");
+
+                    var response = await client.GetAsync($"Producto/getbyid-productos?id={id}");
+
+                    if (response.IsSuccessStatusCode)
+                    {
+                        string apiResponse = await response.Content.ReadAsStringAsync();
+                        getbyidresponse = System.Text.Json.JsonSerializer.Deserialize<Response_GP_Result>(apiResponse);
+                    }
+                    else
+                    {
+                        getbyidresponse = new Response_GP_Result
+                        {
+                            success = false,
+                            message = "Error al obtener el cliente.",
+                        };
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                getbyidresponse = new Response_GP_Result
+                {
+                    success = false,
+                    message = $"Error al obtener los clientes. {ex.Message}",
+                };
             }
 
-            return View(result.Data);
+            return View(getbyidresponse.data);
         }
+
 
         // GET: ProductoController/Create
         public ActionResult Create()
@@ -55,62 +111,160 @@ namespace SGCP.Web.Controllers.ModuloProducto
         // POST: ProductoController/Create
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<ActionResult> Create(CreateProductoDTO createProductoDTO)
+        public async Task<ActionResult> Create(ProductoCreateModel model)
         {
+            var token = HttpContext.Session.GetString("Token");
+
+            if (string.IsNullOrEmpty(token))
+                return RedirectToAction("Login");
+
+            Response_CP_Result createResponse = null;
+
             try
             {
-                ServiceResult result = await _productoService.CreateProducto(createProductoDTO);
+                using var client = new HttpClient();
+                client.BaseAddress = new Uri("http://localhost:5287/api/");
+                client.DefaultRequestHeaders.Authorization =
+                    new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", token);
 
-                if (!result.Success)
+                var response = await client.PostAsJsonAsync("Producto/create-productos", model);
+                string apiResponse = await response.Content.ReadAsStringAsync();
+
+                createResponse = JsonSerializer.Deserialize<Response_CP_Result>(
+                    apiResponse,
+                    new JsonSerializerOptions { PropertyNameCaseInsensitive = true }
+                );
+
+                if (!createResponse.success)
                 {
-                    ViewBag.ErrorMessage = result.Message;
-                    return View();
+                    ViewBag.Error = createResponse.message;
+                    return View(model);
                 }
 
                 return RedirectToAction(nameof(Index));
             }
-            catch
+            catch (Exception ex)
             {
-                return View();
+                ViewBag.Error = $"Error en la operación: {ex.Message}";
+                return View(model);
             }
         }
 
         // GET: ProductoController/Edit/5
         public async Task<ActionResult> Edit(int id)
         {
-            ServiceResult result = await _productoService.GetProductoById(id);
 
-            if (!result.Success)
+            Response_GP_Result getbyidresponse = null;
+
+            try
             {
-                ViewBag.ErrorMessage = result.Message;
-                return View();
+                using (var client = new HttpClient())
+                {
+                    client.BaseAddress = new Uri("http://localhost:5287/api/");
+
+                    var response = await client.GetAsync($"Producto/getbyid-productos?id={id}");
+
+                    if (response.IsSuccessStatusCode)
+                    {
+                        string apiResponse = await response.Content.ReadAsStringAsync();
+                        getbyidresponse = System.Text.Json.JsonSerializer.Deserialize<Response_GP_Result>(apiResponse);
+                    }
+                    else
+                    {
+                        getbyidresponse = new Response_GP_Result
+                        {
+                            success = false,
+                            message = "Error al obtener el cliente.",
+                        };
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                getbyidresponse = new Response_GP_Result
+                {
+                    success = false,
+                    message = $"Error al obtener los clientes. {ex.Message}",
+                };
             }
 
-            return View(result.Data);
+            return View(getbyidresponse.data);
         }
 
         // POST: ProductoController/Edit/5
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<ActionResult> Edit(UpdateProductoDTO updateProductoDTO)
+        public async Task<ActionResult> Edit(ProductoEditModel model)
         {
+
+
+            var token = HttpContext.Session.GetString("Token");
+            var userIdString = HttpContext.Session.GetString("UserId");
+
+            if (string.IsNullOrEmpty(token) || string.IsNullOrEmpty(userIdString))
+                return RedirectToAction("Login");
+
+            model.UsuarioModificacion = int.Parse(userIdString);
+
+            Response_EP_Result editResponse = null;
+
             try
             {
-                ServiceResult result = await _productoService.UpdateProducto(updateProductoDTO);
+                using var client = new HttpClient();
+                client.BaseAddress = new Uri("http://localhost:5287/api/");
+                client.DefaultRequestHeaders.Authorization =
+                    new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", token);
 
-                if (!result.Success)
+                var response = await client.PutAsJsonAsync("Producto/update-productos", model);
+
+                string apiResponse = await response.Content.ReadAsStringAsync();
+
+                if (response.IsSuccessStatusCode)
                 {
-                    ViewBag.ErrorMessage = result.Message;
-                    return View();
+                    editResponse = JsonSerializer.Deserialize<Response_EP_Result>(
+                        apiResponse,
+                        new JsonSerializerOptions { PropertyNameCaseInsensitive = true }
+
+                    );
+
+                    return RedirectToAction(nameof(Index));
+                }
+                else
+                {
+                    editResponse = new Response_EP_Result
+                    {
+                        success = false,
+                        message = "Error al actualizar el producto."
+                    };
                 }
 
-                return RedirectToAction(nameof(Index));
             }
-            catch
-            {
-                return View();
-            }
-        }
 
+            catch (Exception ex)
+            {
+                editResponse = new Response_EP_Result
+                {
+                    success = false,
+                    message = $"Error en la operación: {ex.Message}"
+                };
+            }
+
+            ProductoGetModel productoModel = null;
+            if (editResponse?.data != null)
+            {
+                if (editResponse.data is JsonElement element)
+                {
+                    productoModel = JsonSerializer.Deserialize<ProductoGetModel>(
+                        element.GetRawText(),
+                        new JsonSerializerOptions { PropertyNameCaseInsensitive = true }
+                    );
+                }
+            }
+
+            if (editResponse != null && !editResponse.success)
+                ViewBag.Error = editResponse.message;
+
+            return View(productoModel);
+        }
     }
 }

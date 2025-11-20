@@ -7,5 +7,8 @@ namespace SGCP.Application.Dtos.ModuloUsuarios.Administrador
     {
         [Required(ErrorMessage = "El Id del admin es obligatorio.")]
         public int AdminId { get; set; }
+
+     
+
     }
 }

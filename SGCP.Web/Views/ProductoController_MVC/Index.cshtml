@@ -1,4 +1,4 @@
-﻿@model IEnumerable<SGCP.Application.Dtos.ModuloProducto.Producto.ProductoGetDTO>
+﻿@model IEnumerable<SGCP.Web.Models.ModuloProducto.ProductoGetModel>
 
 @{
     ViewData["Title"] = "Index";
@@ -49,35 +49,35 @@
             <tr>
 
                 <td>
-                    @item.IdProducto
+                    @item.idProducto
                 </td>
                 <td>
-                    @item.Nombre
+                    @item.nombre
                 </td>
                 <td>
-                    @item.Descripcion
+                    @item.descripcion
                 </td>
                 <td>
-                    @item.Categoria
+                    @item.categoria
                 </td>
                 <td>
-                    @item.Precio
+                    @item.precio
                 </td>
                 <td>
-                    @item.Stock
+                    @item.stock
                 </td>
                 <td>
-                    @item.FechaCreacion
+                    @item.fechaCreacion
                 </td>
                 <td>
-                    @item.FechaModificacion
+                    @item.fechaModificacion
                 </td>
                 <td>
-                    @item.UsuarioModificacion
+                    @item.usuarioModificacion
                 </td>
                 <td>
-                    @Html.ActionLink("Edit", "Edit", new { id = item.IdProducto }) |
-                    @Html.ActionLink("Details", "Details", new { id = item.IdProducto }) |
+                    @Html.ActionLink("Edit", "Edit", new { id = item.idProducto }) |
+                    @Html.ActionLink("Details", "Details", new { id = item.idProducto }) |
                 </td>
             </tr>
         }

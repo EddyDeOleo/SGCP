@@ -8,10 +8,9 @@ namespace SGCP.Web.Filters
         public void OnAuthorization(AuthorizationFilterContext context)
         {
             var controllerName = context.RouteData.Values["controller"]?.ToString();
-
-            if (controllerName?.Equals("AuthController_MVC", StringComparison.OrdinalIgnoreCase) == true)
+            if (controllerName != null && controllerName.StartsWith("AuthController_MVC", StringComparison.OrdinalIgnoreCase))
             {
-                return; 
+                return;
             }
 
             var userId = context.HttpContext.Session.GetString("UserId");

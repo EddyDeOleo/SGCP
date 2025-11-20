@@ -1,44 +1,66 @@
 ﻿using Microsoft.AspNetCore.Mvc;
-using SGCP.Application.Dtos.ModuloUsuarios.Authetication;
-using SGCP.Application.Interfaces.ModuloUsuarios;
+using SGCP.Web.Models.ModuloUsuarios.AuthModels;
+using System.Text.Json;
 
 namespace SGCP.Web.Controllers.ModuloUsuarios
 {
-    public class AuthController_MVC : Controller
-    {
-        private readonly IAuthService _authService;
-        private readonly ILogger<AuthController_MVC> _logger;
+  
+        public class AuthController_MVC : Controller
+        {
+            private readonly IHttpClientFactory _httpClientFactory;
 
-        public AuthController_MVC(IAuthService authService, ILogger<AuthController_MVC> logger)
-        {
-            _authService = authService;
-            _logger = logger;
-        }
-        [HttpGet]
-        public IActionResult Login()
-        {
-            if (!string.IsNullOrEmpty(HttpContext.Session.GetString("UserId")))
+            public AuthController_MVC(IHttpClientFactory httpClientFactory)
             {
-                return RedirectToAction("Index", "Home");
+                _httpClientFactory = httpClientFactory;
             }
 
-            return View();
-        }
+            [HttpGet]
+            public IActionResult Login()
+            {
+                if (!string.IsNullOrEmpty(HttpContext.Session.GetString("UserId")))
+                {
+                    return RedirectToAction("Index", "Home");
+                }
+
+                return View();
+            }
 
         [HttpPost]
-        public async Task<IActionResult> Login(LoginDTO model)
+        public async Task<IActionResult> Login(AuthLoginModel model)
         {
             if (!ModelState.IsValid)
                 return View(model);
 
-            var result = await _authService.Login(model);
-            if (!result.Success)
+            HttpClient client = _httpClientFactory.CreateClient();
+            client.BaseAddress = new Uri("http://localhost:5138/api/");
+
+            var response = await client.PostAsJsonAsync("Auth/login-user", model);
+
+            if (!response.IsSuccessStatusCode)
             {
-                ViewBag.Error = result.Message;
+                ViewBag.Error = "Credenciales incorrectas.";
                 return View(model);
             }
 
-            var user = (AuthResponseDTO)result.Data;
+            var apiResponse = await response.Content.ReadAsStringAsync();
+            var result = JsonSerializer.Deserialize<Response_L_Result>(apiResponse);
+
+            if (!result.success)
+            {
+                ViewBag.Error = result.message;
+                return View(model);
+            }
+
+            var user = JsonSerializer.Deserialize<AuthResponseModel>(
+     result.data.GetRawText(),
+     new JsonSerializerOptions { PropertyNameCaseInsensitive = true }
+ );
+
+            if (user == null)
+            {
+                ViewBag.Error = "No se recibieron datos válidos del API.";
+                return View(model);
+            }
 
             HttpContext.Session.SetString("UserId", user.UserId.ToString());
             HttpContext.Session.SetString("Username", user.Username);
@@ -48,11 +70,14 @@ namespace SGCP.Web.Controllers.ModuloUsuarios
             return RedirectToAction("Index", "Home");
         }
 
+
         [HttpPost]
-        public IActionResult Logout()
-        {
-            HttpContext.Session.Clear();
-            return RedirectToAction("Login");
+            public IActionResult Logout()
+            {
+                HttpContext.Session.Clear();
+                return RedirectToAction("Login");
+            }
         }
     }
-}
+
+

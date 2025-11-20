@@ -20,7 +20,6 @@ namespace SGCP.ModuloProducto.Api.Controllers
 
         // GET: api/<ProductoController>
         [HttpGet("get-productos")]
-        [Authorize]
         public async Task<IActionResult>  Get()
         {
             ServiceResult result = await _productoService.GetProducto();    
@@ -35,7 +34,6 @@ namespace SGCP.ModuloProducto.Api.Controllers
 
         // GET api/<ProductoController>/5
         [HttpGet("getbyid-productos")]
-        [Authorize]
         public async Task<IActionResult> Get(int id)
         {
             ServiceResult result = await _productoService.GetProductoById(id);
