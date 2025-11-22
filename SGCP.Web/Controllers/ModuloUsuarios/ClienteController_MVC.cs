@@ -1,5 +1,4 @@
 ﻿using Microsoft.AspNetCore.Mvc;
-using SGCP.Web.Models.ModuloUsuarios.AdministradorModels;
 using SGCP.Web.Models.ModuloUsuarios.ClienteModels;
 using System.Text.Json;
 
@@ -106,10 +105,12 @@ namespace SGCP.Web.Controllers.ModuloUsuarios
         [ValidateAntiForgeryToken]
         public async Task<ActionResult> Create(ClienteCreateModel model)
         {
+
             var token = HttpContext.Session.GetString("Token");
 
             if (string.IsNullOrEmpty(token))
                 return RedirectToAction("Login");
+
 
             Response_CC_Result createResponse = null;
 
@@ -121,27 +122,44 @@ namespace SGCP.Web.Controllers.ModuloUsuarios
                     new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", token);
 
                 var response = await client.PostAsJsonAsync("Cliente/create-cliente", model);
-                string apiResponse = await response.Content.ReadAsStringAsync();
 
-                createResponse = JsonSerializer.Deserialize<Response_CC_Result>(
-                    apiResponse,
-                    new JsonSerializerOptions { PropertyNameCaseInsensitive = true }
-                );
 
-                if (!createResponse.success)
+                if (response.IsSuccessStatusCode)
                 {
-                    ViewBag.Error = createResponse.message;
-                    return View(model);
+                    string apiResponse = await response.Content.ReadAsStringAsync();
+
+                    createResponse = JsonSerializer.Deserialize<Response_CC_Result>(
+                        apiResponse,
+                        new JsonSerializerOptions { PropertyNameCaseInsensitive = true }
+
+                    );
+
+                    return RedirectToAction(nameof(Index));
+                }
+                else
+                {
+                    createResponse = new Response_CC_Result
+                    {
+                        success = false,
+                        message = "Error al crear el cliente."
+                    };
                 }
 
-                return RedirectToAction(nameof(Index));
             }
+
             catch (Exception ex)
             {
-                ViewBag.Error = $"Error en la operación: {ex.Message}";
-                return View(model);
+                createResponse = new Response_CC_Result
+                {
+                    success = false,
+                    message = $"Error en la operación: {ex.Message}"
+                };
             }
+
+            return View();
         }
+
+
 
 
         // GET: ClienteController/Edit/5
@@ -189,17 +207,16 @@ namespace SGCP.Web.Controllers.ModuloUsuarios
         // POST: ClienteController/Edit/5
         [HttpPost]
         [ValidateAntiForgeryToken]
+
         public async Task<ActionResult> Edit(ClienteEditModel model)
         {
 
 
             var token = HttpContext.Session.GetString("Token");
-            var userIdString = HttpContext.Session.GetString("UserId");
 
-            if (string.IsNullOrEmpty(token) || string.IsNullOrEmpty(userIdString))
+            if (string.IsNullOrEmpty(token))
                 return RedirectToAction("Login");
 
-            model.UsuarioModificacion = int.Parse(userIdString);
 
             Response_EC_Result editResponse = null;
 
@@ -212,17 +229,20 @@ namespace SGCP.Web.Controllers.ModuloUsuarios
 
                 var response = await client.PutAsJsonAsync("Cliente/update-cliente", model);
 
-                string apiResponse = await response.Content.ReadAsStringAsync();
 
                 if (response.IsSuccessStatusCode)
                 {
+                    string apiResponse = await response.Content.ReadAsStringAsync();
+
                     editResponse = JsonSerializer.Deserialize<Response_EC_Result>(
                         apiResponse,
                         new JsonSerializerOptions { PropertyNameCaseInsensitive = true }
 
                     );
 
-                    return RedirectToAction(nameof(Index));
+
+
+                   return RedirectToAction(nameof(Index));
                 }
                 else
                 {
@@ -232,6 +252,7 @@ namespace SGCP.Web.Controllers.ModuloUsuarios
                         message = "Error al actualizar el cliente."
                     };
                 }
+
 
             }
 
@@ -244,24 +265,10 @@ namespace SGCP.Web.Controllers.ModuloUsuarios
                 };
             }
 
-            AdminGetModel adminModel = null;
-            if (editResponse?.data != null)
-            {
-                if (editResponse.data is JsonElement element)
-                {
-                    adminModel = JsonSerializer.Deserialize<AdminGetModel>(
-                        element.GetRawText(),
-                        new JsonSerializerOptions { PropertyNameCaseInsensitive = true }
-                    );
-                }
-            }
-
-            if (editResponse != null && !editResponse.success)
-                ViewBag.Error = editResponse.message;
-
-            return View(adminModel);
+            return View();
         }
 
     }
 }
+
 

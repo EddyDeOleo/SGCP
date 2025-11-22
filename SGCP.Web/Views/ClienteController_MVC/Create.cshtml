@@ -6,6 +6,15 @@
 
 <h1>Crear Cliente</h1>
 
+
+
+@if (TempData["Error"] != null)
+{
+    <div class="alert alert-danger">
+        @TempData["Error"]
+    </div>
+}
+
 <hr />
 <div class="row">
     <div class="col-md-4">

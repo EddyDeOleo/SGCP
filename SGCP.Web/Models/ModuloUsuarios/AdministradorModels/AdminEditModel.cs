@@ -23,7 +23,6 @@ namespace SGCP.Web.Models.ModuloUsuarios.AdministradorModels
         [MaxLength(50)]
         public string password { get; set; }
 
-      public int UsuarioModificacion { get; set; }
     }
 
     public class Response_EA_Result

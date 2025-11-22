@@ -22,7 +22,6 @@ namespace SGCP.Web.Models.ModuloProducto
 
         [Range(0, int.MaxValue, ErrorMessage = "El stock no puede ser negativo")]
         public int stock { get; set; }
-        public int UsuarioModificacion { get; internal set; }
     }
 
 

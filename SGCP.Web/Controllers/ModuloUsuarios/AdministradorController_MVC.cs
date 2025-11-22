@@ -1,9 +1,5 @@
 ﻿using Microsoft.AspNetCore.Mvc;
-using SGCP.Application.Base;
-using SGCP.Application.Dtos.ModuloUsuarios.Administrador;
-using SGCP.Application.Interfaces.ModuloUsuarios;
 using SGCP.Web.Models.ModuloUsuarios.AdministradorModels;
-using System.Net.Http.Headers;
 using System.Text.Json;
 
 namespace SGCP.Web.Controllers.ModuloUsuarios
@@ -114,37 +110,50 @@ namespace SGCP.Web.Controllers.ModuloUsuarios
             if (string.IsNullOrEmpty(token))
                 return RedirectToAction("Login");
 
-            Response_CA_Result createResponse = null;
+            Response_CA_Result createResponse;
 
+            using var client = new HttpClient();
+            client.BaseAddress = new Uri("http://localhost:5138/api/");
+            client.DefaultRequestHeaders.Authorization =
+                new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", token);
+
+            var response = await client.PostAsJsonAsync("Administrador/create-admin", model);
+
+            // Leer SIEMPRE el body
+            string apiResponse = await response.Content.ReadAsStringAsync();
+
+            // Intentar deserializar
             try
             {
-                using var client = new HttpClient();
-                client.BaseAddress = new Uri("http://localhost:5138/api/");
-                client.DefaultRequestHeaders.Authorization =
-                    new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", token);
-
-                var response = await client.PostAsJsonAsync("Administrador/create-admin", model);
-                string apiResponse = await response.Content.ReadAsStringAsync();
-
                 createResponse = JsonSerializer.Deserialize<Response_CA_Result>(
                     apiResponse,
                     new JsonSerializerOptions { PropertyNameCaseInsensitive = true }
                 );
-
-                if (!createResponse.success)
+            }
+            catch
+            {
+                // Body no es JSON o está corrupto
+                createResponse = new Response_CA_Result
                 {
-                    ViewBag.Error = createResponse.message;
-                    return View(model);
-                }
+                    success = false,
+                    message = "El servidor devolvió una respuesta no válida."
+                };
+            }
 
+            // Validación por status code
+            if (response.IsSuccessStatusCode && createResponse.success)
+            {
+                TempData["Success"] = createResponse.message;
                 return RedirectToAction(nameof(Index));
             }
-            catch (Exception ex)
-            {
-                ViewBag.Error = $"Error en la operación: {ex.Message}";
-                return View(model);
-            }
+
+            // Error controlado
+            TempData["Error"] = createResponse.message ?? "Error desconocido con el servidor";
+
+            return View(model); // VOLVER A MOSTRAR EL FORMULARIO
         }
+
+
 
         // GET: AdminController/Edit/5
         public async Task<ActionResult> Edit(int id)
@@ -194,14 +203,11 @@ namespace SGCP.Web.Controllers.ModuloUsuarios
         public async Task<ActionResult> Edit(AdminEditModel model)
         {
         
-
             var token = HttpContext.Session.GetString("Token");
-            var userIdString = HttpContext.Session.GetString("UserId");
 
-            if (string.IsNullOrEmpty(token) || string.IsNullOrEmpty(userIdString))
+            if (string.IsNullOrEmpty(token))
                 return RedirectToAction("Login");
 
-            model.UsuarioModificacion = int.Parse(userIdString);
 
             Response_EA_Result editResponse = null;
 
@@ -214,10 +220,11 @@ namespace SGCP.Web.Controllers.ModuloUsuarios
 
                 var response = await client.PutAsJsonAsync("Administrador/update-admin", model);
 
-                string apiResponse = await response.Content.ReadAsStringAsync();
 
                 if (response.IsSuccessStatusCode)
                 {
+                    string apiResponse = await response.Content.ReadAsStringAsync();
+
                     editResponse = JsonSerializer.Deserialize<Response_EA_Result>(
                         apiResponse,
                         new JsonSerializerOptions { PropertyNameCaseInsensitive = true }
@@ -246,22 +253,7 @@ namespace SGCP.Web.Controllers.ModuloUsuarios
                 };
             }
 
-            AdminGetModel adminModel = null;
-            if (editResponse?.data != null)
-            {
-                if (editResponse.data is JsonElement element)
-                {
-                    adminModel = JsonSerializer.Deserialize<AdminGetModel>(
-                        element.GetRawText(),
-                        new JsonSerializerOptions { PropertyNameCaseInsensitive = true }
-                    );
-                }
-            }
-
-            if (editResponse != null && !editResponse.success)
-                ViewBag.Error = editResponse.message;
-
-            return View(adminModel);
+            return View();
         }
 
     }

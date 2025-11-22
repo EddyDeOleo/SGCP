@@ -6,6 +6,15 @@
 
 <h1>Crear Administrador</h1>
 
+
+
+@if (TempData["Error"] != null)
+{
+    <div class="alert alert-danger alert-dismissible fade show" role="alert">
+        @TempData["Error"]
+    </div>
+}
+
 <hr />
 <div class="row">
     <div class="col-md-4">
@@ -44,4 +53,13 @@
 
 @section Scripts {
     @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+}
+
+@section Scripts_Alerts {
+    <script>
+        setTimeout(() => {
+            let alert = document.querySelector('.alert');
+            if (alert) alert.style.display = 'none';
+        }, 2500);
+    </script>
 }

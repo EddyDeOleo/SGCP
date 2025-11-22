@@ -6,6 +6,7 @@ using SGCP.Application.Interfaces.ModuloProducto;
 using SGCP.Web.Models.ModuloProducto;
 using SGCP.Web.Models.ModuloUsuarios.AdministradorModels;
 using SGCP.Web.Models.ModuloUsuarios.ClienteModels;
+using System.Net.Http.Headers;
 using System.Text.Json;
 
 namespace SGCP.Web.Controllers.ModuloProducto
@@ -113,10 +114,12 @@ namespace SGCP.Web.Controllers.ModuloProducto
         [ValidateAntiForgeryToken]
         public async Task<ActionResult> Create(ProductoCreateModel model)
         {
+
             var token = HttpContext.Session.GetString("Token");
 
             if (string.IsNullOrEmpty(token))
                 return RedirectToAction("Login");
+
 
             Response_CP_Result createResponse = null;
 
@@ -128,27 +131,44 @@ namespace SGCP.Web.Controllers.ModuloProducto
                     new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", token);
 
                 var response = await client.PostAsJsonAsync("Producto/create-productos", model);
-                string apiResponse = await response.Content.ReadAsStringAsync();
 
-                createResponse = JsonSerializer.Deserialize<Response_CP_Result>(
-                    apiResponse,
-                    new JsonSerializerOptions { PropertyNameCaseInsensitive = true }
-                );
 
-                if (!createResponse.success)
+                if (response.IsSuccessStatusCode)
                 {
-                    ViewBag.Error = createResponse.message;
-                    return View(model);
+                    string apiResponse = await response.Content.ReadAsStringAsync();
+
+                    createResponse = JsonSerializer.Deserialize<Response_CP_Result>(
+                        apiResponse,
+                        new JsonSerializerOptions { PropertyNameCaseInsensitive = true }
+
+                    );
+
+                    return RedirectToAction(nameof(Index));
+                }
+                else
+                {
+                    createResponse = new Response_CP_Result
+                    {
+                        success = false,
+                        message = "Error al crear el producto."
+                    };
                 }
 
-                return RedirectToAction(nameof(Index));
             }
+
             catch (Exception ex)
             {
-                ViewBag.Error = $"Error en la operación: {ex.Message}";
-                return View(model);
+                createResponse = new Response_CP_Result
+                {
+                    success = false,
+                    message = $"Error en la operación: {ex.Message}"
+                };
             }
+
+            return View();
         }
+        
+
 
         // GET: ProductoController/Edit/5
         public async Task<ActionResult> Edit(int id)
@@ -199,12 +219,10 @@ namespace SGCP.Web.Controllers.ModuloProducto
 
 
             var token = HttpContext.Session.GetString("Token");
-            var userIdString = HttpContext.Session.GetString("UserId");
 
-            if (string.IsNullOrEmpty(token) || string.IsNullOrEmpty(userIdString))
+            if (string.IsNullOrEmpty(token))
                 return RedirectToAction("Login");
 
-            model.UsuarioModificacion = int.Parse(userIdString);
 
             Response_EP_Result editResponse = null;
 
@@ -249,22 +267,7 @@ namespace SGCP.Web.Controllers.ModuloProducto
                 };
             }
 
-            ProductoGetModel productoModel = null;
-            if (editResponse?.data != null)
-            {
-                if (editResponse.data is JsonElement element)
-                {
-                    productoModel = JsonSerializer.Deserialize<ProductoGetModel>(
-                        element.GetRawText(),
-                        new JsonSerializerOptions { PropertyNameCaseInsensitive = true }
-                    );
-                }
-            }
-
-            if (editResponse != null && !editResponse.success)
-                ViewBag.Error = editResponse.message;
-
-            return View(productoModel);
+            return View();
         }
     }
 }

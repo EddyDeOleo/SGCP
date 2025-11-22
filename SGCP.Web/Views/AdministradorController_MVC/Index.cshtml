@@ -6,6 +6,13 @@
 
 <h1>Administradores</h1>
 
+
+@if (TempData["Success"] != null)
+{
+    <div class="alert alert-success alert-dismissible fade show" role="alert">
+        @TempData["Success"]
+    </div>
+}
 <p>
     <a asp-action="Create">Create New</a>
 </p>
@@ -74,3 +81,12 @@
 }
     </tbody>
 </table>
+
+@section Scripts {
+    <script>
+        setTimeout(() => {
+            let alert = document.querySelector('.alert');
+            if (alert) alert.style.display = 'none';
+        }, 2500);
+    </script>
+}

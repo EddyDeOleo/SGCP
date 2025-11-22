@@ -15,8 +15,6 @@ namespace SGCP.Web.Models.ModuloProducto
         [MaxLength(50, ErrorMessage = "La categoría no debe exceder X caracteres")]
         public string? categoria { get; set; }
 
-        [Required(ErrorMessage = "El precio del producto es obligatorio")]
-        [Range(0.01, double.MaxValue, ErrorMessage = "El precio debe ser mayor a cero")]
         public decimal precio { get; set; }
 
         [Required(ErrorMessage = "El stock del producto es obligatorio")]

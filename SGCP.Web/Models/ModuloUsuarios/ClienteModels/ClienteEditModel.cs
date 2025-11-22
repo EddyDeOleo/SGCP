@@ -4,6 +4,7 @@ namespace SGCP.Web.Models.ModuloUsuarios.ClienteModels
 {
     public class ClienteEditModel
     {
+        // hacer que herede del base
         [Required(ErrorMessage = "El Id del admin es obligatorio.")]
         public int clienteId { get; set; }
 
@@ -23,7 +24,6 @@ namespace SGCP.Web.Models.ModuloUsuarios.ClienteModels
         [MaxLength(50)]
         public string password { get; set; }
 
-        public int UsuarioModificacion { get; set; }
     }
 
     public class Response_EC_Result

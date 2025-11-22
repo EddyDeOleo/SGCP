@@ -38,7 +38,8 @@ namespace SGCP.Web.Controllers.ModuloUsuarios
 
             if (!response.IsSuccessStatusCode)
             {
-                ViewBag.Error = "Credenciales incorrectas.";
+
+                TempData["Error"] = "Credenciales incorrectas.";
                 return View(model);
             }
 
@@ -47,7 +48,7 @@ namespace SGCP.Web.Controllers.ModuloUsuarios
 
             if (!result.success)
             {
-                ViewBag.Error = result.message;
+                TempData["Error"] = result.message;
                 return View(model);
             }
 
@@ -58,7 +59,7 @@ namespace SGCP.Web.Controllers.ModuloUsuarios
 
             if (user == null)
             {
-                ViewBag.Error = "No se recibieron datos válidos del API.";
+                TempData["Error"] = "No se recibieron datos válidos del API.";
                 return View(model);
             }
 
